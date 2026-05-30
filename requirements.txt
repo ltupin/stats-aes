@@ -1,0 +1,11 @@
+anyio==4.13.0
+certifi==2026.5.20
+ecdsa==0.19.2
+h11==0.16.0
+httpcore==1.0.9
+httpx==0.28.1
+idna==3.17
+pyasn1==0.6.3
+python-jose==3.5.0
+rsa==4.9.1
+six==1.17.0

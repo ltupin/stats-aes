@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8"><title>Fatal Fury Special AES — Yahoo Auctions 2026</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f5f6fa; color: #1a1a2e; padding: 24px; max-width: 1400px; margin: 0 auto; }
+  h1 { font-size: 1.4rem; margin: 0 0 4px 0; }
+  p.sub { color: #666; font-size: .85rem; margin: 0 0 20px 0; }
+  .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,.08); margin-bottom: 20px; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .stat { background: #fff; padding: 14px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+  .stat-val { font-size: 1.4rem; font-weight: 700; }
+  .stat-lbl { font-size: .75rem; color: #666; text-transform: uppercase; letter-spacing: .04em; margin-top: 2px; }
+  .controls { display: flex; gap: 12px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; font-size: .85rem; }
+  .controls label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+  canvas { max-width: 100%; }
+  .insight { background: linear-gradient(90deg, #fef3c7 0%, #fee2e2 100%); border-left: 4px solid #dc2626; padding: 14px 18px; border-radius: 8px; margin-bottom: 20px; }
+  .insight h3 { margin: 0 0 6px 0; font-size: 1rem; }
+  .insight p  { margin: 0; font-size: .88rem; line-height: 1.5; }
+  .insight strong { color: #dc2626; font-size: 1.05em; }
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; }
+  .split-card { background: rgba(255,255,255,.7); padding: 10px 14px; border-radius: 6px; font-size: .85rem; }
+  table.trend-table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+  table.trend-table th { background: #f9f9fc; text-align: left; padding: 6px 10px; position: sticky; top: 0; }
+  table.trend-table td { padding: 5px 10px; border-top: 1px solid #eee; }
+  .scroll-y { max-height: 480px; overflow-y: auto; border-radius: 6px; }
+  .filter-note { background: #f0f9ff; border-left: 4px solid #0ea5e9; padding: 10px 14px; border-radius: 6px; margin-bottom: 20px; font-size: .85rem; color: #075985; }
+  .source-note { background: #fdf2f8; border-left: 4px solid #db2777; padding: 10px 14px; border-radius: 6px; margin-bottom: 20px; font-size: .85rem; color: #831843; }
+  .errbox { background: #fee; border: 1px solid #c33; padding: 10px; font-family: monospace; font-size: .8rem; color: #c00; display: none; margin: 10px 0; border-radius: 6px; }
+</style></head><body>
+
+<h1>Fatal Fury Special AES — ventes terminées sur Yahoo Auctions (2026)</h1>
+<p class="sub">Source : Yahoo!オークション closedsearch · cartouches AES seules · <strong>prix de vente effectifs</strong> · 126 ventes · 29/05/2026</p>
+
+<div class="source-note">
+  💡 <strong>Différence avec Mercari</strong> : ce sont des <strong>vraies transactions</strong> (enchère gagnée ou Buy-Now exécuté) — pas des prix demandés. Le signal de demande réelle est beaucoup plus net que sur Mercari où les <em>ON_SALE</em> indiquent juste les attentes du vendeur.
+</div>
+
+<div class="filter-note">
+  🎯 <strong>Filtre identique à Mercari</strong> : titre contient FFS ET aucun marqueur de lot, console, accessoire, goodie, livre, variante. Prix plancher ¥5,000.
+</div>
+
+<div class="insight">
+  <h3>📣 Effet de l'annonce Plaion Neo Geo AES+ (16 avril 2026)</h3>
+  <p>Plaion a annoncé le 16/04/2026 la sortie en novembre d'une nouvelle console <strong>Neo Geo AES+</strong> compatible avec les cartouches d'origine.</p>
+  <div class="split">
+    <div class="split-card"><strong>Avant le 16/04/2026</strong><br>42 ventes · médiane ¥6,077 · moyenne ¥8,828</div>
+    <div class="split-card"><strong>Depuis le 16/04/2026</strong><br>84 ventes · médiane <strong>¥14,186</strong> · moyenne ¥13,769</div>
+  </div>
+  <p style="margin-top:10px"><strong>Bond médiane: +133.4%</strong> — sur prix de vente réels.</p>
+</div>
+
+<div id="err" class="errbox"></div>
+<div class="stats" id="stats"></div>
+
+<div class="card">
+  <div class="controls">
+    <label><input type="checkbox" id="show-auction" checked> Enchères (Auction)</label>
+    <label><input type="checkbox" id="show-buynow" checked> Buy-Now (prix fixe)</label>
+    <label><input type="checkbox" id="show-trend" checked> Tendance hebdo</label>
+    <label><input type="checkbox" id="log-scale"> Échelle log Y</label>
+  </div>
+  <div style="height:520px;position:relative"><canvas id="chart"></canvas></div>
+</div>
+
+<div class="card">
+  <h2 style="font-size:1rem;margin:0 0 8px 0">Détails médiane hebdomadaire (semaines avec ≥2 ventes)</h2>
+  <div class="scroll-y">
+    <table class="trend-table">
+      <thead><tr><th>Semaine ISO</th><th style="text-align:right">N ventes</th><th style="text-align:right">Prix médian</th><th style="text-align:right">Δ vs S-précédente</th></tr></thead>
+      <tbody id="trend-table"></tbody>
+    </table>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
+<script>
+const POINTS = [{"x": 1780062120000, "y": 15800, "name": "NEOGEO ネオジオ 餓狼伝説スペシャル ROMカセット", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z615683214", "bid": 1, "kind": "Buy-Now"}, {"x": 1780061460000, "y": 14000, "name": "ネオジオROM　餓狼伝説スペシャル　", "url": "https://page.auctions.yahoo.co.jp/jp/auction/c1231580976", "bid": 1, "kind": "Auction"}, {"x": 1780061400000, "y": 16001, "name": "T ネオジオ 餓狼伝説スペシャル 箱説付き SNK ロムカセット NEOGEO", "url": "https://page.auctions.yahoo.co.jp/jp/auction/e1231381728", "bid": 22, "kind": "Auction"}, {"x": 1779976920000, "y": 17800, "name": "【箱・取説あり】餓狼伝説スペシャル ネオジオ ROM NEOGEO SNK 餓狼伝説SPECIAL", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z616971556", "bid": 1, "kind": "Buy-Now"}, {"x": 1779975420000, "y": 12430, "name": "ネオジオ SNK 餓狼伝説スペシャル(ゆ26-10-13)", "url": "https://page.auctions.yahoo.co.jp/jp/auction/o1231275997", "bid": 4, "kind": "Auction"}, {"x": 1779890820000, "y": 6750, "name": "【国内正規品】NEOGEO 餓狼伝説SPECIAL 餓狼伝説スペシャル SNK ロムカセット ネオジオ", "url": "https://page.auctions.yahoo.co.jp/jp/auction/1231031230", "bid": 6, "kind": "Auction"}, {"x": 1779799680000, "y": 7980, "name": "NEOGEO 餓狼伝説スペシャル ソフトのみ ROM ロム ネオジオ 動作確認済", "url": "https://page.auctions.yahoo.co.jp/jp/auction/l1230564665", "bid": 1, "kind": "Auction"}, {"x": 1779747480000, "y": 14800, "name": "餓狼伝説スペシャル　ネオジオ", "url": "https://page.auctions.yahoo.co.jp/jp/auction/n1230509692", "bid": 1, "kind": "Buy-Now"}, {"x": 1779709140000, "y": 15800, "name": "餓狼伝説　スペシャル　SNK NEOGEO 餓狼伝説SPECIAL ネオジオ ロム", "url": "https://page.auctions.yahoo.co.jp/jp/auction/o1230298229", "bid": 1, "kind": "Auction"}, {"x": 1779634440000, "y": 20503, "name": "箱　説明付　 餓狼伝説スペシャル　fatal fury 餓狼伝説SPECIAL SNK ロム NEOGEO ネオジオ", "url": "https://page.auctions.yahoo.co.jp/jp/auction/o1230411186", "bid": 23, "kind": "Auction"}, {"x": 1779633660000, "y": 8250, "name": "NEOGEO 餓狼伝説スペシャル ネオジオ SNK ソフトのみ 餓狼伝説 ROM ロム", "url": "https://page.auctions.yahoo.co.jp/jp/auction/x1230403515", "bid": 21, "kind": "Auction"}, {"x": 1779630660000, "y": 52301, "name": "◎ NEOGEO ◎ 真サムライスピリッツ 龍虎の拳2 餓狼伝説スペシャル ◎ SNK", "url": "https://page.auctions.yahoo.co.jp/jp/auction/l1230770565", "bid": 3, "kind": "Auction"}, {"x": 1779628560000, "y": 7300, "name": "【送料無料・動作確認済】ネオジオ 餓狼伝説スペシャル ROMカセットのみ", "url": "https://page.auctions.yahoo.co.jp/jp/auction/s1230373953", "bid": 11, "kind": "Auction"}, {"x": 1779540420000, "y": 7500, "name": "【婀】NEOGEO ネオジオ 餓狼伝説 SPECIAL スペシャル ロム カセット ROM E12BE8", "url": "https://page.auctions.yahoo.co.jp/jp/auction/q1230174698", "bid": 11, "kind": "Auction"}, {"x": 1779539400000, "y": 24100, "name": "ネオジオ 餓狼伝説スペシャル 箱説付き SNK ロムカセット", "url": "https://page.auctions.yahoo.co.jp/jp/auction/j1230130172", "bid": 19, "kind": "Auction"}, {"x": 1779528060000, "y": 14222, "name": "【送料無料】 餓狼伝説スペシャル ネオジオ ロムカセット FATAL FURY SPECIAL NEOGEO SNK", "url": "https://page.auctions.yahoo.co.jp/jp/auction/d1230542082", "bid": 15, "kind": "Auction"}, {"x": 1779452940000, "y": 14800, "name": "ネオジオ 餓狼伝説スペシャル ロム版 / SNK NEOGEO 餓狼伝説SPECIAL ROM", "url": "https://page.auctions.yahoo.co.jp/jp/auction/k1230849395", "bid": 1, "kind": "Buy-Now"}, {"x": 1779192120000, "y": 15180, "name": "動作保証品 NG ネオジオROM 餓狼伝説スペシャル SPECIAL エス・エヌ・ケイ SNK 箱付【10", "url": "https://page.auctions.yahoo.co.jp/jp/auction/h1229892085", "bid": 30, "kind": "Auction"}, {"x": 1779122580000, "y": 16800, "name": "【箱・取説あり】餓狼伝説スペシャル ネオジオ ROM NEOGEO SNK 餓狼伝説SPECIAL", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z611848948", "bid": 1, "kind": "Buy-Now"}, {"x": 1779069900000, "y": 16000, "name": "【動作確認済】餓狼伝説SPECIAL　餓狼伝説スペシャル　NEOGEO　ネオジオ rom", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z611367548", "bid": 1, "kind": "Buy-Now"}, {"x": 1779026460000, "y": 8980, "name": "SNK NEOGEO 餓狼伝説SPECIAL スペシャル　ロムカセット ソフト", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z611301744", "bid": 1, "kind": "Buy-Now"}, {"x": 1778935920000, "y": 20000, "name": "1990年代 SNK NEOGEO/ネオジオ 餓狼伝説スペシャル 格闘ゲーム ROMカセット 箱 説明書有り ", "url": "https://page.auctions.yahoo.co.jp/jp/auction/s1016926578", "bid": 1, "kind": "Auction"}, {"x": 1778901720000, "y": 18001, "name": "ネオジオROM 餓狼伝説スペシャル 箱説付", "url": "https://page.auctions.yahoo.co.jp/jp/auction/g1229280880", "bid": 13, "kind": "Auction"}, {"x": 1778851560000, "y": 15500, "name": "(W34401)餓狼伝説スペシャル NEOGEO ROM ネオジオ ロム カセット ゲーム 動作未確認 ジャンク", "url": "https://page.auctions.yahoo.co.jp/jp/auction/h1229423110", "bid": 8, "kind": "Auction"}, {"x": 1778824920000, "y": 10000, "name": "NEOGEO ROM 餓狼伝説スペシャル ネオジオ ロム ソフトのみ", "url": "https://page.auctions.yahoo.co.jp/jp/auction/u1229236461", "bid": 1, "kind": "Auction"}, {"x": 1778728320000, "y": 10000, "name": "餓狼伝説スペシャル ネオジオ SNK NEOGEO", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z607110642", "bid": 1, "kind": "Buy-Now"}, {"x": 1778649600000, "y": 12800, "name": "SNK NEO-GEO ロムカセット 餓狼伝説SPECIAL ネオジオ　餓狼伝説スペシャル　ROM中古品説明書無し", "url": "https://page.auctions.yahoo.co.jp/jp/auction/w1229748007", "bid": 1, "kind": "Auction"}, {"x": 1778521920000, "y": 14300, "name": " 餓狼伝説スペシャル NEOGEO ロムカセット", "url": "https://page.auctions.yahoo.co.jp/jp/auction/q1228763649", "bid": 10, "kind": "Auction"}, {"x": 1778470740000, "y": 14999, "name": "ネオジオ 餓狼伝説 SNK 餓狼伝説スペシャル NEOGEO ロムカセット fatal fury special ", "url": "https://page.auctions.yahoo.co.jp/jp/auction/w1229484225", "bid": 1, "kind": "Buy-Now"}, {"x": 1778422500000, "y": 36000, "name": "ネオジオ 餓狼伝説スペシャル　NEOGEO 新品同様　送料無料　正規品", "url": "https://page.auctions.yahoo.co.jp/jp/auction/t1228938861", "bid": 37, "kind": "Auction"}, {"x": 1778422020000, "y": 9000, "name": "餓狼伝説 スペシャル　　SNKネオジオ用ソフト", "url": "https://page.auctions.yahoo.co.jp/jp/auction/r1228165271", "bid": 14, "kind": "Auction"}, {"x": 1778418960000, "y": 14312, "name": "2WB77◆NG SNK 餓狼伝説スペシャル 箱説有 ネオジオ ソフト/ゲーム ROM NEOGEO NEO-GEO 送:60", "url": "https://page.auctions.yahoo.co.jp/jp/auction/f1228685807", "bid": 36, "kind": "Auction"}, {"x": 1778414460000, "y": 14000, "name": "説明必読 NEOGEO 餓狼伝説スペシャル ROM SNK ネオジオ ロム SPECIAL", "url": "https://page.auctions.yahoo.co.jp/jp/auction/1228585121", "bid": 1, "kind": "Auction"}, {"x": 1778332980000, "y": 15000, "name": "◆ ネオジオROMソフト 餓狼伝説スペシャル 箱説付き SNK ◆", "url": "https://page.auctions.yahoo.co.jp/jp/auction/c1229114005", "bid": 17, "kind": "Auction"}, {"x": 1778332020000, "y": 17107, "name": "【中古品】餓狼伝説 SPECIAL SNK NEOGEO ネオジオ 餓狼伝説スペシャル ゲームソフト", "url": "https://page.auctions.yahoo.co.jp/jp/auction/s1228757024", "bid": 27, "kind": "Auction"}, {"x": 1778331840000, "y": 13980, "name": "餓狼伝説スペシャル SPECIAL ROM ネオジオ NEOGEO ", "url": "https://page.auctions.yahoo.co.jp/jp/auction/q1229293245", "bid": 1, "kind": "Auction"}, {"x": 1778252700000, "y": 15000, "name": "☆中古☆　ＮＥＯＧＥＯ　【　餓狼伝説スペシャル　】 【即決】", "url": "https://page.auctions.yahoo.co.jp/jp/auction/g501963107", "bid": 1, "kind": "Auction"}, {"x": 1778214600000, "y": 10000, "name": "SNK ネオジオ ロムカセット 餓狼伝説スペシャル 1993", "url": "https://page.auctions.yahoo.co.jp/jp/auction/x1229167108", "bid": 1, "kind": "Auction"}, {"x": 1778160360000, "y": 21001, "name": "【国内正規品】餓狼伝説スペシャル NEOGEO 餓狼伝説SPECIAL ネオジオ ロムカセット", "url": "https://page.auctions.yahoo.co.jp/jp/auction/x1228780303", "bid": 26, "kind": "Auction"}, {"x": 1778146440000, "y": 16000, "name": "ネオジオ ロム 餓狼伝説 スペシャル", "url": "https://page.auctions.yahoo.co.jp/jp/auction/d1228624551", "bid": 1, "kind": "Auction"}, {"x": 1778138400000, "y": 15555, "name": "人気 ネオジオ ロム 餓狼伝説 スペシャル NEOGEO", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z605117696", "bid": 1, "kind": "Buy-Now"}, {"x": 1778137320000, "y": 15000, "name": "餓狼伝説スペシャル　ネオジオ", "url": "https://page.auctions.yahoo.co.jp/jp/auction/g1228981770", "bid": 1, "kind": "Buy-Now"}, {"x": 1778073540000, "y": 8250, "name": "◆ ネオジオROMソフト 餓狼伝説スペシャル SNK ◆", "url": "https://page.auctions.yahoo.co.jp/jp/auction/e1228803164", "bid": 41, "kind": "Auction"}, {"x": 1778071680000, "y": 19500, "name": "NEO-GEO ネオジオ 餓狼伝説 スペシャル ロム カセット 取説 箱 SNK 簡易動作確認済み 激安１円スタート", "url": "https://page.auctions.yahoo.co.jp/jp/auction/r1228308403", "bid": 31, "kind": "Auction"}, {"x": 1778064060000, "y": 15000, "name": "餓狼伝説スペシャル　ネオジオ", "url": "https://page.auctions.yahoo.co.jp/jp/auction/r1228845484", "bid": 1, "kind": "Buy-Now"}, {"x": 1778001840000, "y": 8000, "name": "NEOGEO ネオジオ 餓狼伝説スペシャル ROMカセット", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z604524314", "bid": 1, "kind": "Buy-Now"}, {"x": 1777997100000, "y": 12000, "name": "新品ネオジオCD [餓狼伝説スペシャル] ★問屋仕入れ商品▽他にも　新品NEOGEO CD　在庫あり", "url": "https://page.auctions.yahoo.co.jp/jp/auction/l1148130782", "bid": 1, "kind": "Buy-Now"}, {"x": 1777986300000, "y": 14300, "name": "【GM8265/60/0】ネオジオソフト★餓狼伝説 スペシャル★SPECIAL★SNK★NEO-GEO★NEO GEO★レトロゲーム★カセット★説明書付き★", "url": "https://page.auctions.yahoo.co.jp/jp/auction/n1227649431", "bid": 26, "kind": "Auction"}, {"x": 1777953360000, "y": 14850, "name": "ネオジオ ロムカセット 餓狼伝説スペシャル special ケース 取説付き neogeo SNK（菱）", "url": "https://page.auctions.yahoo.co.jp/jp/auction/s1223389660", "bid": 4, "kind": "Auction"}, {"x": 1777903500000, "y": 23012, "name": "(0428B)ネオジオ SNK NEOGEO 餓狼伝説スペシャル 餓狼伝説2 ゲームソフト(at0019)", "url": "https://page.auctions.yahoo.co.jp/jp/auction/p1228085343", "bid": 41, "kind": "Auction"}, {"x": 1777829760000, "y": 15555, "name": "人気 ネオジオ ロム 餓狼伝説 スペシャル NEOGEO", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z603418318", "bid": 1, "kind": "Buy-Now"}, {"x": 1777812300000, "y": 14150, "name": "SNK NEOGEO ロムカセット 餓狼伝説 SPECIAL がろうでんせつスペシャル 1993", "url": "https://page.auctions.yahoo.co.jp/jp/auction/k1228325172", "bid": 17, "kind": "Auction"}, {"x": 1777795260000, "y": 19800, "name": "ネオジオ NEOGEO 餓狼伝説スペシャル ロムカセット", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z419130414", "bid": 1, "kind": "Buy-Now"}, {"x": 1777738260000, "y": 15000, "name": "ネオジオ ロム 餓狼伝説 スペシャル", "url": "https://page.auctions.yahoo.co.jp/jp/auction/1228469504", "bid": 1, "kind": "Auction"}, {"x": 1777729080000, "y": 14510, "name": "◆ ネオジオROMソフト 餓狼伝説スペシャル 箱説付き SNK ◆", "url": "https://page.auctions.yahoo.co.jp/jp/auction/r1228324884", "bid": 24, "kind": "Auction"}, {"x": 1777724400000, "y": 15555, "name": "人気 ネオジオ ロム 餓狼伝説 スペシャル NEOGEO", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z602662284", "bid": 1, "kind": "Buy-Now"}, {"x": 1777676580000, "y": 19999, "name": "本日のみGWセール極美品　ネオジオ 餓狼伝説スペシャル ROMカセット SNK", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z601512926", "bid": 1, "kind": "Buy-Now"}, {"x": 1777588860000, "y": 15000, "name": "人気 ネオジオ ロム 餓狼伝説 スペシャル NEOGEO", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z600769164", "bid": 1, "kind": "Buy-Now"}, {"x": 1777582140000, "y": 15000, "name": "ネオジオ ロム 餓狼伝説 スペシャル", "url": "https://page.auctions.yahoo.co.jp/jp/auction/g1228366435", "bid": 1, "kind": "Auction"}, {"x": 1777554000000, "y": 15000, "name": "ネオジオ ロム 餓狼伝説 スペシャル", "url": "https://page.auctions.yahoo.co.jp/jp/auction/w1228301879", "bid": 1, "kind": "Auction"}, {"x": 1777553400000, "y": 5000, "name": "ネオジオ ROMソフト 餓狼伝説 スペシャル 動作未確認 NEOGEO ロム", "url": "https://page.auctions.yahoo.co.jp/jp/auction/g1196558355", "bid": 1, "kind": "Buy-Now"}, {"x": 1777511520000, "y": 14000, "name": "ネオジオ ロム 餓狼伝説 スペシャル", "url": "https://page.auctions.yahoo.co.jp/jp/auction/q1228214180", "bid": 1, "kind": "Auction"}, {"x": 1777414680000, "y": 14000, "name": "ネオジオ ロム 餓狼伝説 スペシャル", "url": "https://page.auctions.yahoo.co.jp/jp/auction/m1228128423", "bid": 1, "kind": "Auction"}, {"x": 1777293960000, "y": 14850, "name": "【動作確認済】餓狼伝説スペシャル　ネオジオ　ROMカセット", "url": "https://page.auctions.yahoo.co.jp/jp/auction/h1207011394", "bid": 8, "kind": "Auction"}, {"x": 1777286040000, "y": 11000, "name": "NG 餓狼伝説 Special 餓狼伝説スペシャル SNK ネオジオ NEOGEO NEO-GEO ROM ロム カセット 動作確認済", "url": "https://page.auctions.yahoo.co.jp/jp/auction/f1227971397", "bid": 1, "kind": "Buy-Now"}, {"x": 1777232520000, "y": 13000, "name": "ネオジオ ロム 餓狼伝説 スペシャル", "url": "https://page.auctions.yahoo.co.jp/jp/auction/l1227949130", "bid": 1, "kind": "Auction"}, {"x": 1777162500000, "y": 11000, "name": "ネオジオ ロム 餓狼伝説 スペシャル", "url": "https://page.auctions.yahoo.co.jp/jp/auction/u1227789857", "bid": 1, "kind": "Auction"}, {"x": 1777118220000, "y": 10249, "name": "☆ NEOGEO 餓狼伝説 Special ロムカセット ネオジオ スペシャル ◇ ジャンク ☆", "url": "https://page.auctions.yahoo.co.jp/jp/auction/f1225489612", "bid": 20, "kind": "Auction"}, {"x": 1777046760000, "y": 10000, "name": "ネオジオ ロム 餓狼伝説 スペシャル", "url": "https://page.auctions.yahoo.co.jp/jp/auction/r1227738110", "bid": 1, "kind": "Auction"}, {"x": 1777038480000, "y": 7250, "name": "0109-02◆ネオジオ 餓狼伝説スペシャル SPECIAL カセット ゲームソフト 動作未確認 NEOGEO SNK", "url": "https://page.auctions.yahoo.co.jp/jp/auction/1215301273", "bid": 2, "kind": "Auction"}, {"x": 1777037940000, "y": 10450, "name": "1円〜 ネオジオ ロムカセット 餓狼伝説スペシャル", "url": "https://page.auctions.yahoo.co.jp/jp/auction/j1227412328", "bid": 31, "kind": "Auction"}, {"x": 1777037640000, "y": 10000, "name": "ネオジオ ロム 餓狼伝説 スペシャル", "url": "https://page.auctions.yahoo.co.jp/jp/auction/u1227209704", "bid": 1, "kind": "Auction"}, {"x": 1777033200000, "y": 8000, "name": "ネオジオ　餓狼伝説スペシャル", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z597840564", "bid": 1, "kind": "Buy-Now"}, {"x": 1776951780000, "y": 13200, "name": "★餓狼伝説スペシャル SNK ネオジオ ROMカセット ゲームソフト★", "url": "https://page.auctions.yahoo.co.jp/jp/auction/l1226767218", "bid": 39, "kind": "Auction"}, {"x": 1776806460000, "y": 7980, "name": "ネオジオ ROMソフト 餓狼伝説 スペシャル 箱 説明書付 動作未確認 NEOGEO ロム", "url": "https://page.auctions.yahoo.co.jp/jp/auction/u1200837773", "bid": 1, "kind": "Buy-Now"}, {"x": 1776775500000, "y": 8525, "name": "動作保証品 NG ネオジオROM 餓狼伝説 スペシャル SPECIAL エス・エヌ・ケイ SNK 箱説付【10", "url": "https://page.auctions.yahoo.co.jp/jp/auction/c1226793650", "bid": 16, "kind": "Auction"}, {"x": 1776740760000, "y": 9889, "name": "中古AB★餓狼伝説スペシャル★ネオジオソフト", "url": "https://page.auctions.yahoo.co.jp/jp/auction/b1210032612", "bid": 1, "kind": "Buy-Now"}, {"x": 1776689700000, "y": 5000, "name": "NEOGEO ロムカセット 餓狼伝説 スペシャル 箱 説明書付き 餓狼伝説SPECIAL", "url": "https://page.auctions.yahoo.co.jp/jp/auction/q1227216438", "bid": 1, "kind": "Buy-Now"}, {"x": 1776686940000, "y": 5250, "name": "◇ SNK NEOGEO ネオジオ ROMカセット 餓狼伝説 スペシャル 取説付 ◇", "url": "https://page.auctions.yahoo.co.jp/jp/auction/e1226397725", "bid": 28, "kind": "Auction"}, {"x": 1776603300000, "y": 8740, "name": "【1円】ネオジオ 餓狼伝説 スペシャル ゲームソフト ケース/説明書付き NEOGEO SNK 未検品ジャンク B04-063rm/F3", "url": "https://page.auctions.yahoo.co.jp/jp/auction/p1226437667", "bid": 26, "kind": "Auction"}, {"x": 1776600360000, "y": 7900, "name": "ネオジオ NEOGEO 餓狼伝説スペシャル 餓狼伝説SPECIAL ゲームソフト SNK ロムカセット ROMカセット　動作未確認　取説あり", "url": "https://page.auctions.yahoo.co.jp/jp/auction/q1226284256", "bid": 6, "kind": "Auction"}, {"x": 1776527340000, "y": 7040, "name": "NEOGEO ロムカセット 餓狼伝説 スペシャル 箱 説明書付き レトロゲーム ジャンク B11120618", "url": "https://page.auctions.yahoo.co.jp/jp/auction/c1226464259", "bid": 1, "kind": "Auction"}, {"x": 1776389340000, "y": 9000, "name": "ネオジオ ロム 餓狼伝説 スペシャル", "url": "https://page.auctions.yahoo.co.jp/jp/auction/q1161927629", "bid": 1, "kind": "Buy-Now"}, {"x": 1776373200000, "y": 6000, "name": "【動作確認済み】NEOGEO 餓狼伝説 スペシャル ROM ロム ソフト カセット ネオジオ SNK", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z593074344", "bid": 1, "kind": "Buy-Now"}, {"x": 1776255120000, "y": 6325, "name": "動作保証品 NG ネオジオROM 餓狼伝説スペシャル SPECIAL 箱説付【10", "url": "https://page.auctions.yahoo.co.jp/jp/auction/q1226058658", "bid": 7, "kind": "Auction"}, {"x": 1775998560000, "y": 5405, "name": "ネオジオ NEOGEO 餓狼伝説SPECIAL 餓狼伝説スペシャル ロム カセット ソフト SNK ネオジオソフト ROM ロムカセット", "url": "https://page.auctions.yahoo.co.jp/jp/auction/n1225699882", "bid": 5, "kind": "Auction"}, {"x": 1775655000000, "y": 5555, "name": "ネオジオ ロムカセット 餓狼伝説スペシャル 　動作確認済み", "url": "https://page.auctions.yahoo.co.jp/jp/auction/s1225168766", "bid": 1, "kind": "Auction"}, {"x": 1775564580000, "y": 35001, "name": "業務用ネオジオ　餓狼伝説スペシャル", "url": "https://page.auctions.yahoo.co.jp/jp/auction/l1225361356", "bid": 27, "kind": "Auction"}, {"x": 1774790940000, "y": 5000, "name": "SNK　NEO-GIO　ROMカセットソフト　ネオジオ　餓狼伝説スペシャル", "url": "https://page.auctions.yahoo.co.jp/jp/auction/p1223773788", "bid": 1, "kind": "Auction"}, {"x": 1774705080000, "y": 5500, "name": "ジャンク ネオジオ SNK 餓狼伝説スペシャル (ゆ27-09-01)", "url": "https://page.auctions.yahoo.co.jp/jp/auction/q1224358557", "bid": 28, "kind": "Auction"}, {"x": 1774703460000, "y": 7500, "name": "73-49 餓狼伝説スペシャル ネオジオ SNK NEOGEO", "url": "https://page.auctions.yahoo.co.jp/jp/auction/o1224048979", "bid": 1, "kind": "Auction"}, {"x": 1774270920000, "y": 6105, "name": "動作保証品 NG ネオジオROM 餓狼伝説スペシャル 箱説付【10", "url": "https://page.auctions.yahoo.co.jp/jp/auction/f1223392323", "bid": 10, "kind": "Auction"}, {"x": 1773924060000, "y": 5620, "name": "ネオジオ ソフト 餓狼伝説スペシャル", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z558586736", "bid": 1, "kind": "Buy-Now"}, {"x": 1773667680000, "y": 6138, "name": "★餓狼伝説スペシャル ネオジオ SNK NEOGEO★", "url": "https://page.auctions.yahoo.co.jp/jp/auction/g1222304042", "bid": 29, "kind": "Auction"}, {"x": 1773665040000, "y": 6850, "name": "【GM7991/60/0】ネオジオソフト★餓狼伝説 スペシャル★SPECIAL★SNK★NEO-GEO★NEO GEO★レトロゲーム★カセット★説明書付き★", "url": "https://page.auctions.yahoo.co.jp/jp/auction/c1222416947", "bid": 17, "kind": "Auction"}, {"x": 1773493080000, "y": 6380, "name": "動作保証品 NG ネオジオROM 餓狼伝説スペシャル SPECIAL NEO GEO エス・エヌ・ケイ SNK 箱説付【10", "url": "https://page.auctions.yahoo.co.jp/jp/auction/u1222311391", "bid": 26, "kind": "Auction"}, {"x": 1772972820000, "y": 11505, "name": "動作確認済 ［ NEOGEO ROMカセット ］ 餓狼伝説スペシャル ＆ ワールドヒーローズ2 【中古品】［取説有り］ SNK ADK Fatal Fury Special WH", "url": "https://page.auctions.yahoo.co.jp/jp/auction/u1221654885", "bid": 4, "kind": "Auction"}, {"x": 1772828640000, "y": 6300, "name": "餓狼伝説スペシャル ネオジオ ROM SNK ケース・説明書あり", "url": "https://page.auctions.yahoo.co.jp/jp/auction/b1211624649", "bid": 1, "kind": "Auction"}, {"x": 1772798940000, "y": 5000, "name": "ネオジオソフト　餓狼伝説Special スペシャル　SNK 箱説付", "url": "https://page.auctions.yahoo.co.jp/jp/auction/o1196329277", "bid": 1, "kind": "Auction"}, {"x": 1772713260000, "y": 5500, "name": "【GM7955/60/0】ネオジオソフト★餓狼伝説 スペシャル★SPECIAL★SNK★NEO-GEO★NEO GEO★レトロゲーム★カセット★説明書付き★", "url": "https://page.auctions.yahoo.co.jp/jp/auction/m1221138182", "bid": 8, "kind": "Auction"}, {"x": 1772631180000, "y": 5980, "name": "SNK NEOGEO 餓狼伝説スペシャル 動作確認・清掃・メンテナンス済 | ゲームソフトROM ネオジオ", "url": "https://page.auctions.yahoo.co.jp/jp/auction/b1221382278", "bid": 1, "kind": "Buy-Now"}, {"x": 1772629380000, "y": 8250, "name": "★動作良好　SNK 餓狼伝説スペシャル ROMカセット 1993年発売 NEOGEO/ネオジオ◆餓狼伝説SPECIAL ROM盤 FATAL FURY 箱説明書あり★", "url": "https://page.auctions.yahoo.co.jp/jp/auction/f1221243784", "bid": 22, "kind": "Auction"}, {"x": 1772280600000, "y": 5000, "name": "KS11380A● NEO・GEO SNK ネオジオ 専用ロムカセット 餓狼伝説 スペシャル SPECIAL 対戦ゲーム 格ゲー 格闘 箱付き テレビゲーム", "url": "https://page.auctions.yahoo.co.jp/jp/auction/1211887271", "bid": 2, "kind": "Auction"}, {"x": 1772156640000, "y": 5990, "name": "【SNK 餓狼伝説スペシャル ROMカセット 箱 説明書付き】1993年発売 NEOGEO/ネオジオ◆餓狼伝説SPECIAL ROM盤 FATAL FURY", "url": "https://page.auctions.yahoo.co.jp/jp/auction/1187376613", "bid": 1, "kind": "Buy-Now"}, {"x": 1771847880000, "y": 8800, "name": "ネオジオ NEOGEO カセットケースのみ 餓狼伝説スペシャル ザ・キング・オブ・ファイターズ95 真サムライスピリッツ 管理ZI-60", "url": "https://page.auctions.yahoo.co.jp/jp/auction/t1220089769", "bid": 29, "kind": "Auction"}, {"x": 1771767060000, "y": 5000, "name": "【ネオジオ ロム】餓狼伝説スペシャル【中古】【NEOGEO ROM】", "url": "https://page.auctions.yahoo.co.jp/jp/auction/h1219614134", "bid": 1, "kind": "Auction"}, {"x": 1771157400000, "y": 6875, "name": "動作保証品 NG ネオジオROM 餓狼伝説スペシャル SPECIAL エス・エヌ・ケイ SNK 箱説付【10", "url": "https://page.auctions.yahoo.co.jp/jp/auction/k1219160037", "bid": 8, "kind": "Auction"}, {"x": 1771156680000, "y": 8400, "name": "送料無料 NEOGEO 餓狼伝説SPECIAL 箱 説明書付き ネオジオROM NEOGEO NEO-GEO 餓狼伝説 スペシャル SNK NG ロム ネオジオ SPECIAL", "url": "https://page.auctions.yahoo.co.jp/jp/auction/n1217960601", "bid": 1, "kind": "Buy-Now"}, {"x": 1771071000000, "y": 5250, "name": "ネオジオ 餓狼伝説スペシャル 箱説付き SNK ロムカセット", "url": "https://page.auctions.yahoo.co.jp/jp/auction/d1219170689", "bid": 18, "kind": "Auction"}, {"x": 1770985080000, "y": 5850, "name": "NEOGEO ネオジオ 餓狼伝説スペシャル 餓狼伝説 ロムカセット ゲームソフトROMカセット ", "url": "https://page.auctions.yahoo.co.jp/jp/auction/d1218703690", "bid": 8, "kind": "Auction"}, {"x": 1770818580000, "y": 5700, "name": "SNK ネオジオ ソフト 餓狼伝説スペシャル", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z545867722", "bid": 1, "kind": "Buy-Now"}, {"x": 1770815400000, "y": 18150, "name": "【GLB】中古 ジャンク ネオジオカセット 餓狼伝説スペシャル BASEBALL STARS ワールドヒーローズ2 龍虎の拳【動作確認済】°°", "url": "https://page.auctions.yahoo.co.jp/jp/auction/u1218888495", "bid": 4, "kind": "Auction"}, {"x": 1770812160000, "y": 5775, "name": "動作保証品 NG ネオジオROM 餓狼伝説スペシャル SPECIAL エス・エヌ・ケイ SNK 箱説付【10", "url": "https://page.auctions.yahoo.co.jp/jp/auction/m1218707534", "bid": 9, "kind": "Auction"}, {"x": 1770642000000, "y": 6500, "name": "餓狼伝説スペシャル SPECIAL ネオジオ ROM SNK NEOGEO ", "url": "https://page.auctions.yahoo.co.jp/jp/auction/n1218931772", "bid": 2, "kind": "Auction"}, {"x": 1770560700000, "y": 13310, "name": "1円〜 ネオジオ ロムカセット 餓狼伝説スペシャル ワールドヒーローズ2", "url": "https://page.auctions.yahoo.co.jp/jp/auction/h1218717063", "bid": 17, "kind": "Auction"}, {"x": 1770209220000, "y": 48500, "name": "NEOGEO ネオジオ SNK ADK ロムカセット　 キング オブ ファイターズ　 龍虎の拳2 餓狼伝説スペシャル　中古品　動作未確認", "url": "https://page.auctions.yahoo.co.jp/jp/auction/o1217660281", "bid": 17, "kind": "Auction"}, {"x": 1769692320000, "y": 5775, "name": "1円〜 ネオジオ ロムカセット 餓狼伝説スペシャル", "url": "https://page.auctions.yahoo.co.jp/jp/auction/f1217463705", "bid": 13, "kind": "Auction"}, {"x": 1769094900000, "y": 8750, "name": "NEOGEO FATAL FURY SPECIAL 餓狼伝説スペシャル", "url": "https://page.auctions.yahoo.co.jp/jp/auction/x1216036522", "bid": 8, "kind": "Auction"}, {"x": 1769089740000, "y": 6050, "name": "【箱付き】餓狼伝説スペシャル ネオジオ NEOGEO", "url": "https://page.auctions.yahoo.co.jp/jp/auction/e1216532898", "bid": 11, "kind": "Auction"}, {"x": 1769074980000, "y": 6500, "name": "動作確認済 NG SNK NEOGEO 餓狼伝説　SPECIAL スペシャル ネオジオ ROMカセット ケース 説明書 あり", "url": "https://page.auctions.yahoo.co.jp/jp/auction/h1215118274", "bid": 1, "kind": "Auction"}, {"x": 1768741080000, "y": 18516, "name": "ネオジオ NEOGEO SNK ロムカセット ソフト NG 餓狼伝説2 餓狼伝説スペシャル サムライスピリッツ", "url": "https://page.auctions.yahoo.co.jp/jp/auction/1216164455", "bid": 24, "kind": "Auction"}, {"x": 1768480020000, "y": 5000, "name": "中古品 レア SNK NEOGEO 餓狼伝説スペシャル ネオジオ ROMカセット 餓狼伝説 レトロゲーム 現状品 餓狼伝説SPECIAL 箱有 取説無 動作未確認", "url": "https://page.auctions.yahoo.co.jp/jp/auction/x1214352754", "bid": 1, "kind": "Auction"}, {"x": 1768479060000, "y": 5500, "name": "動作保証品 NG ネオジオROM 餓狼伝説スペシャル SPECIAL エス・エヌ・ケイ SNK 箱説付【10", "url": "https://page.auctions.yahoo.co.jp/jp/auction/g1215373157", "bid": 11, "kind": "Auction"}, {"x": 1768397040000, "y": 5775, "name": "1円〜 ネオジオ CD 餓狼伝説スペシャル サムライスピリッツ 天草降臨 他", "url": "https://page.auctions.yahoo.co.jp/jp/auction/k1215671324", "bid": 9, "kind": "Auction"}, {"x": 1768052100000, "y": 9898, "name": "1円〜 NEO・GEO ネオジオ ロムカセット 餓狼伝説スペシャル 龍虎の拳", "url": "https://page.auctions.yahoo.co.jp/jp/auction/p1215229976", "bid": 22, "kind": "Auction"}, {"x": 1767962940000, "y": 6000, "name": "NEOGEO ネオジオ SNK 餓狼伝説スペシャル ROM ロムカセット　説明書　箱付き　ワンオーナー", "url": "https://page.auctions.yahoo.co.jp/jp/auction/l1215085553", "bid": 1, "kind": "Auction"}];
+const TREND  = [{"x": 1767873600000, "y": 7949.0, "count": 2, "label": "2026-W02"}, {"x": 1768478400000, "y": 5637.5, "count": 4, "label": "2026-W03"}, {"x": 1769083200000, "y": 6500, "count": 3, "label": "2026-W04"}, {"x": 1770292800000, "y": 30905.0, "count": 2, "label": "2026-W06"}, {"x": 1770897600000, "y": 6175.0, "count": 8, "label": "2026-W07"}, {"x": 1772107200000, "y": 5990, "count": 3, "label": "2026-W09"}, {"x": 1772712000000, "y": 6140.0, "count": 6, "label": "2026-W10"}, {"x": 1773921600000, "y": 6138, "count": 3, "label": "2026-W12"}, {"x": 1774526400000, "y": 5802.5, "count": 4, "label": "2026-W13"}, {"x": 1775736000000, "y": 5555, "count": 3, "label": "2026-W15"}, {"x": 1776340800000, "y": 7470.0, "count": 6, "label": "2026-W16"}, {"x": 1776945600000, "y": 9944.5, "count": 14, "label": "2026-W17"}, {"x": 1777550400000, "y": 15000, "count": 15, "label": "2026-W18"}, {"x": 1778155200000, "y": 15000, "count": 21, "label": "2026-W19"}, {"x": 1778760000000, "y": 14300, "count": 9, "label": "2026-W20"}, {"x": 1779364800000, "y": 15180, "count": 11, "label": "2026-W21"}, {"x": 1779969600000, "y": 14800, "count": 9, "label": "2026-W22"}];
+const ANNOUNCE_X = 1776297600000;
+function showErr(msg){const e=document.getElementById('err');e.style.display='block';e.textContent=(e.textContent?e.textContent+' | ':'')+msg;console.error(msg);}
+window.addEventListener('error', ev => showErr(`JS error: ${ev.message} @ ${ev.filename}:${ev.lineno}`));
+try {
+  const prices = POINTS.map(p => p.y).sort((a,b) => a-b);
+  const median = prices[Math.floor(prices.length/2)];
+  const mean = Math.round(prices.reduce((a,b)=>a+b,0) / prices.length);
+  document.getElementById('stats').innerHTML = `
+    <div class="stat"><div class="stat-val">${POINTS.length}</div><div class="stat-lbl">Ventes 2026</div></div>
+    <div class="stat"><div class="stat-val">¥${median.toLocaleString()}</div><div class="stat-lbl">Prix médian</div></div>
+    <div class="stat"><div class="stat-val">¥${mean.toLocaleString()}</div><div class="stat-lbl">Prix moyen</div></div>
+    <div class="stat"><div class="stat-val">¥${prices[0].toLocaleString()}</div><div class="stat-lbl">Min</div></div>
+    <div class="stat"><div class="stat-val">¥${prices[prices.length-1].toLocaleString()}</div><div class="stat-lbl">Max</div></div>`;
+  const tbody = document.getElementById('trend-table');
+  let prev = null;
+  TREND.forEach(t => {
+    let evo = '—', color = '#666';
+    if (prev !== null) {
+      const pct = ((t.y - prev) / prev * 100);
+      evo = `${pct >= 0 ? '+' : ''}${pct.toFixed(1)}%`;
+      color = t.y < prev ? '#15803d' : (t.y > prev ? '#dc2626' : '#666');
+    }
+    tbody.insertAdjacentHTML('beforeend',
+      `<tr><td>${t.label}</td><td style="text-align:right">${t.count}</td><td style="text-align:right">¥${Math.round(t.y).toLocaleString()}</td><td style="text-align:right;color:${color}">${evo}</td></tr>`);
+    prev = t.y;
+  });
+  if (typeof Chart === 'undefined') { showErr('Chart.js failed to load'); }
+  else {
+    const ctx = document.getElementById('chart').getContext('2d');
+    const auction = POINTS.filter(p => p.kind === 'Auction');
+    const buynow  = POINTS.filter(p => p.kind === 'Buy-Now');
+    const annoLinePlugin = {
+      id: 'annoLine',
+      afterDatasetsDraw(chart) {
+        const x = chart.scales.x.getPixelForValue(ANNOUNCE_X);
+        if (isNaN(x)) return;
+        const c = chart.ctx;
+        const top = chart.chartArea.top, bot = chart.chartArea.bottom;
+        c.save();
+        c.strokeStyle = '#dc2626'; c.lineWidth = 2; c.setLineDash([6,4]);
+        c.beginPath(); c.moveTo(x, top); c.lineTo(x, bot); c.stroke();
+        c.setLineDash([]);
+        c.fillStyle = 'rgba(220,38,38,.9)';
+        const label = '📣 Annonce Plaion AES+';
+        c.font = 'bold 11px sans-serif';
+        const w = c.measureText(label).width + 12;
+        c.fillRect(x + 4, top + 4, w, 22);
+        c.fillStyle = '#fff'; c.fillText(label, x + 10, top + 19);
+        c.restore();
+      }
+    };
+    let chart;
+    function makeChart(yType) {
+      if (chart) chart.destroy();
+      chart = new Chart(ctx, {
+        type: 'scatter',
+        data: { datasets: [
+          { label: 'Enchères (Auction)', data: auction, backgroundColor: 'rgba(239,68,68,.65)', pointRadius: 5 },
+          { label: 'Buy-Now (prix fixe)', data: buynow, backgroundColor: 'rgba(34,197,94,.65)', pointRadius: 4 },
+          { label: 'Médiane hebdo', data: TREND, type: 'line',
+            borderColor: '#1a1a2e', backgroundColor: '#1a1a2e', borderWidth: 2,
+            pointRadius: 3, pointBackgroundColor: '#fff', pointBorderColor: '#1a1a2e',
+            showLine: true, tension: 0.15 } ] },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          parsing: { xAxisKey: 'x', yAxisKey: 'y' },
+          plugins: {
+            legend: { position: 'top' },
+            tooltip: { callbacks: {
+              title: items => new Date(items[0].parsed.x).toLocaleDateString('fr-FR', { year: 'numeric', month: 'short', day: 'numeric' }),
+              label: c => {
+                const p = c.raw;
+                if (p.name) return [`¥${p.y.toLocaleString()} — ${p.kind} (${p.bid} bid${p.bid>1?'s':''})`, p.name.slice(0, 60)];
+                if (p.label) return `${p.label} : médiane ¥${Math.round(p.y).toLocaleString()} (${p.count} ventes)`;
+                return `¥${Math.round(p.y).toLocaleString()}`;
+              } } }
+          },
+          scales: {
+            x: { type: 'linear',
+                 ticks: { callback: v => new Date(v).toLocaleDateString('fr-FR', {month:'short', day:'2-digit'}) },
+                 title: { display: true, text: 'Date de vente (clôture enchère)' } },
+            y: { type: yType, title: { display: true, text: 'Prix de vente (¥)' },
+                 ticks: { callback: v => '¥' + v.toLocaleString() } },
+          },
+          onClick: (evt, items) => { if (items.length) { const p = items[0].element.$context.raw; if (p.url) window.open(p.url, '_blank'); } },
+        },
+        plugins: [annoLinePlugin],
+      });
+    }
+    makeChart('linear');
+    function refresh() {
+      chart.setDatasetVisibility(0, document.getElementById('show-auction').checked);
+      chart.setDatasetVisibility(1, document.getElementById('show-buynow').checked);
+      chart.setDatasetVisibility(2, document.getElementById('show-trend').checked);
+      chart.update();
+    }
+    ['show-auction','show-buynow','show-trend'].forEach(id =>
+      document.getElementById(id).addEventListener('change', refresh));
+    document.getElementById('log-scale').addEventListener('change', e => makeChart(e.target.checked ? 'logarithmic' : 'linear'));
+  }
+} catch(e) { showErr(`Exception: ${e.message}`); }
+</script></body></html>

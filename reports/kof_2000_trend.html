@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8"><title>KOF 2000 AES — Mercari & Yahoo Auctions — 2026</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f5f6fa; color: #1a1a2e; padding: 24px; max-width: 1400px; margin: 0 auto; }
+  h1 { font-size: 1.4rem; margin: 0 0 4px 0; }
+  p.sub { color: #666; font-size: .85rem; margin: 0 0 20px 0; }
+  .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,.08); margin-bottom: 20px; }
+  .controls { display: flex; gap: 14px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; font-size: .85rem; }
+  .controls label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+  canvas { max-width: 100%; }
+  .insight { background: linear-gradient(90deg, #fef3c7 0%, #fee2e2 100%); border-left: 4px solid #dc2626; padding: 14px 18px; border-radius: 8px; margin-bottom: 20px; }
+  .insight h3 { margin: 0 0 6px 0; font-size: 1rem; }
+  .insight p  { margin: 0; font-size: .88rem; line-height: 1.5; }
+  .insight strong { color: #dc2626; font-size: 1.05em; }
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+  .src-card { background: rgba(255,255,255,.75); padding: 10px 14px; border-radius: 6px; font-size: .82rem; }
+  .src-card.mer { border-left: 3px solid #f59e0b; }
+  .src-card.yh  { border-left: 3px solid #2563eb; }
+  .errbox { background: #fee; border: 1px solid #c33; padding: 10px; font-family: monospace; font-size: .8rem; color: #c00; display: none; margin: 10px 0; border-radius: 6px; }
+  .nav { margin-bottom: 16px; font-size: .85rem; display: flex; flex-wrap: wrap; gap: 6px; }
+  .nav a { padding: 4px 10px; border-radius: 4px; background: #fff; color: #2563eb; text-decoration: none; border: 1px solid #ddd; }
+  .nav a.active { background: #2563eb; color: #fff; border-color: #2563eb; }
+</style></head><body>
+
+<h1>KOF 2000 AES — Mercari &amp; Yahoo Auctions — 2026</h1>
+<p class="sub">Mercari 5 ventes · Yahoo 20 ventes · données du 29/05/2026</p>
+
+<div class="nav">
+<a href="kof_94_trend.html">KOF '94</a>
+<a href="kof_95_trend.html">KOF '95</a>
+<a href="kof_96_trend.html">KOF '96</a>
+<a href="kof_97_trend.html">KOF '97</a>
+<a href="kof_98_trend.html">KOF '98</a>
+<a href="kof_99_trend.html">KOF '99</a>
+<a href="kof_2000_trend.html" class="active">KOF 2000</a>
+<a href="kof_2001_trend.html">KOF 2001</a>
+<a href="kof_2002_trend.html">KOF 2002</a>
+
+</div>
+
+<div class="insight">
+  <h3>📣 Effet de l'annonce Plaion Neo Geo AES+ (16 avril 2026)</h3>
+  <p>Plaion a annoncé le 16/04/2026 la sortie en novembre d'une nouvelle console <strong>Neo Geo AES+</strong> compatible avec les cartouches d'origine.</p>
+  <div class="split">
+    <div class="src-card mer">
+      <strong>🟡 Mercari</strong><br>
+      Avant 16/04 : 3 ventes · médiane ¥55,555<br>
+      Depuis : 2 · médiane <strong>¥82,500</strong> · <strong>+48.5%</strong>
+    </div>
+    <div class="src-card yh">
+      <strong>🔵 Yahoo</strong><br>
+      Avant 16/04 : 16 ventes · médiane ¥53,000<br>
+      Depuis : 4 · médiane <strong>¥70,683</strong> · <strong>+33.4%</strong>
+    </div>
+  </div>
+</div>
+
+<div id="err" class="errbox"></div>
+
+<div class="card">
+  <div class="controls">
+    <label><input type="checkbox" id="show-mer" checked> 🟡 Mercari</label>
+    <label><input type="checkbox" id="show-yh"  checked> 🔵 Yahoo</label>
+    <label><input type="checkbox" id="show-mer-trend" checked> ↗ Tendance Mercari</label>
+    <label><input type="checkbox" id="show-yh-trend"  checked> ↗ Tendance Yahoo</label>
+    <label><input type="checkbox" id="log-scale"> Échelle log Y</label>
+  </div>
+  <div style="height:560px;position:relative"><canvas id="chart"></canvas></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
+<script>
+const MER = [{"x": 1779111300000, "y": 120000, "name": "【動作確認済】ザキングオブファイターズ 2000 NEOGEO ROM KOF", "url": "https://jp.mercari.com/item/m84076156298", "status": "SOLD_OUT", "version": "2000", "source": "mercari"}, {"x": 1774438560000, "y": 55555, "name": "ネオジオ ザ・キング・オブ・ファイターズ2000 ロム", "url": "https://jp.mercari.com/item/m52258468447", "status": "SOLD_OUT", "version": "2000", "source": "mercari"}, {"x": 1778747460000, "y": 45000, "name": "動作確認済/ THE KING OF FIGHTERS 2000 ネオジオROM", "url": "https://jp.mercari.com/item/m57693608920", "status": "SOLD_OUT", "version": "2000", "source": "mercari"}, {"x": 1776135180000, "y": 72800, "name": "【動作確認済・美品】NEOGEO KOF 2000 説明書付", "url": "https://jp.mercari.com/item/m22442825845", "status": "SOLD_OUT", "version": "2000", "source": "mercari"}, {"x": 1769439000000, "y": 55000, "name": "き*い様 ザ・キング・オブ・ファイターズ 2000 ネオジオ　ソフト(ROM)", "url": "https://jp.mercari.com/item/m33734642031", "status": "SOLD_OUT", "version": "2000", "source": "mercari"}];
+const YH  = [{"x": 1780059480000, "y": 67666, "name": "(管106488)【ゲームソフト】THE KING OF FIGHTERS 2000 ザキングオブファイターズ KOF ネオジオ NEOGEO ROM 箱説有 現状品 動作未チェック", "url": "https://page.auctions.yahoo.co.jp/jp/auction/c1230915340", "bid": 3, "kind": "Auction", "version": "2000", "source": "yahoo"}, {"x": 1779372660000, "y": 73700, "name": "【箱付き】【動作品】ザ・キング・オブ・ファイターズ2000 ネオジオ NEOGEO", "url": "https://page.auctions.yahoo.co.jp/jp/auction/d1230319221", "bid": 17, "kind": "Auction", "version": "2000", "source": "yahoo"}, {"x": 1778851560000, "y": 76000, "name": "(W34405)THE KING OF FIGHTERS 2000 ザ キング オブ ファイターズ 2000 NEOGEO ROM ネオジオ ロム カセット ゲーム 動作未確認 ジャンク", "url": "https://page.auctions.yahoo.co.jp/jp/auction/k1229419347", "bid": 40, "kind": "Auction", "version": "2000", "source": "yahoo"}, {"x": 1777643820000, "y": 36500, "name": "【中古・説欠品】：ザ・キング・オブ・ファイターズ 2000 ネオジオ NEOGEO KOF SNK ゲームソフト ※動作未確認(20260414)", "url": "https://page.auctions.yahoo.co.jp/jp/auction/l1226519024", "bid": 2, "kind": "Auction", "version": "2000", "source": "yahoo"}, {"x": 1776259380000, "y": 56000, "name": "コレクター放出 ザ・キング・オブ・ファイターズ 2000　KOF2000　THE KING OF FIGHTERS 2000 SNK　NEOGEO", "url": "https://page.auctions.yahoo.co.jp/jp/auction/p1226180565", "bid": 50, "kind": "Auction", "version": "2000", "source": "yahoo"}, {"x": 1775135460000, "y": 52000, "name": "1円〜 希少 ザ・キングオブ・ファイターズ 2000 NEOGEO SNK 688メガ ロムカセット 付属品あり 対戦 ネオジオ ゲームソフト 0326G②", "url": "https://page.auctions.yahoo.co.jp/jp/auction/e1224288162", "bid": 34, "kind": "Auction", "version": "2000", "source": "yahoo"}, {"x": 1774949580000, "y": 59980, "name": "【ネオジオソフト】ザ・キング・オブ・ファイターズ2000 ROM SNK 箱説付", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z584952152", "bid": 1, "kind": "Buy-Now", "version": "2000", "source": "yahoo"}, {"x": 1774275600000, "y": 5361, "name": "ＳＮＫ／ネオジオ　THE KING OF FIGHTERS 2000　ザ・キング・オブ・ファイターズ２０００", "url": "https://page.auctions.yahoo.co.jp/jp/auction/c1223620778", "bid": 6, "kind": "Auction", "version": "2000", "source": "yahoo"}, {"x": 1772973720000, "y": 57200, "name": "1円〜 動作品 NG ネオジオROM ザ・キング・オブ・ファイターズ 2000 KOF エス・エヌ・ケイ SNK NEOGEO 箱説付【10", "url": "https://page.auctions.yahoo.co.jp/jp/auction/s1221611522", "bid": 49, "kind": "Auction", "version": "2000", "source": "yahoo"}, {"x": 1772635140000, "y": 45001, "name": "ネオジオ NEO GEO ロムカセット THE KING OF FIGHTERS 2000 ザ・キング・オブ・ファイターズ ゲームソフト 現状品", "url": "https://page.auctions.yahoo.co.jp/jp/auction/t1221274348", "bid": 1, "kind": "Auction", "version": "2000", "source": "yahoo"}, {"x": 1771682100000, "y": 54780, "name": "【中古】NG）【動作確認済】SNK/ザ・キング・オブ・ファイターズ2000/ネオジオ ROMカセット [240006542796]", "url": "https://page.auctions.yahoo.co.jp/jp/auction/k1205063940", "bid": 1, "kind": "Auction", "version": "2000", "source": "yahoo"}, {"x": 1770731340000, "y": 22000, "name": "#【SNK NEOGEO ザ・キング・オブ・ファイターズ 2000 ネオジオ ゲームソフト ロムカセット 元箱 レトロ 動作未確認 ジャンク品】R01241", "url": "https://page.auctions.yahoo.co.jp/jp/auction/e1218719131", "bid": 1, "kind": "Auction", "version": "2000", "source": "yahoo"}, {"x": 1770468360000, "y": 45500, "name": "NG ネオジオROM ザ・キング・オブ・ファイターズ 2000 KOF エスエヌケイ SNK NEOGEO 説明書付き", "url": "https://page.auctions.yahoo.co.jp/jp/auction/q1217645447", "bid": 2, "kind": "Auction", "version": "2000", "source": "yahoo"}, {"x": 1769695020000, "y": 8000, "name": "ザ・キング・オブ・ファイターズ2000　　テレホンカード 　　テレカ　ネオジオ", "url": "https://page.auctions.yahoo.co.jp/jp/auction/s1216562250", "bid": 1, "kind": "Auction", "version": "2000", "source": "yahoo"}, {"x": 1769346600000, "y": 8800, "name": "ザ・キング・オブ・ファイターズ2000　　テレホンカード ２　　テレカ　ネオジオ", "url": "https://page.auctions.yahoo.co.jp/jp/auction/p1216555630", "bid": 1, "kind": "Auction", "version": "2000", "source": "yahoo"}, {"x": 1769089620000, "y": 44550, "name": "中古品 ゲーム ネオジオ SNK ザ・キング・オブ・ファイターズ 2000 カセット", "url": "https://page.auctions.yahoo.co.jp/jp/auction/w1216675337", "bid": 37, "kind": "Auction", "version": "2000", "source": "yahoo"}, {"x": 1768831260000, "y": 60000, "name": "ネオジオ ザキングオブファイターズ2000 NEOGEO SNK ロムカセット", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z342410076", "bid": 1, "kind": "Buy-Now", "version": "2000", "source": "yahoo"}, {"x": 1768739400000, "y": 62000, "name": "ザ・キング・オブ・ファイターズ2000 / NEOGEO ネオジオ", "url": "https://page.auctions.yahoo.co.jp/jp/auction/k1215556120", "bid": 37, "kind": "Auction", "version": "2000", "source": "yahoo"}, {"x": 1768141320000, "y": 54000, "name": "ネオジオAES用ROM★ザ・キング・オブ・ファイターズ2000 (THE KING OF FIGHTERS 2000)★箱説付★動作品", "url": "https://page.auctions.yahoo.co.jp/jp/auction/n1214856125", "bid": 8, "kind": "Auction", "version": "2000", "source": "yahoo"}, {"x": 1767272460000, "y": 59600, "name": "ネオジオROMソフト　　 ザ・キング・オブ・ファイターズ 2000", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z185776980", "bid": 1, "kind": "Buy-Now", "version": "2000", "source": "yahoo"}];
+const ANNOUNCE_X = 1776297600000;
+const START_X    = 1767225600000;
+
+function showErr(m){const e=document.getElementById('err');e.style.display='block';e.textContent=(e.textContent?e.textContent+' | ':'')+m;console.error(m);}
+window.addEventListener('error', ev => showErr(`JS error: ${ev.message} @ ${ev.lineno}`));
+
+function weeklyTrend(points) {
+  // Rolling 3-week centered median: pool prices from week N-1, N, N+1
+  // to smooth small-sample noise without losing the median's outlier resistance.
+  const buckets = new Map();
+  for (const p of points) {
+    const d = new Date(p.x);
+    const tmp = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+    tmp.setUTCDate(tmp.getUTCDate() + 3 - (tmp.getUTCDay() + 6) % 7);
+    const weekYear = tmp.getUTCFullYear();
+    const week1 = new Date(Date.UTC(weekYear, 0, 4));
+    const week = 1 + Math.round(((tmp - week1) / 86400000 - 3 + (week1.getUTCDay() + 6) % 7) / 7);
+    const key = `${weekYear}-W${String(week).padStart(2,'0')}`;
+    if (!buckets.has(key)) buckets.set(key, { prices: [], dates: [] });
+    buckets.get(key).prices.push(p.y); buckets.get(key).dates.push(p.x);
+  }
+  const sortedKeys = [...buckets.keys()].sort();
+  const out = [];
+  for (let i = 0; i < sortedKeys.length; i++) {
+    const window = [sortedKeys[i-1], sortedKeys[i], sortedKeys[i+1]].filter(Boolean);
+    const pooledPrices = window.flatMap(k => buckets.get(k).prices);
+    const pooledDates  = buckets.get(sortedKeys[i]).dates;
+    if (pooledPrices.length < 3) continue;
+    const sorted = [...pooledPrices].sort((a,b)=>a-b);
+    const med = sorted.length % 2
+      ? sorted[(sorted.length-1)/2]
+      : (sorted[sorted.length/2-1] + sorted[sorted.length/2]) / 2;
+    const midX = pooledDates.sort((a,b)=>a-b)[Math.floor(pooledDates.length/2)];
+    out.push({ x: midX, y: med, count: pooledPrices.length, label: sortedKeys[i] + ' (±1 sem)' });
+  }
+  return out;
+}
+
+try {
+  if (typeof Chart === 'undefined') { showErr('Chart.js failed'); throw new Error('no Chart'); }
+  const ctx = document.getElementById('chart').getContext('2d');
+
+  const annoLinePlugin = {
+    id: 'annoLine',
+    afterDatasetsDraw(chart) {
+      const x = chart.scales.x.getPixelForValue(ANNOUNCE_X);
+      if (isNaN(x)) return;
+      const c = chart.ctx;
+      const top = chart.chartArea.top, bot = chart.chartArea.bottom;
+      c.save();
+      c.strokeStyle = '#dc2626'; c.lineWidth = 2; c.setLineDash([6,4]);
+      c.beginPath(); c.moveTo(x, top); c.lineTo(x, bot); c.stroke();
+      c.setLineDash([]);
+      c.fillStyle = 'rgba(220,38,38,.9)';
+      const label = '📣 Plaion AES+';
+      c.font = 'bold 11px sans-serif';
+      const w = c.measureText(label).width + 12;
+      c.fillRect(x + 4, top + 4, w, 22);
+      c.fillStyle = '#fff'; c.fillText(label, x + 10, top + 19);
+      c.restore();
+    }
+  };
+
+  let chart;
+  function makeChart(yType) {
+    if (chart) chart.destroy();
+    const merTrend = weeklyTrend(MER);
+    const yhTrend  = weeklyTrend(YH);
+    chart = new Chart(ctx, {
+      type: 'scatter',
+      data: { datasets: [
+        { label: 'Mercari', data: MER, backgroundColor: 'rgba(245,158,11,.55)', pointRadius: 4, pointStyle: 'circle' },
+        { label: 'Yahoo',   data: YH,  backgroundColor: 'rgba(37,99,235,.65)',   pointRadius: 5, pointStyle: 'triangle' },
+        { label: 'Tendance Mercari', data: merTrend, type: 'line',
+          borderColor: '#f59e0b', backgroundColor: '#f59e0b', borderWidth: 2, borderDash: [5,4],
+          pointRadius: 3, pointBackgroundColor: '#fff', pointBorderColor: '#f59e0b',
+          showLine: true, tension: 0.15 },
+        { label: 'Tendance Yahoo', data: yhTrend, type: 'line',
+          borderColor: '#1e40af', backgroundColor: '#1e40af', borderWidth: 2,
+          pointRadius: 3, pointBackgroundColor: '#fff', pointBorderColor: '#1e40af',
+          showLine: true, tension: 0.15 },
+      ]},
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        parsing: { xAxisKey: 'x', yAxisKey: 'y' },
+        plugins: {
+          legend: { position: 'top' },
+          tooltip: { callbacks: {
+            title: items => new Date(items[0].parsed.x).toLocaleDateString('fr-FR', { year: 'numeric', month: 'short', day: 'numeric' }),
+            label: c => {
+              const p = c.raw;
+              if (p.source === 'mercari') return [`🟡 Mercari ¥${p.y.toLocaleString()} — ${p.status}`, p.name.slice(0, 60)];
+              if (p.source === 'yahoo')   return [`🔵 Yahoo ¥${p.y.toLocaleString()} — ${p.kind} (${p.bid} bids)`, p.name.slice(0, 60)];
+              if (p.label) return `${p.label} : médiane ¥${Math.round(p.y).toLocaleString()} (${p.count})`;
+              return `¥${Math.round(p.y).toLocaleString()}`;
+            }
+          } }
+        },
+        scales: {
+          x: { type: 'linear', min: START_X,
+               ticks: { callback: v => new Date(v).toLocaleDateString('fr-FR', {month:'short', day:'2-digit'}) },
+               title: { display: true, text: 'Date' } },
+          y: { type: yType, title: { display: true, text: 'Prix (¥)' },
+               ticks: { callback: v => '¥' + v.toLocaleString() } },
+        },
+        onClick: (evt, items) => { if (items.length) { const p = items[0].element.$context.raw; if (p.url) window.open(p.url, '_blank'); } },
+      },
+      plugins: [annoLinePlugin],
+    });
+    refreshVisibility();
+  }
+  function refreshVisibility() {
+    if (!chart) return;
+    chart.setDatasetVisibility(0, document.getElementById('show-mer').checked);
+    chart.setDatasetVisibility(1, document.getElementById('show-yh').checked);
+    chart.setDatasetVisibility(2, document.getElementById('show-mer-trend').checked);
+    chart.setDatasetVisibility(3, document.getElementById('show-yh-trend').checked);
+    chart.update();
+  }
+  makeChart('linear');
+  ['show-mer','show-yh','show-mer-trend','show-yh-trend'].forEach(id =>
+    document.getElementById(id).addEventListener('change', refreshVisibility));
+  document.getElementById('log-scale').addEventListener('change', e => makeChart(e.target.checked ? 'logarithmic' : 'linear'));
+} catch(e) { showErr(`Exception: ${e.message}`); }
+</script></body></html>

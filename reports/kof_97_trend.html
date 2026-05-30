@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8"><title>KOF '97 AES — Mercari & Yahoo Auctions — 2026</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f5f6fa; color: #1a1a2e; padding: 24px; max-width: 1400px; margin: 0 auto; }
+  h1 { font-size: 1.4rem; margin: 0 0 4px 0; }
+  p.sub { color: #666; font-size: .85rem; margin: 0 0 20px 0; }
+  .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,.08); margin-bottom: 20px; }
+  .controls { display: flex; gap: 14px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; font-size: .85rem; }
+  .controls label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+  canvas { max-width: 100%; }
+  .insight { background: linear-gradient(90deg, #fef3c7 0%, #fee2e2 100%); border-left: 4px solid #dc2626; padding: 14px 18px; border-radius: 8px; margin-bottom: 20px; }
+  .insight h3 { margin: 0 0 6px 0; font-size: 1rem; }
+  .insight p  { margin: 0; font-size: .88rem; line-height: 1.5; }
+  .insight strong { color: #dc2626; font-size: 1.05em; }
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+  .src-card { background: rgba(255,255,255,.75); padding: 10px 14px; border-radius: 6px; font-size: .82rem; }
+  .src-card.mer { border-left: 3px solid #f59e0b; }
+  .src-card.yh  { border-left: 3px solid #2563eb; }
+  .errbox { background: #fee; border: 1px solid #c33; padding: 10px; font-family: monospace; font-size: .8rem; color: #c00; display: none; margin: 10px 0; border-radius: 6px; }
+  .nav { margin-bottom: 16px; font-size: .85rem; display: flex; flex-wrap: wrap; gap: 6px; }
+  .nav a { padding: 4px 10px; border-radius: 4px; background: #fff; color: #2563eb; text-decoration: none; border: 1px solid #ddd; }
+  .nav a.active { background: #2563eb; color: #fff; border-color: #2563eb; }
+</style></head><body>
+
+<h1>KOF '97 AES — Mercari &amp; Yahoo Auctions — 2026</h1>
+<p class="sub">Mercari 16 ventes · Yahoo 40 ventes · données du 29/05/2026</p>
+
+<div class="nav">
+<a href="kof_94_trend.html">KOF '94</a>
+<a href="kof_95_trend.html">KOF '95</a>
+<a href="kof_96_trend.html">KOF '96</a>
+<a href="kof_97_trend.html" class="active">KOF '97</a>
+<a href="kof_98_trend.html">KOF '98</a>
+<a href="kof_99_trend.html">KOF '99</a>
+<a href="kof_2000_trend.html">KOF 2000</a>
+<a href="kof_2001_trend.html">KOF 2001</a>
+<a href="kof_2002_trend.html">KOF 2002</a>
+
+</div>
+
+<div class="insight">
+  <h3>📣 Effet de l'annonce Plaion Neo Geo AES+ (16 avril 2026)</h3>
+  <p>Plaion a annoncé le 16/04/2026 la sortie en novembre d'une nouvelle console <strong>Neo Geo AES+</strong> compatible avec les cartouches d'origine.</p>
+  <div class="split">
+    <div class="src-card mer">
+      <strong>🟡 Mercari</strong><br>
+      Avant 16/04 : 8 ventes · médiane ¥24,150<br>
+      Depuis : 8 · médiane <strong>¥36,500</strong> · <strong>+51.1%</strong>
+    </div>
+    <div class="src-card yh">
+      <strong>🔵 Yahoo</strong><br>
+      Avant 16/04 : 20 ventes · médiane ¥25,344<br>
+      Depuis : 20 · médiane <strong>¥39,527</strong> · <strong>+56.0%</strong>
+    </div>
+  </div>
+</div>
+
+<div id="err" class="errbox"></div>
+
+<div class="card">
+  <div class="controls">
+    <label><input type="checkbox" id="show-mer" checked> 🟡 Mercari</label>
+    <label><input type="checkbox" id="show-yh"  checked> 🔵 Yahoo</label>
+    <label><input type="checkbox" id="show-mer-trend" checked> ↗ Tendance Mercari</label>
+    <label><input type="checkbox" id="show-yh-trend"  checked> ↗ Tendance Yahoo</label>
+    <label><input type="checkbox" id="log-scale"> Échelle log Y</label>
+  </div>
+  <div style="height:560px;position:relative"><canvas id="chart"></canvas></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
+<script>
+const MER = [{"x": 1779784860000, "y": 40000, "name": "動作確認済みです！ザキングオブファイターズ97 ネオジオロム", "url": "https://jp.mercari.com/item/m58770668284", "status": "SOLD_OUT", "version": "97", "source": "mercari"}, {"x": 1779364500000, "y": 40000, "name": "【即購入ok】NEOGEO ザ・キングオブ・ファイターズ97", "url": "https://jp.mercari.com/item/m83968982270", "status": "SOLD_OUT", "version": "97", "source": "mercari"}, {"x": 1778763900000, "y": 19000, "name": "ネオジオROMソフト ザ・キング・オブ・ファイターズ’97 SNK KOF97", "url": "https://jp.mercari.com/item/m34074230948", "status": "SOLD_OUT", "version": "97", "source": "mercari"}, {"x": 1778076120000, "y": 42000, "name": "THE KING OF FIGHTERS '97 NEO GEO", "url": "https://jp.mercari.com/item/m19415229516", "status": "SOLD_OUT", "version": "97", "source": "mercari"}, {"x": 1777827000000, "y": 29800, "name": "「激安」ザ・キング・オブ・ファイターズ97 ネオジオ", "url": "https://jp.mercari.com/item/m11683408837", "status": "SOLD_OUT", "version": "97", "source": "mercari"}, {"x": 1777707840000, "y": 42000, "name": "NEO GEO ザ・キング・オブ・ファイターズ97", "url": "https://jp.mercari.com/item/m90567315528", "status": "SOLD_OUT", "version": "97", "source": "mercari"}, {"x": 1777064940000, "y": 33000, "name": "SNK NEOGEOロム　ザ・キング・オブ・ファイターズ'97", "url": "https://jp.mercari.com/item/m48505081996", "status": "SOLD_OUT", "version": "97", "source": "mercari"}, {"x": 1776857520000, "y": 33000, "name": "NEO GEO ザ・キング・オブ・ファイターズ97", "url": "https://jp.mercari.com/item/m36609036473", "status": "SOLD_OUT", "version": "97", "source": "mercari"}, {"x": 1770870780000, "y": 24300, "name": "希少《ネオジオROM》ザ・キングオブファイターズ 97", "url": "https://jp.mercari.com/item/m90454185370", "status": "SOLD_OUT", "version": "97", "source": "mercari"}, {"x": 1774325220000, "y": 32599, "name": "NEOGEO ネオジオ ロム版「ザ・キングオブファイターズ KOF 97」", "url": "https://jp.mercari.com/item/m93068685455", "status": "SOLD_OUT", "version": "97", "source": "mercari"}, {"x": 1773496320000, "y": 20000, "name": "【中古】NEOGEO ROM THE KING OF FIGHTERS '97", "url": "https://jp.mercari.com/item/m83794076638", "status": "SOLD_OUT", "version": "97", "source": "mercari"}, {"x": 1772383140000, "y": 27800, "name": "SNK NEOGEO KOF97 動作確認・清掃・メンテナンス済", "url": "https://jp.mercari.com/item/m60888332961", "status": "SOLD_OUT", "version": "97", "source": "mercari"}, {"x": 1772787480000, "y": 22000, "name": "松*郎様 動作ＯＫ！　ザ・キング・オブ・ファイターズ‘97 ネオジオ", "url": "https://jp.mercari.com/item/m88519245626", "status": "SOLD_OUT", "version": "97", "source": "mercari"}, {"x": 1771156860000, "y": 25000, "name": "THE KING OF FIGHTERS '97 NEO GEO　ハガキあり", "url": "https://jp.mercari.com/item/m22098632884", "status": "SOLD_OUT", "version": "97", "source": "mercari"}, {"x": 1768406700000, "y": 24000, "name": "ネオジオROMソフト ザ・キング・オブ・ファイターズ’97 SNK KOF97", "url": "https://jp.mercari.com/item/m56532819820", "status": "SOLD_OUT", "version": "97", "source": "mercari"}, {"x": 1767353580000, "y": 19800, "name": "ザ・キング・オブ・ファイターズ97 ネオジオ", "url": "https://jp.mercari.com/item/m51542566223", "status": "SOLD_OUT", "version": "97", "source": "mercari"}];
+const YH  = [{"x": 1779286860000, "y": 5000, "name": "レア 希少 キングオブファイターズ97 ハガキのみ ネオジオ NEOGEO", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z611529112", "bid": 1, "kind": "Buy-Now", "version": "97", "source": "yahoo"}, {"x": 1779203100000, "y": 39555, "name": "NEOGEO ザ・キングオブ・ファイターズ97 KOF97 ROM SNK", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z612256566", "bid": 1, "kind": "Buy-Now", "version": "97", "source": "yahoo"}, {"x": 1779196080000, "y": 32500, "name": "●格闘ゲーム【kof97 キングオブファイターズ97】ネオジオROM レトロゲーム　箱　説明書あり　名作　ハガキあり", "url": "https://page.auctions.yahoo.co.jp/jp/auction/r1229689710", "bid": 3, "kind": "Auction", "version": "97", "source": "yahoo"}, {"x": 1779178860000, "y": 42000, "name": "NEOGEO ザ・キング・オブ・ファイターズ '97 KOF 97 ロムカセットSNK AES やや匂い有", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z611548548", "bid": 1, "kind": "Buy-Now", "version": "97", "source": "yahoo"}, {"x": 1779066060000, "y": 5000, "name": "レア 希少 キングオブファイターズ97 ハガキのみ ネオジオ NEOGEO", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z610960138", "bid": 1, "kind": "Buy-Now", "version": "97", "source": "yahoo"}, {"x": 1779026700000, "y": 48500, "name": "◆ ネオジオROMソフト ザ・キング・オブ・ファイターズ97 SNK 箱説ハガキ付き ◆", "url": "https://page.auctions.yahoo.co.jp/jp/auction/q1230098557", "bid": 102, "kind": "Auction", "version": "97", "source": "yahoo"}, {"x": 1778691600000, "y": 5000, "name": "レア 希少 キングオブファイターズ97 ハガキのみ ネオジオ NEOGEO", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z609115600", "bid": 1, "kind": "Buy-Now", "version": "97", "source": "yahoo"}, {"x": 1778680200000, "y": 39500, "name": "【国内正規品】THE KING OF FIGHTERS 97 NEOGEO キング オブ ファイターズ 97 SNK ネオジオ ロムカセット", "url": "https://page.auctions.yahoo.co.jp/jp/auction/e1229442505", "bid": 12, "kind": "Auction", "version": "97", "source": "yahoo"}, {"x": 1778606880000, "y": 50000, "name": "レア 希少 ザ・キング・オブ・ファイターズ 97 THE KING OF FIGHTERS' 97 NEOGEO ROM ネオジオ ロム SNK KOF ", "url": "https://page.auctions.yahoo.co.jp/jp/auction/t1229317513", "bid": 1, "kind": "Auction", "version": "97", "source": "yahoo"}, {"x": 1778588940000, "y": 55330, "name": "1円〜 動作保証品 NG ネオジオROM ザ・キング・オブ・ファイターズ ’97 箱説ハガキ付【10", "url": "https://page.auctions.yahoo.co.jp/jp/auction/q1228930403", "bid": 23, "kind": "Auction", "version": "97", "source": "yahoo"}, {"x": 1778267400000, "y": 45000, "name": "レア 希少 ザ・キング・オブ・ファイターズ 97 THE KING OF FIGHTERS' 97 NEOGEO ROM ネオジオ ロム SNK KOF ", "url": "https://page.auctions.yahoo.co.jp/jp/auction/c1229003251", "bid": 1, "kind": "Auction", "version": "97", "source": "yahoo"}, {"x": 1778159520000, "y": 41600, "name": "【国内正規品 ハガキ有】THE KING OF FIGHTERS 97 キング オブ ファイターズ97 NEOGEO ネオジオ SNK ロムカセット", "url": "https://page.auctions.yahoo.co.jp/jp/auction/m1228788818", "bid": 8, "kind": "Auction", "version": "97", "source": "yahoo"}, {"x": 1778140980000, "y": 9797, "name": "家庭用NEOGEO ザ・キング・オブ・ファイターズ97 SNK ソフトのみ　kof97 rom", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z605666684", "bid": 1, "kind": "Buy-Now", "version": "97", "source": "yahoo"}, {"x": 1778130300000, "y": 44000, "name": "ザ・キングオブファイターズ97 THE KING OF FIGHTERS' 97 NEOGEO ROM ネオジオ ロム SNK ", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z605111178", "bid": 1, "kind": "Buy-Now", "version": "97", "source": "yahoo"}, {"x": 1778085480000, "y": 42000, "name": "レア 希少 ザ・キング・オブ・ファイターズ 97 THE KING OF FIGHTERS' 97 NEOGEO ROM ネオジオ ロム SNK KOF ", "url": "https://page.auctions.yahoo.co.jp/jp/auction/c1228872673", "bid": 1, "kind": "Auction", "version": "97", "source": "yahoo"}, {"x": 1777900920000, "y": 32500, "name": "NG ザ・キング・オブ・ファイターズ 97 THE KING OF FIGHTERS' 97 KOF SNK ネオジオ NEOGEO NEO-GEO ROM ロム カセット 動作確認済", "url": "https://page.auctions.yahoo.co.jp/jp/auction/j1228308251", "bid": 1, "kind": "Auction", "version": "97", "source": "yahoo"}, {"x": 1777829460000, "y": 40000, "name": "レア 希少 ザ・キング・オブ・ファイターズ 97 THE KING OF FIGHTERS' 97 NEOGEO ROM ネオジオ ロム SNK KOF ", "url": "https://page.auctions.yahoo.co.jp/jp/auction/k1228368684", "bid": 1, "kind": "Auction", "version": "97", "source": "yahoo"}, {"x": 1777512720000, "y": 33000, "name": "レア 希少 ザ・キング・オブ・ファイターズ 97 THE KING OF FIGHTERS' 97 NEOGEO ROM ネオジオ ロム SNK KOF ", "url": "https://page.auctions.yahoo.co.jp/jp/auction/t1219818658", "bid": 2, "kind": "Auction", "version": "97", "source": "yahoo"}, {"x": 1776952920000, "y": 28000, "name": "【動作確認済み】NEOGEO ザ・キング・オブファイターズ '97 KOF 97 ROM ロム ソフト カセット ネオジオ SNK", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z597336450", "bid": 1, "kind": "Buy-Now", "version": "97", "source": "yahoo"}, {"x": 1776859740000, "y": 25500, "name": "(管105987)【ゲームソフト】THE KING OF FIGHTERS '97 ザキングオブファイターズ KOF ネオジオ NEOGEO ROM 箱説有 現状品 動作未チェック", "url": "https://page.auctions.yahoo.co.jp/jp/auction/e1227097615", "bid": 4, "kind": "Auction", "version": "97", "source": "yahoo"}, {"x": 1776173100000, "y": 27509, "name": "コレクター放出 レア 希少 ザ・キング・オブ・ファイターズ 97 THE KING OF FIGHTERS' 97 NEOGEO ROM ネオジオ ロム SNK KOF ", "url": "https://page.auctions.yahoo.co.jp/jp/auction/n1226078770", "bid": 23, "kind": "Auction", "version": "97", "source": "yahoo"}, {"x": 1775827980000, "y": 26952, "name": "【箱付き】【動作品】ザ・キング・オブ・ファイターズ97 ネオジオ NEOGEO", "url": "https://page.auctions.yahoo.co.jp/jp/auction/e1225548113", "bid": 4, "kind": "Auction", "version": "97", "source": "yahoo"}, {"x": 1775224920000, "y": 14850, "name": "ザ・キング・オブ・ファイターズ97 ネオジオ NEOGEO", "url": "https://page.auctions.yahoo.co.jp/jp/auction/d1224706442", "bid": 22, "kind": "Auction", "version": "97", "source": "yahoo"}, {"x": 1774788300000, "y": 26000, "name": "NEOGEO キング オブ ファイターズ97 SNK KOF ネオジオ ROM", "url": "https://page.auctions.yahoo.co.jp/jp/auction/q1224358887", "bid": 16, "kind": "Auction", "version": "97", "source": "yahoo"}, {"x": 1774788060000, "y": 20570, "name": "1円〜 動作品 NG ネオジオROM ザ・キング・オブ・ファイターズ’97 箱説付【10", "url": "https://page.auctions.yahoo.co.jp/jp/auction/b1224030930", "bid": 36, "kind": "Auction", "version": "97", "source": "yahoo"}, {"x": 1774531680000, "y": 30728, "name": "【箱付き】【動作品】ザ・キング・オブ・ファイターズ97 ネオジオ NEOGEO", "url": "https://page.auctions.yahoo.co.jp/jp/auction/r1223911992", "bid": 12, "kind": "Auction", "version": "97", "source": "yahoo"}, {"x": 1772974560000, "y": 10100, "name": "2E040 NEOGEO ネオジオ ロムカセット THE KING OF FIGHTERS '97 ザ・キング・オブ・ファイターズ ゲームソフト ゲーム ホビー", "url": "https://page.auctions.yahoo.co.jp/jp/auction/x1221478454", "bid": 13, "kind": "Auction", "version": "97", "source": "yahoo"}, {"x": 1772027760000, "y": 25972, "name": "mY405a [箱説有] NEOGEO ソフト ザ・キング・オブ・ファイターズ 97 / ネオジオ ROM カセット ☆ | ゲーム X", "url": "https://page.auctions.yahoo.co.jp/jp/auction/d1220295229", "bid": 38, "kind": "Auction", "version": "97", "source": "yahoo"}, {"x": 1771935180000, "y": 35597, "name": "ネオジオ KoF'97 + 解説本のオマケ付き ザ・キング・オブ・ファイターズ'97 オマケ付き ロムカセット NEOGEO（中古品）", "url": "https://page.auctions.yahoo.co.jp/jp/auction/o1219859357", "bid": 9, "kind": "Auction", "version": "97", "source": "yahoo"}, {"x": 1771770180000, "y": 23001, "name": "SNK NEOGEO ネオジオ ロムカセット ゲームソフト THE KING OF FIGHTERS’97 ザ・キング・オブ・ファイターズ ケース付", "url": "https://page.auctions.yahoo.co.jp/jp/auction/m1220368904", "bid": 1, "kind": "Auction", "version": "97", "source": "yahoo"}, {"x": 1771767120000, "y": 15700, "name": "【ネオジオ ロム】ザ・キング・オブ・ファイターズ'97 ※ROMのみ【中古】【NEOGEO ROM】", "url": "https://page.auctions.yahoo.co.jp/jp/auction/p1220194449", "bid": 28, "kind": "Auction", "version": "97", "source": "yahoo"}, {"x": 1771765260000, "y": 28600, "name": "【箱付き】【動作品】ザ・キング・オブ・ファイターズ97 ネオジオ NEOGEO", "url": "https://page.auctions.yahoo.co.jp/jp/auction/n1219942741", "bid": 11, "kind": "Auction", "version": "97", "source": "yahoo"}, {"x": 1771163940000, "y": 30000, "name": "レア 希少 ザ・キング・オブ・ファイターズ 97 THE KING OF FIGHTERS' 97 NEOGEO ROM ネオジオ ロム SNK KOF ", "url": "https://page.auctions.yahoo.co.jp/jp/auction/q1199322609", "bid": 1, "kind": "Auction", "version": "97", "source": "yahoo"}, {"x": 1770559260000, "y": 25300, "name": "#【SNK NEOGEO ザ・キング・オブ・ファイターズ 97 ネオジオ ゲームソフト ロムカセット 取説 元箱 レトロ 動作未確認 ジャンク品】R01238", "url": "https://page.auctions.yahoo.co.jp/jp/auction/s1218475716", "bid": 3, "kind": "Auction", "version": "97", "source": "yahoo"}, {"x": 1769348100000, "y": 22000, "name": "Yn5145 SNK NEOGEO ROM ネオジオ ロムカセット ザ・キング・オブ・ファイターズ 97 KOF 簡易動作確認済 中古", "url": "https://page.auctions.yahoo.co.jp/jp/auction/e1216520399", "bid": 37, "kind": "Auction", "version": "97", "source": "yahoo"}, {"x": 1769255280000, "y": 7980, "name": "【説明書欠品】ザ キング オブ ファイターズ97 箱付き ネオジオ SNK", "url": "https://page.auctions.yahoo.co.jp/jp/auction/w1217138900", "bid": 1, "kind": "Buy-Now", "version": "97", "source": "yahoo"}, {"x": 1769093700000, "y": 25388, "name": "6275 NEOGEO ネオジオ キング オブ ファイターズ ROM SNK KOF ロムカセット ファイターズ97 動作未確認", "url": "https://page.auctions.yahoo.co.jp/jp/auction/n1216161992", "bid": 9, "kind": "Auction", "version": "97", "source": "yahoo"}, {"x": 1769092500000, "y": 19910, "name": "中古品 ゲーム ネオジオ SNK ザ・キング・オブ・ファイターズ97 カセット", "url": "https://page.auctions.yahoo.co.jp/jp/auction/q1216685805", "bid": 13, "kind": "Auction", "version": "97", "source": "yahoo"}, {"x": 1769090580000, "y": 23000, "name": "ザキングオブファイターズ97【NEOGEO】【ハガキ付】ROM版", "url": "https://page.auctions.yahoo.co.jp/jp/auction/d1216904781", "bid": 1, "kind": "Auction", "version": "97", "source": "yahoo"}, {"x": 1768738260000, "y": 25388, "name": "ザ・キング・オブ・ファイターズ'97 / NEOGEO ネオジオ", "url": "https://page.auctions.yahoo.co.jp/jp/auction/1215550688", "bid": 20, "kind": "Auction", "version": "97", "source": "yahoo"}];
+const ANNOUNCE_X = 1776297600000;
+const START_X    = 1767225600000;
+
+function showErr(m){const e=document.getElementById('err');e.style.display='block';e.textContent=(e.textContent?e.textContent+' | ':'')+m;console.error(m);}
+window.addEventListener('error', ev => showErr(`JS error: ${ev.message} @ ${ev.lineno}`));
+
+function weeklyTrend(points) {
+  // Rolling 3-week centered median: pool prices from week N-1, N, N+1
+  // to smooth small-sample noise without losing the median's outlier resistance.
+  const buckets = new Map();
+  for (const p of points) {
+    const d = new Date(p.x);
+    const tmp = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+    tmp.setUTCDate(tmp.getUTCDate() + 3 - (tmp.getUTCDay() + 6) % 7);
+    const weekYear = tmp.getUTCFullYear();
+    const week1 = new Date(Date.UTC(weekYear, 0, 4));
+    const week = 1 + Math.round(((tmp - week1) / 86400000 - 3 + (week1.getUTCDay() + 6) % 7) / 7);
+    const key = `${weekYear}-W${String(week).padStart(2,'0')}`;
+    if (!buckets.has(key)) buckets.set(key, { prices: [], dates: [] });
+    buckets.get(key).prices.push(p.y); buckets.get(key).dates.push(p.x);
+  }
+  const sortedKeys = [...buckets.keys()].sort();
+  const out = [];
+  for (let i = 0; i < sortedKeys.length; i++) {
+    const window = [sortedKeys[i-1], sortedKeys[i], sortedKeys[i+1]].filter(Boolean);
+    const pooledPrices = window.flatMap(k => buckets.get(k).prices);
+    const pooledDates  = buckets.get(sortedKeys[i]).dates;
+    if (pooledPrices.length < 3) continue;
+    const sorted = [...pooledPrices].sort((a,b)=>a-b);
+    const med = sorted.length % 2
+      ? sorted[(sorted.length-1)/2]
+      : (sorted[sorted.length/2-1] + sorted[sorted.length/2]) / 2;
+    const midX = pooledDates.sort((a,b)=>a-b)[Math.floor(pooledDates.length/2)];
+    out.push({ x: midX, y: med, count: pooledPrices.length, label: sortedKeys[i] + ' (±1 sem)' });
+  }
+  return out;
+}
+
+try {
+  if (typeof Chart === 'undefined') { showErr('Chart.js failed'); throw new Error('no Chart'); }
+  const ctx = document.getElementById('chart').getContext('2d');
+
+  const annoLinePlugin = {
+    id: 'annoLine',
+    afterDatasetsDraw(chart) {
+      const x = chart.scales.x.getPixelForValue(ANNOUNCE_X);
+      if (isNaN(x)) return;
+      const c = chart.ctx;
+      const top = chart.chartArea.top, bot = chart.chartArea.bottom;
+      c.save();
+      c.strokeStyle = '#dc2626'; c.lineWidth = 2; c.setLineDash([6,4]);
+      c.beginPath(); c.moveTo(x, top); c.lineTo(x, bot); c.stroke();
+      c.setLineDash([]);
+      c.fillStyle = 'rgba(220,38,38,.9)';
+      const label = '📣 Plaion AES+';
+      c.font = 'bold 11px sans-serif';
+      const w = c.measureText(label).width + 12;
+      c.fillRect(x + 4, top + 4, w, 22);
+      c.fillStyle = '#fff'; c.fillText(label, x + 10, top + 19);
+      c.restore();
+    }
+  };
+
+  let chart;
+  function makeChart(yType) {
+    if (chart) chart.destroy();
+    const merTrend = weeklyTrend(MER);
+    const yhTrend  = weeklyTrend(YH);
+    chart = new Chart(ctx, {
+      type: 'scatter',
+      data: { datasets: [
+        { label: 'Mercari', data: MER, backgroundColor: 'rgba(245,158,11,.55)', pointRadius: 4, pointStyle: 'circle' },
+        { label: 'Yahoo',   data: YH,  backgroundColor: 'rgba(37,99,235,.65)',   pointRadius: 5, pointStyle: 'triangle' },
+        { label: 'Tendance Mercari', data: merTrend, type: 'line',
+          borderColor: '#f59e0b', backgroundColor: '#f59e0b', borderWidth: 2, borderDash: [5,4],
+          pointRadius: 3, pointBackgroundColor: '#fff', pointBorderColor: '#f59e0b',
+          showLine: true, tension: 0.15 },
+        { label: 'Tendance Yahoo', data: yhTrend, type: 'line',
+          borderColor: '#1e40af', backgroundColor: '#1e40af', borderWidth: 2,
+          pointRadius: 3, pointBackgroundColor: '#fff', pointBorderColor: '#1e40af',
+          showLine: true, tension: 0.15 },
+      ]},
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        parsing: { xAxisKey: 'x', yAxisKey: 'y' },
+        plugins: {
+          legend: { position: 'top' },
+          tooltip: { callbacks: {
+            title: items => new Date(items[0].parsed.x).toLocaleDateString('fr-FR', { year: 'numeric', month: 'short', day: 'numeric' }),
+            label: c => {
+              const p = c.raw;
+              if (p.source === 'mercari') return [`🟡 Mercari ¥${p.y.toLocaleString()} — ${p.status}`, p.name.slice(0, 60)];
+              if (p.source === 'yahoo')   return [`🔵 Yahoo ¥${p.y.toLocaleString()} — ${p.kind} (${p.bid} bids)`, p.name.slice(0, 60)];
+              if (p.label) return `${p.label} : médiane ¥${Math.round(p.y).toLocaleString()} (${p.count})`;
+              return `¥${Math.round(p.y).toLocaleString()}`;
+            }
+          } }
+        },
+        scales: {
+          x: { type: 'linear', min: START_X,
+               ticks: { callback: v => new Date(v).toLocaleDateString('fr-FR', {month:'short', day:'2-digit'}) },
+               title: { display: true, text: 'Date' } },
+          y: { type: yType, title: { display: true, text: 'Prix (¥)' },
+               ticks: { callback: v => '¥' + v.toLocaleString() } },
+        },
+        onClick: (evt, items) => { if (items.length) { const p = items[0].element.$context.raw; if (p.url) window.open(p.url, '_blank'); } },
+      },
+      plugins: [annoLinePlugin],
+    });
+    refreshVisibility();
+  }
+  function refreshVisibility() {
+    if (!chart) return;
+    chart.setDatasetVisibility(0, document.getElementById('show-mer').checked);
+    chart.setDatasetVisibility(1, document.getElementById('show-yh').checked);
+    chart.setDatasetVisibility(2, document.getElementById('show-mer-trend').checked);
+    chart.setDatasetVisibility(3, document.getElementById('show-yh-trend').checked);
+    chart.update();
+  }
+  makeChart('linear');
+  ['show-mer','show-yh','show-mer-trend','show-yh-trend'].forEach(id =>
+    document.getElementById(id).addEventListener('change', refreshVisibility));
+  document.getElementById('log-scale').addEventListener('change', e => makeChart(e.target.checked ? 'logarithmic' : 'linear'));
+} catch(e) { showErr(`Exception: ${e.message}`); }
+</script></body></html>
