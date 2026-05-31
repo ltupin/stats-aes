@@ -1,0 +1,4 @@
+# Faux positifs FF3 marché France (eBay.fr) — une URL par ligne
+
+# Version Corée + prix aberrant (€2 000) — signalé par l'utilisateur 2026-06-01
+https://www.ebay.fr/itm/236677579959
