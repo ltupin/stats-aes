@@ -67,6 +67,11 @@ EXCLUDE_COMMON_LC = [s.lower() for s in [
     "ニンテンドー","Nintendo","PlayStation","ドリームキャスト","Dreamcast","DREAMCAST","ドリキャス","DC版",
     "アーケード","ACA NEOGEO","Wii","WII","セガサターン","Saturn",
     "PS2","PS3","PS4","PS5","PSP","NDS",
+    # Portages rétro (PAS la version Neo Geo AES) — ex. FF2/FFS sortis sur MD/SFC/PCE
+    "メガドライブ","MEGA DRIVE","MEGADRIVE","メガCD","MEGA CD","GENESIS","ジェネシス",
+    "スーパーファミコン","スーファミ","SFC","SNES","Super Famicom","Super Nintendo",
+    "PCエンジン","PC Engine","PCENGINE","TurboGrafx","ゲームギア","GAME GEAR","GAMEGEAR",
+    "X68000","3DO","FM TOWNS","エフエムタウンズ",
     "ディスクのみ",
     "オンラインコレクション","ONLINE COLLECTION",
 ]]
@@ -125,6 +130,45 @@ GAMES = {
         ],
         "exclude_urls": set(),
     },
+    "ff2": {
+        "label": "Fatal Fury 2 AES",
+        # Le « 2 » après 餓狼伝説 distingue du Special (餓狼伝説スペシャル, sans chiffre).
+        # (?![0-9０-９]) évite 20周年 / 2本 etc.
+        "INCLUDE": re.compile(
+            r"(餓狼伝説[\s　]*[2２](?![0-9０-９])"
+            r"|餓狼伝説[\s　]*II(?!I)"
+            r"|Fatal\s*Fury\s*2|FATAL\s*FURY\s*2)", re.IGNORECASE),
+        "EXCLUDE_GAME": [
+            # NE PAS confondre avec les autres opus
+            "餓狼伝説3","餓狼伝説SPECIAL","餓狼伝説スペシャル","SPECIAL","スペシャル",
+            "餓狼 MARK","MARK OF THE WOLVES","MOTW","ウルブズ","City of the Wolves","COTW",
+            # Real Bout 餓狼伝説2 (リアルバウト餓狼伝説2) = jeu DIFFÉRENT
+            "リアルバウト","Real Bout","REALBOUT","REAL BOUT","RB餓狼","ＲＢ",
+            # Autres franchises SNK
+            "キングオブファイターズ","KOF","King of Fighters","KING OF FIGHTERS",
+            "サムライスピリッツ","侍魂","龍虎の拳","メタルスラッグ","Metal Slug",
+            "ワールドヒーローズ","ブレイカーズ","風雲","アテナ","ATHENA","月華",
+        ],
+        "exclude_urls": set(),
+    },
+    "ff3": {
+        "label": "Fatal Fury 3 AES",
+        # Le « 3 » après 餓狼伝説, ou le sous-titre 遥かなる闘い (Road to Final Victory).
+        "INCLUDE": re.compile(
+            r"(餓狼伝説[\s　]*[3３](?![0-9０-９])"
+            r"|餓狼伝説[\s　]*III"
+            r"|Fatal\s*Fury\s*3|FATAL\s*FURY\s*3"
+            r"|餓狼伝説[\s　]*遥かなる闘い|遥かなる闘い)", re.IGNORECASE),
+        "EXCLUDE_GAME": [
+            "餓狼伝説1","餓狼伝説2","餓狼伝説SPECIAL","餓狼伝説スペシャル","SPECIAL","スペシャル",
+            "餓狼 MARK","MARK OF THE WOLVES","MOTW","ウルブズ","City of the Wolves","COTW",
+            "リアルバウト","Real Bout","REALBOUT","REAL BOUT","RB餓狼","ＲＢ",
+            "キングオブファイターズ","KOF","King of Fighters","KING OF FIGHTERS",
+            "サムライスピリッツ","侍魂","龍虎の拳","メタルスラッグ","Metal Slug",
+            "ワールドヒーローズ","ブレイカーズ","風雲","アテナ","ATHENA","月華",
+        ],
+        "exclude_urls": set(),
+    },
 }
 
 
@@ -150,7 +194,11 @@ def build_filter(cfg, key):
 def gather(key, cfg):
     keep = build_filter(cfg, key)
     mer, yh = [], []
-    with open(RAW_DIR / f"{key}_mercari.csv", encoding="utf-8") as f:
+    # Une source peut manquer (ex. Yahoo géo-bloqué, jamais fetché) → liste vide.
+    mer_path = RAW_DIR / f"{key}_mercari.csv"
+    yh_path  = RAW_DIR / f"{key}_yahoo.csv"
+    if mer_path.exists():
+      with open(mer_path, encoding="utf-8") as f:
         rd = csv.reader(f, delimiter=";"); next(rd)
         for row in rd:
             if len(row) < 5: continue
@@ -166,7 +214,8 @@ def gather(key, cfg):
             if not keep(title, url): continue
             mer.append({"x": int(dt.timestamp()*1000), "y": p,
                         "name": title, "url": url, "status": status, "source": "mercari"})
-    with open(RAW_DIR / f"{key}_yahoo.csv", encoding="utf-8") as f:
+    if yh_path.exists():
+      with open(yh_path, encoding="utf-8") as f:
         rd = csv.reader(f, delimiter=";"); next(rd)
         for row in rd:
             if len(row) < 6: continue

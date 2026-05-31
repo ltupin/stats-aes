@@ -21,7 +21,9 @@ Statistiques/
 ├── requirements.txt              — dépendances pip
 ├── .venv/                        — venv local (Python 3.14)
 ├── reports/                      — pages HTML autonomes (Chart.js via CDN)
+│   ├── ff2_trend.html
 │   ├── ffs_trend.html
+│   ├── ff3_trend.html
 │   ├── samsho1_trend.html
 │   ├── aof_trend.html
 │   └── kof_{94,95,96,97,98,99,2000,2001,2002}_trend.html
@@ -118,7 +120,9 @@ suivants.
 
 | Jeu              | Mercari Δ | Yahoo Δ | Lecture |
 |------------------|-----------|---------|---------|
+| Fatal Fury 2     | +119 %    | n/a*    | Forte hausse ; *Yahoo non fetché (géo-bloc) |
 | Fatal Fury Sp.   | +168 %    | +135 %  | Bond Plaion massif (jeu pilote) |
+| Fatal Fury 3     | +19 %     | n/a*    | Hausse modérée, déjà cher/rare ; *Mercari only |
 | KOF '94          | +112 %    | +86 %   | Premier opus, fortes volumes |
 | KOF '95-'97      | +27→+77 % | +32→+77 % | Tendance haussière cohérente |
 | KOF '98-2002     | bruité    | bruité  | Volumes minces, conclusions fragiles |

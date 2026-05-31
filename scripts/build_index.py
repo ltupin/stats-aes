@@ -63,7 +63,8 @@ def group_of(name):
     return "main"
 
 
-MAIN_ORDER = ["ffs_trend.html", "samsho1_trend.html", "aof_trend.html"]
+MAIN_ORDER = ["ff2_trend.html", "ffs_trend.html", "ff3_trend.html",
+              "samsho1_trend.html", "aof_trend.html"]
 
 
 def sort_key(rep):
@@ -96,6 +97,11 @@ def render_card(rep):
     srcs = ""
     for s in rep["sources"]:
         icon = "🟡" if s["label"] == "Mercari" else "🔵"
+        # Source sans aucune vente (ex. Yahoo géo-bloqué, jamais fetché).
+        if s["pre"] == "0" and s["post"] == "0":
+            srcs += (f'<div class="src"><span class="src-name">{icon} {s["label"]}</span>'
+                     f'<span class="src-medians na">aucune donnée</span></div>')
+            continue
         cls = delta_class(s["delta"])
         if s["pre"] is not None:
             line = (f'<span class="src-name">{icon} {s["label"]}</span>'
@@ -176,6 +182,7 @@ PAGE = """<!DOCTYPE html>
   .src-name {{ width: 92px; flex: none; color: #444; }}
   .src-medians {{ flex: 1; color: #666; font-variant-numeric: tabular-nums; }}
   .src-medians .n {{ color: #aaa; margin-left: 4px; font-size: .9em; }}
+  .src-medians.na {{ color: #bbb; font-style: italic; }}
   .delta {{ font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }}
   .delta.hot {{ color: var(--hot); }}
   .delta.up {{ color: var(--up); }}

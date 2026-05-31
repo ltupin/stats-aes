@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8"><title>Fatal Fury 2 AES — Mercari & Yahoo Auctions — 2026</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f5f6fa; color: #1a1a2e; padding: 24px; max-width: 1400px; margin: 0 auto; }
+  h1 { font-size: 1.4rem; margin: 0 0 4px 0; }
+  p.sub { color: #666; font-size: .85rem; margin: 0 0 20px 0; }
+  .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,.08); margin-bottom: 20px; }
+  .controls { display: flex; gap: 14px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; font-size: .85rem; }
+  .controls label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+  canvas { max-width: 100%; }
+  .insight { background: linear-gradient(90deg, #fef3c7 0%, #fee2e2 100%); border-left: 4px solid #dc2626; padding: 14px 18px; border-radius: 8px; margin-bottom: 20px; }
+  .insight h3 { margin: 0 0 6px 0; font-size: 1rem; }
+  .insight p  { margin: 0; font-size: .88rem; line-height: 1.5; }
+  .insight strong { color: #dc2626; font-size: 1.05em; }
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+  .src-card { background: rgba(255,255,255,.75); padding: 10px 14px; border-radius: 6px; font-size: .82rem; }
+  .src-card.mer { border-left: 3px solid #f59e0b; }
+  .src-card.yh  { border-left: 3px solid #2563eb; }
+  .errbox { background: #fee; border: 1px solid #c33; padding: 10px; font-family: monospace; font-size: .8rem; color: #c00; display: none; margin: 10px 0; border-radius: 6px; }
+</style></head><body>
+
+<h1>Fatal Fury 2 AES — Mercari &amp; Yahoo Auctions — 2026</h1>
+<p class="sub">Mercari 27 ventes · Yahoo 0 ventes · données du 31/05/2026</p>
+
+<div class="insight">
+  <h3>📣 Effet de l'annonce Plaion Neo Geo AES+ (16 avril 2026)</h3>
+  <p>Plaion a annoncé le 16/04/2026 la sortie en novembre d'une nouvelle console <strong>Neo Geo AES+</strong> compatible avec les cartouches d'origine.</p>
+  <div class="split">
+    <div class="src-card mer">
+      <strong>🟡 Mercari</strong><br>
+      Avant 16/04 : 11 ventes · médiane ¥6,500<br>
+      Depuis : 16 · médiane <strong>¥14,250</strong> · <strong>+119.2%</strong>
+    </div>
+    <div class="src-card yh">
+      <strong>🔵 Yahoo</strong><br>
+      Avant 16/04 : 0 ventes · médiane ¥0<br>
+      Depuis : 0 · médiane <strong>¥0</strong> · <strong>+0.0%</strong>
+    </div>
+  </div>
+</div>
+
+<div id="err" class="errbox"></div>
+
+<div class="card">
+  <div class="controls">
+    <label><input type="checkbox" id="show-mer" checked> 🟡 Mercari</label>
+    <label><input type="checkbox" id="show-yh"  checked> 🔵 Yahoo</label>
+    <label><input type="checkbox" id="show-mer-trend" checked> ↗ Tendance Mercari</label>
+    <label><input type="checkbox" id="show-yh-trend"  checked> ↗ Tendance Yahoo</label>
+    <label><input type="checkbox" id="log-scale"> Échelle log Y</label>
+  </div>
+  <div style="height:560px;position:relative"><canvas id="chart"></canvas></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
+<script>
+const MER = [{"x": 1779813780000, "y": 14000, "name": "ネオジオROMソフト 餓狼伝説2 -新たなる闘い- SNK 箱説付き", "url": "https://jp.mercari.com/item/m95504914299", "status": "SOLD_OUT", "source": "mercari"}, {"x": 1779375060000, "y": 8500, "name": "ネオジオROMソフト 餓狼伝説2 -新たなる闘い- SNK NEOGEO", "url": "https://jp.mercari.com/item/m96544537589", "status": "SOLD_OUT", "source": "mercari"}, {"x": 1779342060000, "y": 22000, "name": "NEOGEO 餓狼伝説2 ネオジオロム SNK", "url": "https://jp.mercari.com/item/m55744623731", "status": "SOLD_OUT", "source": "mercari"}, {"x": 1778917500000, "y": 17000, "name": "ネオジオROMカセット 餓狼伝説2", "url": "https://jp.mercari.com/item/m28873370100", "status": "SOLD_OUT", "source": "mercari"}, {"x": 1778916240000, "y": 12000, "name": "【動作確認済み】ネオジオ 餓狼伝説2 新たなる闘い NEOGEO ネオジオROM", "url": "https://jp.mercari.com/item/m98805204974", "status": "SOLD_OUT", "source": "mercari"}, {"x": 1778685300000, "y": 9800, "name": "SNK NEOGEO 餓狼伝説2 ロムカセット ネオジオ ソフト", "url": "https://jp.mercari.com/item/m81654740067", "status": "SOLD_OUT", "source": "mercari"}, {"x": 1778479020000, "y": 14500, "name": "NEOGEO 餓狼伝説2 ネオジオ", "url": "https://jp.mercari.com/item/m62260054526", "status": "SOLD_OUT", "source": "mercari"}, {"x": 1778325660000, "y": 15180, "name": "【外箱ボロ】SNK ネオジオ ROM 餓狼伝説2", "url": "https://jp.mercari.com/item/m54758894968", "status": "SOLD_OUT", "source": "mercari"}, {"x": 1778445180000, "y": 16000, "name": "ネオジオ 餓狼伝説2", "url": "https://jp.mercari.com/item/m73074065535", "status": "SOLD_OUT", "source": "mercari"}, {"x": 1778138100000, "y": 15555, "name": "ネオジオ ロム 餓狼伝説2 NEOGEO ROM 人気", "url": "https://jp.mercari.com/item/m77724141934", "status": "SOLD_OUT", "source": "mercari"}, {"x": 1778129280000, "y": 7000, "name": "餓狼伝説2 ネオジオ", "url": "https://jp.mercari.com/item/m16395665848", "status": "SOLD_OUT", "source": "mercari"}, {"x": 1778033400000, "y": 21000, "name": "餓狼伝説2 NEO GEO", "url": "https://jp.mercari.com/item/m98540914812", "status": "SOLD_OUT", "source": "mercari"}, {"x": 1777883280000, "y": 6500, "name": "餓狼伝説2 NEO GEO ソフト", "url": "https://jp.mercari.com/item/m27057736834", "status": "SOLD_OUT", "source": "mercari"}, {"x": 1777881960000, "y": 15000, "name": "◇餓狼伝説2−新たなる闘い− 　[ネオ・ジオ］ROM", "url": "https://jp.mercari.com/item/m71414972968", "status": "SOLD_OUT", "source": "mercari"}, {"x": 1777526820000, "y": 12000, "name": "餓狼伝説2 NEOGEO ロムカセット SNK", "url": "https://jp.mercari.com/item/2JQYGB6CsUfeu5sAPsEFsG", "status": "SOLD_OUT", "source": "mercari"}, {"x": 1776324480000, "y": 6100, "name": "餓狼伝説2 NEO GEO オリジナル版", "url": "https://jp.mercari.com/item/m69690919336", "status": "SOLD_OUT", "source": "mercari"}, {"x": 1775906100000, "y": 5600, "name": "餓狼伝説2 ネオジオ SNK NEOGEO 新たなる闘い ROM ロム カセット", "url": "https://jp.mercari.com/item/m26275948930", "status": "SOLD_OUT", "source": "mercari"}, {"x": 1773901080000, "y": 7000, "name": "餓狼伝説2 NEO GEO バトルアクションゲーム", "url": "https://jp.mercari.com/item/m88500095736", "status": "SOLD_OUT", "source": "mercari"}, {"x": 1775403300000, "y": 5900, "name": "SNK NEOGEO ネオジオ 餓狼伝説2 • ソフトのみ", "url": "https://jp.mercari.com/item/m55049640320", "status": "SOLD_OUT", "source": "mercari"}, {"x": 1774607880000, "y": 6650, "name": "餓狼伝説2 NEO GEO ソフト SNK", "url": "https://jp.mercari.com/item/m62179693952", "status": "SOLD_OUT", "source": "mercari"}, {"x": 1771297200000, "y": 5900, "name": "餓狼伝説2 ネオジオ", "url": "https://jp.mercari.com/item/m34259773154", "status": "SOLD_OUT", "source": "mercari"}, {"x": 1769775840000, "y": 6000, "name": "餓狼伝説2 ネオジオ", "url": "https://jp.mercari.com/item/m93845095885", "status": "SOLD_OUT", "source": "mercari"}, {"x": 1769575800000, "y": 6500, "name": "餓狼伝説2 NEO GEO ロムカセット", "url": "https://jp.mercari.com/item/m54441276619", "status": "SOLD_OUT", "source": "mercari"}, {"x": 1768895220000, "y": 11980, "name": "餓狼伝説2 NEOGEO ロムカセット SNK", "url": "https://jp.mercari.com/item/2JKzb6oTekKwhwVvxYcpem", "status": "SOLD_OUT", "source": "mercari"}, {"x": 1768877820000, "y": 12980, "name": "餓狼伝説2 NEO GEO ソフト 美品", "url": "https://jp.mercari.com/item/2JKz5RRRcYKXEeK5PeHcNb", "status": "SOLD_OUT", "source": "mercari"}, {"x": 1767752760000, "y": 7000, "name": "餓狼伝説2 NEO GEO", "url": "https://jp.mercari.com/item/m47614340278", "status": "SOLD_OUT", "source": "mercari"}, {"x": 1767951060000, "y": 6200, "name": "【美品】餓狼伝説2 SNK ネオジオ", "url": "https://jp.mercari.com/item/m30444918514", "status": "SOLD_OUT", "source": "mercari"}];
+const YH  = [];
+const ANNOUNCE_X = 1776297600000;
+const START_X    = 1767225600000;
+
+function showErr(m){const e=document.getElementById('err');e.style.display='block';e.textContent=(e.textContent?e.textContent+' | ':'')+m;console.error(m);}
+window.addEventListener('error', ev => showErr(`JS error: ${ev.message} @ ${ev.lineno}`));
+
+function weeklyTrend(points) {
+  const buckets = new Map();
+  for (const p of points) {
+    const d = new Date(p.x);
+    const tmp = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+    tmp.setUTCDate(tmp.getUTCDate() + 3 - (tmp.getUTCDay() + 6) % 7);
+    const weekYear = tmp.getUTCFullYear();
+    const week1 = new Date(Date.UTC(weekYear, 0, 4));
+    const week = 1 + Math.round(((tmp - week1) / 86400000 - 3 + (week1.getUTCDay() + 6) % 7) / 7);
+    const key = `${weekYear}-W${String(week).padStart(2,'0')}`;
+    if (!buckets.has(key)) buckets.set(key, { prices: [], dates: [] });
+    buckets.get(key).prices.push(p.y); buckets.get(key).dates.push(p.x);
+  }
+  const sortedKeys = [...buckets.keys()].sort();
+  const out = [];
+  for (let i = 0; i < sortedKeys.length; i++) {
+    const window = [sortedKeys[i-1], sortedKeys[i], sortedKeys[i+1]].filter(Boolean);
+    const pooled = window.flatMap(k => buckets.get(k).prices);
+    const dates  = buckets.get(sortedKeys[i]).dates;
+    if (pooled.length < 3) continue;
+    const s = [...pooled].sort((a,b)=>a-b);
+    const med = s.length % 2 ? s[(s.length-1)/2] : (s[s.length/2-1]+s[s.length/2])/2;
+    const midX = dates.sort((a,b)=>a-b)[Math.floor(dates.length/2)];
+    out.push({ x: midX, y: med, count: pooled.length, label: sortedKeys[i] + ' (±1 sem)' });
+  }
+  return out;
+}
+
+try {
+  if (typeof Chart === 'undefined') { showErr('Chart.js failed'); throw new Error('no Chart'); }
+  const ctx = document.getElementById('chart').getContext('2d');
+  const annoLinePlugin = {
+    id: 'annoLine',
+    afterDatasetsDraw(chart) {
+      const x = chart.scales.x.getPixelForValue(ANNOUNCE_X);
+      if (isNaN(x)) return;
+      const c = chart.ctx;
+      const top = chart.chartArea.top, bot = chart.chartArea.bottom;
+      c.save();
+      c.strokeStyle = '#dc2626'; c.lineWidth = 2; c.setLineDash([6,4]);
+      c.beginPath(); c.moveTo(x, top); c.lineTo(x, bot); c.stroke();
+      c.setLineDash([]);
+      c.fillStyle = 'rgba(220,38,38,.9)';
+      const lbl = '📣 Plaion AES+';
+      c.font = 'bold 11px sans-serif';
+      const w = c.measureText(lbl).width + 12;
+      c.fillRect(x + 4, top + 4, w, 22);
+      c.fillStyle = '#fff'; c.fillText(lbl, x + 10, top + 19);
+      c.restore();
+    }
+  };
+  let chart;
+  function makeChart(yType) {
+    if (chart) chart.destroy();
+    const merTrend = weeklyTrend(MER);
+    const yhTrend  = weeklyTrend(YH);
+    chart = new Chart(ctx, {
+      type: 'scatter',
+      data: { datasets: [
+        { label: 'Mercari', data: MER, backgroundColor: 'rgba(245,158,11,.55)', pointRadius: 4, pointStyle: 'circle' },
+        { label: 'Yahoo',   data: YH,  backgroundColor: 'rgba(37,99,235,.65)',  pointRadius: 5, pointStyle: 'triangle' },
+        { label: 'Tendance Mercari', data: merTrend, type: 'line',
+          borderColor: '#f59e0b', backgroundColor: '#f59e0b', borderWidth: 2, borderDash: [5,4],
+          pointRadius: 3, pointBackgroundColor: '#fff', pointBorderColor: '#f59e0b', showLine: true, tension: 0.15 },
+        { label: 'Tendance Yahoo', data: yhTrend, type: 'line',
+          borderColor: '#1e40af', backgroundColor: '#1e40af', borderWidth: 2,
+          pointRadius: 3, pointBackgroundColor: '#fff', pointBorderColor: '#1e40af', showLine: true, tension: 0.15 },
+      ]},
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        parsing: { xAxisKey: 'x', yAxisKey: 'y' },
+        plugins: {
+          legend: { position: 'top' },
+          tooltip: { callbacks: {
+            title: items => new Date(items[0].parsed.x).toLocaleDateString('fr-FR', { year: 'numeric', month: 'short', day: 'numeric' }),
+            label: c => {
+              const p = c.raw;
+              if (p.source === 'mercari') return [`🟡 Mercari ¥${p.y.toLocaleString()} — ${p.status}`, p.name.slice(0, 60)];
+              if (p.source === 'yahoo')   return [`🔵 Yahoo ¥${p.y.toLocaleString()} — ${p.kind} (${p.bid} bids)`, p.name.slice(0, 60)];
+              if (p.label) return `${p.label} : médiane ¥${Math.round(p.y).toLocaleString()} (${p.count})`;
+              return `¥${Math.round(p.y).toLocaleString()}`;
+            }
+          } }
+        },
+        scales: {
+          x: { type: 'linear', min: START_X,
+               ticks: { callback: v => new Date(v).toLocaleDateString('fr-FR', {month:'short', day:'2-digit'}) },
+               title: { display: true, text: 'Date' } },
+          y: { type: yType, title: { display: true, text: 'Prix (¥)' },
+               ticks: { callback: v => '¥' + v.toLocaleString() } },
+        },
+        onClick: (evt, items) => { if (items.length) { const p = items[0].element.$context.raw; if (p.url) window.open(p.url, '_blank'); } },
+      },
+      plugins: [annoLinePlugin],
+    });
+    refreshVisibility();
+  }
+  function refreshVisibility() {
+    if (!chart) return;
+    chart.setDatasetVisibility(0, document.getElementById('show-mer').checked);
+    chart.setDatasetVisibility(1, document.getElementById('show-yh').checked);
+    chart.setDatasetVisibility(2, document.getElementById('show-mer-trend').checked);
+    chart.setDatasetVisibility(3, document.getElementById('show-yh-trend').checked);
+    chart.update();
+  }
+  makeChart('linear');
+  ['show-mer','show-yh','show-mer-trend','show-yh-trend'].forEach(id =>
+    document.getElementById(id).addEventListener('change', refreshVisibility));
+  document.getElementById('log-scale').addEventListener('change', e => makeChart(e.target.checked ? 'logarithmic' : 'linear'));
+} catch(e) { showErr(`Exception: ${e.message}`); }
+</script></body></html>
