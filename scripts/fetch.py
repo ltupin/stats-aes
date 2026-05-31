@@ -83,6 +83,7 @@ def fetch_yahoo(keyword):
     encoded = quote(keyword)
     seen, items = set(), []
     total = None
+    blocked = False
     with httpx.Client(headers={"User-Agent": UA, "Accept-Language": "ja,en;q=0.9"},
                      timeout=20, follow_redirects=True) as c:
         start = 1
@@ -91,6 +92,9 @@ def fetch_yahoo(keyword):
                    f"?p={encoded}&va={encoded}&b={start}&n=50&s1=end&o1=d")
             r = c.get(url)
             if r.status_code != 200:
+                # 403 + EEA/UK notice = geo-block (need a JP network/proxy).
+                if r.status_code == 403 and ("EEA" in r.text or "欧州経済領域" in r.text):
+                    blocked = True
                 break
             m = re.search(r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>',
                           r.text, re.DOTALL)
@@ -115,7 +119,7 @@ def fetch_yahoo(keyword):
                 break
             start += 50
             time.sleep(1.0)
-    return items, total
+    return items, total, blocked
 
 
 def write_mercari_csv(path, items):
@@ -163,11 +167,34 @@ def write_yahoo_csv(path, items):
             w.writerow([title, url, ps, bid, kind, end_str])
 
 
+def _save(path, items, writer, label, force, note=""):
+    """Write items unless empty — an empty result would clobber prior data.
+
+    Returns True if written. With force=True, writes even when empty (use for a
+    game that genuinely has 0 sales)."""
+    if not items and not force:
+        exists = path.exists()
+        warn = f"  ⚠️  {label}: 0 item{note} — "
+        warn += (f"CSV existant conservé ({path.name}), non écrasé."
+                 if exists else "rien à écrire (aucun CSV existant).")
+        warn += " Utiliser --force pour écrire un CSV vide."
+        print(warn, file=sys.stderr)
+        return False
+    writer(path, items)
+    print(f"=> {path}")
+    return True
+
+
 def main():
-    if len(sys.argv) != 4:
-        print("usage: fetch.py KEY MERCARI_KW YAHOO_KW", file=sys.stderr)
-        sys.exit(2)
-    key, mer_kw, yh_kw = sys.argv[1:]
+    import argparse
+    ap = argparse.ArgumentParser(description="Fetch Mercari + Yahoo for a game key.")
+    ap.add_argument("key")
+    ap.add_argument("mercari_kw")
+    ap.add_argument("yahoo_kw")
+    ap.add_argument("--force", action="store_true",
+                    help="écrire même si 0 résultat (écrase le CSV existant)")
+    args = ap.parse_args()
+    key, mer_kw, yh_kw = args.key, args.mercari_kw, args.yahoo_kw
     RAW_DIR.mkdir(parents=True, exist_ok=True)
 
     print(f"=== {key} ===")
@@ -178,15 +205,15 @@ def main():
 
     print(f"Yahoo   keyword: {yh_kw}")
     t0 = time.time()
-    yh, total = fetch_yahoo(yh_kw)
+    yh, total, blocked = fetch_yahoo(yh_kw)
     print(f"  → {len(yh)}/{total} items in {time.time()-t0:.1f}s")
+    if blocked:
+        print("  🚧 Yahoo géo-bloqué (HTTP 403, EEE/UK) — passe par un proxy/VPN "
+              "japonais. Données Yahoo existantes préservées.", file=sys.stderr)
 
-    mer_path = RAW_DIR / f"{key}_mercari.csv"
-    yh_path  = RAW_DIR / f"{key}_yahoo.csv"
-    write_mercari_csv(mer_path, mer)
-    write_yahoo_csv(yh_path, yh)
-    print(f"=> {mer_path}")
-    print(f"=> {yh_path}")
+    _save(RAW_DIR / f"{key}_mercari.csv", mer, write_mercari_csv, "Mercari", args.force)
+    _save(RAW_DIR / f"{key}_yahoo.csv", yh, write_yahoo_csv, "Yahoo", args.force,
+          note=" (bloqué)" if blocked else "")
 
 
 if __name__ == "__main__":
