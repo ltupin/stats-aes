@@ -176,17 +176,67 @@ GAMES = {
     },
 }
 
+# ── KOF : versions régénérables (affectation UNIQUE par titre) ───────────────
+# La version = le nombre collé au nom de la franchise (ファイターズ96, KOF95,
+# ファイターズ2000, KOF02→2002). On capture CE nombre-là, pas n'importe quel
+# nombre du titre, pour qu'un titre n'aille que dans UNE version.
+KOF_BASE_RX = re.compile(
+    r"(?:THE\s*)?KING\s*OF\s*FIGHTERS|キング[・･\s]*オブ[・･\s]*ファイターズ"
+    r"|キングオブファイターズ|ザ[・･\s]*キング|KOF|ＫＯＦ", re.IGNORECASE)
+# Nombre (demi- ou pleine-chasse) collé au mot de franchise, tolérant les
+# séparateurs courants (espaces, ・ ' ’ ` * _ - …).
+KOF_VER_RX = re.compile(
+    r"(?:ファイターズ|FIGHTERS|ＦＩＧＨＴＥＲＳ|KOF|ＫＯＦ)"
+    r"[\s　'’‘・･*`＊~_\-]*([0-9０-９]{2,4})", re.IGNORECASE)
+_FW = str.maketrans("０１２３４５６７８９", "0123456789")  # pleine-chasse → ASCII
+_KOF_SHORT = {"00": "2000", "01": "2001", "02": "2002"}
+KOF_VERSIONS = ["94", "95", "96", "97", "98", "99", "2000", "2001", "2002"]
+
+
+def kof_version(title):
+    """Retourne la version KOF ('94'…'2002') d'un titre, ou None.
+    Affectation unique : le 1er nombre collé au nom de franchise gagne."""
+    if not KOF_BASE_RX.search(title):
+        return None
+    m = KOF_VER_RX.search(title)
+    if not m:
+        return None
+    num = m.group(1).translate(_FW)
+    if len(num) == 4:
+        return num if num in KOF_VERSIONS else None
+    if len(num) == 2:
+        num = _KOF_SHORT.get(num, num)
+        return num if num in KOF_VERSIONS else None
+    return None  # 3 chiffres ou autre → ambigu, on ne classe pas
+
+
+_KOF_OTHER_FRANCHISES = [
+    "餓狼伝説", "リアルバウト", "Real Bout", "MARK OF THE WOLVES", "餓狼 MARK",
+    "サムライスピリッツ", "侍魂", "龍虎の拳", "Art of Fighting", "メタルスラッグ",
+    "Metal Slug", "ワールドヒーローズ", "ブレイカーズ", "風雲", "アテナ", "月華",
+]
+for _v in KOF_VERSIONS:
+    GAMES[f"kof_{_v}"] = {
+        "label": f"KOF {('’' + _v) if len(_v) == 2 else _v} AES",
+        "raw": "kof",  # lit kof_mercari.csv / kof_yahoo.csv
+        "INCLUDE": (lambda ver: (lambda title: kof_version(title) == ver))(_v),
+        "EXCLUDE_GAME": _KOF_OTHER_FRANCHISES,
+        "exclude_urls": set(),
+    }
+
 
 # ── Filter ────────────────────────────────────────────────────────────────
 
 def build_filter(cfg, key):
     INC = cfg["INCLUDE"]
+    # INCLUDE peut être une regex (.search) ou un prédicat callable(title)->bool.
+    inc_match = INC if callable(INC) else INC.search
     EXG = [e.lower() for e in cfg["EXCLUDE_GAME"]]
     # Merge in-code exclusions with persistent file from data/exclude_urls/KEY.txt
     EX_URLS = cfg.get("exclude_urls", set()) | load_exclude_urls(key)
     def keep(title, url):
         if url in EX_URLS: return False
-        if not INC.search(title): return False
+        if not inc_match(title): return False
         tl = title.lower()
         if SET_RX.search(title) or NB_HON_RX.search(title) or BOX_ONLY_RX.search(title):
             return False
@@ -201,8 +251,11 @@ def gather(key, cfg):
     keep = build_filter(cfg, key)
     mer, yh = [], []
     # Une source peut manquer (ex. Yahoo géo-bloqué, jamais fetché) → liste vide.
-    mer_path = RAW_DIR / f"{key}_mercari.csv"
-    yh_path  = RAW_DIR / f"{key}_yahoo.csv"
+    # cfg["raw"] permet à plusieurs jeux de partager un même CSV brut
+    # (ex. les 9 versions KOF lisent toutes kof_mercari.csv / kof_yahoo.csv).
+    raw_key  = cfg.get("raw", key)
+    mer_path = RAW_DIR / f"{raw_key}_mercari.csv"
+    yh_path  = RAW_DIR / f"{raw_key}_yahoo.csv"
     if mer_path.exists():
       with open(mer_path, encoding="utf-8") as f:
         rd = csv.reader(f, delimiter=";"); next(rd)
@@ -253,10 +306,10 @@ def stats_split(points):
 
 # ── HTML report ───────────────────────────────────────────────────────────
 
-# Rolling 3-week centered median: pools week N-1, N, N+1 prices and takes
-# their median. Smooths noise on sparse-data weeks (down to 2-3 sales/week)
-# without losing the median's outlier resistance.
-_ROLLING_FN = """function weeklyTrend(points) {
+# Weekly median: median of each ISO week's prices (no cross-week pooling).
+# A week is plotted as soon as it has >= MIN_WEEK sales.
+_MIN_WEEK = 2
+_ROLLING_FN = "const MIN_WEEK = " + str(_MIN_WEEK) + ";\n" + r"""function weeklyTrend(points) {
   const buckets = new Map();
   for (const p of points) {
     const d = new Date(p.x);
@@ -271,15 +324,14 @@ _ROLLING_FN = """function weeklyTrend(points) {
   }
   const sortedKeys = [...buckets.keys()].sort();
   const out = [];
-  for (let i = 0; i < sortedKeys.length; i++) {
-    const window = [sortedKeys[i-1], sortedKeys[i], sortedKeys[i+1]].filter(Boolean);
-    const pooled = window.flatMap(k => buckets.get(k).prices);
-    const dates  = buckets.get(sortedKeys[i]).dates;
-    if (pooled.length < 3) continue;
-    const s = [...pooled].sort((a,b)=>a-b);
+  for (const key of sortedKeys) {
+    const prices = buckets.get(key).prices;
+    const dates  = buckets.get(key).dates;
+    if (prices.length < MIN_WEEK) continue;
+    const s = [...prices].sort((a,b)=>a-b);
     const med = s.length % 2 ? s[(s.length-1)/2] : (s[s.length/2-1]+s[s.length/2])/2;
     const midX = dates.sort((a,b)=>a-b)[Math.floor(dates.length/2)];
-    out.push({ x: midX, y: med, count: pooled.length, label: sortedKeys[i] + ' (±1 sem)' });
+    out.push({ x: midX, y: med, count: prices.length, label: key });
   }
   return out;
 }"""

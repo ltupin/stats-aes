@@ -28,8 +28,7 @@ Statistiques/
 │   ├── aof_trend.html
 │   └── kof_{94,95,96,97,98,99,2000,2001,2002}_trend.html
 ├── data/
-│   ├── kof_data.json                    — données intermédiaires KOF
-│   ├── raw/                             — CSV bruts (Mercari + Yahoo)
+│   ├── raw/                             — CSV bruts (Mercari + Yahoo), CUMULATIFS
 │   │   ├── {key}_mercari.csv                Titre;URL;Prix;Statut;Created
 │   │   └── {key}_yahoo.csv                  Titre;URL;Prix;BidCount;Type;EndDate
 │   ├── filtered/                        — CSV nettoyés (post-filtre)
@@ -37,7 +36,7 @@ Statistiques/
 │   └── exclude_urls/                    — URLs droppées manuellement (persistant)
 │       └── {key}.txt                        une URL par ligne, # = commentaire
 └── scripts/
-    ├── fetch.py                  — Mercari + Yahoo paginated fetcher
+    ├── fetch.py                  — Mercari + Yahoo fetcher (fusion CUMULATIVE)
     ├── report.py                 — filtre + générateur HTML
     ├── validate.py               — validation interactive (drop faux positifs)
     └── build_index.py            — régénère index.html depuis les rapports
@@ -112,9 +111,14 @@ suivants.
   seuls / télécartes…
 - **Outliers** : flagués si > 2× médiane globale, soumis à validation
   utilisateur, droppés par URL si confirmés faux positifs
-- **Tendance** : médiane glissante 3 semaines centrée (pool semaines N-1, N,
-  N+1) — plus lisse que la médiane hebdo brute sur les jeux à faible volume
-  tout en restant robuste aux outliers
+- **Tendance** : **médiane hebdomadaire** (par semaine ISO ; une semaine est
+  tracée dès ≥ 2 ventes) — `_MIN_WEEK` dans `report.py`
+- **Données cumulatives** : `fetch.py` **fusionne** dans les CSV existants
+  (clé = URL) et ne supprime jamais rien → la base ne fait que grandir, même
+  si Yahoo retire une vieille annonce de sa fenêtre `closedsearch`
+- **KOF** : les 9 versions (’94→2002) sont régénérables — un classifieur
+  d'affectation unique (`kof_version`) lit le n° collé au nom de la franchise
+  et alimente `data/raw/kof_*.csv` partagé (champ `raw` dans `GAMES`)
 
 ## Résultats clés
 

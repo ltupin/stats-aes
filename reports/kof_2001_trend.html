@@ -17,26 +17,10 @@
   .src-card.mer { border-left: 3px solid #f59e0b; }
   .src-card.yh  { border-left: 3px solid #2563eb; }
   .errbox { background: #fee; border: 1px solid #c33; padding: 10px; font-family: monospace; font-size: .8rem; color: #c00; display: none; margin: 10px 0; border-radius: 6px; }
-  .nav { margin-bottom: 16px; font-size: .85rem; display: flex; flex-wrap: wrap; gap: 6px; }
-  .nav a { padding: 4px 10px; border-radius: 4px; background: #fff; color: #2563eb; text-decoration: none; border: 1px solid #ddd; }
-  .nav a.active { background: #2563eb; color: #fff; border-color: #2563eb; }
 </style></head><body>
 
 <h1>KOF 2001 AES — Mercari &amp; Yahoo Auctions — 2026</h1>
-<p class="sub">Mercari 4 ventes · Yahoo 15 ventes · données du 29/05/2026</p>
-
-<div class="nav">
-<a href="kof_94_trend.html">KOF '94</a>
-<a href="kof_95_trend.html">KOF '95</a>
-<a href="kof_96_trend.html">KOF '96</a>
-<a href="kof_97_trend.html">KOF '97</a>
-<a href="kof_98_trend.html">KOF '98</a>
-<a href="kof_99_trend.html">KOF '99</a>
-<a href="kof_2000_trend.html">KOF 2000</a>
-<a href="kof_2001_trend.html" class="active">KOF 2001</a>
-<a href="kof_2002_trend.html">KOF 2002</a>
-
-</div>
+<p class="sub">Mercari 5 ventes · Yahoo 11 ventes · données du 31/05/2026</p>
 
 <div class="insight">
   <h3>📣 Effet de l'annonce Plaion Neo Geo AES+ (16 avril 2026)</h3>
@@ -45,12 +29,12 @@
     <div class="src-card mer">
       <strong>🟡 Mercari</strong><br>
       Avant 16/04 : 2 ventes · médiane ¥76,900<br>
-      Depuis : 2 · médiane <strong>¥87,250</strong> · <strong>+13.5%</strong>
+      Depuis : 3 · médiane <strong>¥85,000</strong> · <strong>+10.5%</strong>
     </div>
     <div class="src-card yh">
       <strong>🔵 Yahoo</strong><br>
-      Avant 16/04 : 9 ventes · médiane ¥57,420<br>
-      Depuis : 6 · médiane <strong>¥49,155</strong> · <strong>-14.4%</strong>
+      Avant 16/04 : 5 ventes · médiane ¥50,550<br>
+      Depuis : 6 · médiane <strong>¥49,155</strong> · <strong>-2.8%</strong>
     </div>
   </div>
 </div>
@@ -70,17 +54,16 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
 <script>
-const MER = [{"x": 1778419860000, "y": 89500, "name": "ザ・キング・オブ・ファイターズ2001", "url": "https://jp.mercari.com/item/m60360584109", "status": "SOLD_OUT", "version": "2001", "source": "mercari"}, {"x": 1777551600000, "y": 85000, "name": "ネオジオ ロム ザ キング オブ ファイターズ 2001 KOF2001 ROM", "url": "https://jp.mercari.com/item/m78055639874", "status": "SOLD_OUT", "version": "2001", "source": "mercari"}, {"x": 1776140340000, "y": 94800, "name": "【動作確認済・美品】NEOGEO KOF 2001 説明書付", "url": "https://jp.mercari.com/item/m11369509589", "status": "SOLD_OUT", "version": "2001", "source": "mercari"}, {"x": 1768810920000, "y": 59000, "name": "【未使用】ネオジオROM KOF2001ザ・キングオブファイターズ2001", "url": "https://jp.mercari.com/item/m55767292721", "status": "SOLD_OUT", "version": "2001", "source": "mercari"}];
-const YH  = [{"x": 1779630480000, "y": 30120, "name": "〈動作確認済み〉 NEOGEO ネオジオ ザ・キング・オブ・ファイターズ2001 THE KING OF FIGHTERS2001 KOF2001 NG", "url": "https://page.auctions.yahoo.co.jp/jp/auction/p1230590370", "bid": 45, "kind": "Auction", "version": "2001", "source": "yahoo"}, {"x": 1779629940000, "y": 81000, "name": "● 極美品 箱説付き●ネオジオ キングオブファイターズ2001 NEOGEO SNK コレクション", "url": "https://page.auctions.yahoo.co.jp/jp/auction/c1230225180", "bid": 21, "kind": "Auction", "version": "2001", "source": "yahoo"}, {"x": 1779541500000, "y": 30310, "name": "○NG ネオジオROM THE KING OF FIGHTERS ザ・キング・オブ・ファイターズ 2001 PLAYMORE プレイモア【IO", "url": "https://page.auctions.yahoo.co.jp/jp/auction/m1230334041", "bid": 24, "kind": "Auction", "version": "2001", "source": "yahoo"}, {"x": 1778456940000, "y": 68000, "name": "ザキングオブファイターズ2001 NG NEOGEO", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z604264964", "bid": 1, "kind": "Buy-Now", "version": "2001", "source": "yahoo"}, {"x": 1778244900000, "y": 24800, "name": "ネオジオ ロムカセット ザ キング オブ ファイターズ 2001 KOF2001 NEO GEO ROM", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z605187618", "bid": 1, "kind": "Buy-Now", "version": "2001", "source": "yahoo"}, {"x": 1776435180000, "y": 80000, "name": "ザ・キング・オブ・ファイターズ 2001 KOF2001 THE KING OF FIGHTERS 2001 SNK NEOGEO 箱説明書付き ネオジオ", "url": "https://page.auctions.yahoo.co.jp/jp/auction/x1226393578", "bid": 44, "kind": "Auction", "version": "2001", "source": "yahoo"}, {"x": 1773837900000, "y": 56100, "name": "NEO GEO キング オブ ファイターズ2001 ROM ネオジオ KOF 動作確認済み 中古 箱・説明書付き SNK プレイモア", "url": "https://page.auctions.yahoo.co.jp/jp/auction/r1222996032", "bid": 49, "kind": "Auction", "version": "2001", "source": "yahoo"}, {"x": 1773798900000, "y": 63000, "name": "ザキングオブファイターズ2001 NG NEOGEO", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z576859968", "bid": 1, "kind": "Buy-Now", "version": "2001", "source": "yahoo"}, {"x": 1772460720000, "y": 50550, "name": "ネオジオ NEO GEO THE KING OF FIGHTERS 2001 ザ・キング・オブ・ファイターズ ゲームカセット ゲームソフト 現状品", "url": "https://page.auctions.yahoo.co.jp/jp/auction/p1221275832", "bid": 2, "kind": "Auction", "version": "2001", "source": "yahoo"}, {"x": 1770893880000, "y": 65000, "name": "●格闘ゲーム【kof2001 キングオブファイターズ2001】ネオジオROM レトロゲーム　箱　説明書あり　0206", "url": "https://page.auctions.yahoo.co.jp/jp/auction/u1218787593", "bid": 1, "kind": "Buy-Now", "version": "2001", "source": "yahoo"}, {"x": 1768739640000, "y": 56000, "name": "ザ・キング・オブ・ファイターズ2001 / NEOGEO ネオジオ", "url": "https://page.auctions.yahoo.co.jp/jp/auction/f1215563356", "bid": 30, "kind": "Auction", "version": "2001", "source": "yahoo"}, {"x": 1768372920000, "y": 63000, "name": "ザキングオブファイターズ2001 NG NEOGEO", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z540097330", "bid": 1, "kind": "Buy-Now", "version": "2001", "source": "yahoo"}, {"x": 1767833160000, "y": 52380, "name": "ネオジオ　キングオブファイターズ2001 rom ロム　neogeo", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z539374588", "bid": 1, "kind": "Buy-Now", "version": "2001", "source": "yahoo"}, {"x": 1767531180000, "y": 68000, "name": "ネオジオ　キングオブファイターズ　2001 ロム　rom neogeo", "url": "https://page.auctions.yahoo.co.jp/jp/auction/w1214355970", "bid": 2, "kind": "Auction", "version": "2001", "source": "yahoo"}, {"x": 1767274560000, "y": 57420, "name": "【箱付き】【動作品】ザ・キング・オブ・ファイターズ 2001 ネオジオ NEOGEO", "url": "https://page.auctions.yahoo.co.jp/jp/auction/w1213662928", "bid": 15, "kind": "Auction", "version": "2001", "source": "yahoo"}];
+const MER = [{"x": 1779026520000, "y": 28999, "name": "NEOGEO THE KING OF FIGHTERS 2001ネオジオ KOF", "url": "https://jp.mercari.com/item/m10490188057", "status": "SOLD_OUT", "source": "mercari"}, {"x": 1778419860000, "y": 89500, "name": "ザ・キング・オブ・ファイターズ2001", "url": "https://jp.mercari.com/item/m60360584109", "status": "SOLD_OUT", "source": "mercari"}, {"x": 1777551600000, "y": 85000, "name": "ネオジオ ロム ザ キング オブ ファイターズ 2001 KOF2001 ROM", "url": "https://jp.mercari.com/item/m78055639874", "status": "SOLD_OUT", "source": "mercari"}, {"x": 1776140340000, "y": 94800, "name": "【動作確認済・美品】NEOGEO KOF 2001 説明書付", "url": "https://jp.mercari.com/item/m11369509589", "status": "SOLD_OUT", "source": "mercari"}, {"x": 1768810920000, "y": 59000, "name": "【未使用】ネオジオROM KOF2001ザ・キングオブファイターズ2001", "url": "https://jp.mercari.com/item/m55767292721", "status": "SOLD_OUT", "source": "mercari"}];
+const YH  = [{"x": 1779630480000, "y": 30120, "name": "〈動作確認済み〉 NEOGEO ネオジオ ザ・キング・オブ・ファイターズ2001 THE KING OF FIGHTERS2001 KOF2001 NG", "url": "https://page.auctions.yahoo.co.jp/jp/auction/p1230590370", "bid": 45, "kind": "Auction", "source": "yahoo"}, {"x": 1779629940000, "y": 81000, "name": "● 極美品 箱説付き●ネオジオ キングオブファイターズ2001 NEOGEO SNK コレクション", "url": "https://page.auctions.yahoo.co.jp/jp/auction/c1230225180", "bid": 21, "kind": "Auction", "source": "yahoo"}, {"x": 1779541500000, "y": 30310, "name": "○NG ネオジオROM THE KING OF FIGHTERS ザ・キング・オブ・ファイターズ 2001 PLAYMORE プレイモア【IO", "url": "https://page.auctions.yahoo.co.jp/jp/auction/m1230334041", "bid": 24, "kind": "Auction", "source": "yahoo"}, {"x": 1778456940000, "y": 68000, "name": "ザキングオブファイターズ2001 NG NEOGEO", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z604264964", "bid": 1, "kind": "Buy-Now", "source": "yahoo"}, {"x": 1778244900000, "y": 24800, "name": "ネオジオ ロムカセット ザ キング オブ ファイターズ 2001 KOF2001 NEO GEO ROM", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z605187618", "bid": 1, "kind": "Buy-Now", "source": "yahoo"}, {"x": 1776435180000, "y": 80000, "name": "ザ・キング・オブ・ファイターズ 2001 KOF2001 THE KING OF FIGHTERS 2001 SNK NEOGEO 箱説明書付き ネオジオ", "url": "https://page.auctions.yahoo.co.jp/jp/auction/x1226393578", "bid": 44, "kind": "Auction", "source": "yahoo"}, {"x": 1774446180000, "y": 17050, "name": "箱傷み有り コトブキヤ アンヘル -THE KING OF FIGHTERS 2001- 1/7 SNK美少女 ザ・キング・オブ・ファイターズ 2001", "url": "https://page.auctions.yahoo.co.jp/jp/auction/m1223112964", "bid": 6, "kind": "Auction", "source": "yahoo"}, {"x": 1774184760000, "y": 17600, "name": "コトブキヤ アンヘル -THE KING OF FIGHTERS 2001- 1/7 SNK美少女 コトブキヤオンラインショップ限定 ザ・キング・オブ・ファイターズ 2001", "url": "https://page.auctions.yahoo.co.jp/jp/auction/h1221485904", "bid": 1, "kind": "Auction", "source": "yahoo"}, {"x": 1773837900000, "y": 56100, "name": "NEO GEO キング オブ ファイターズ2001 ROM ネオジオ KOF 動作確認済み 中古 箱・説明書付き SNK プレイモア", "url": "https://page.auctions.yahoo.co.jp/jp/auction/r1222996032", "bid": 49, "kind": "Auction", "source": "yahoo"}, {"x": 1773798900000, "y": 63000, "name": "ザキングオブファイターズ2001 NG NEOGEO", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z576859968", "bid": 1, "kind": "Buy-Now", "source": "yahoo"}, {"x": 1772460720000, "y": 50550, "name": "ネオジオ NEO GEO THE KING OF FIGHTERS 2001 ザ・キング・オブ・ファイターズ ゲームカセット ゲームソフト 現状品", "url": "https://page.auctions.yahoo.co.jp/jp/auction/p1221275832", "bid": 2, "kind": "Auction", "source": "yahoo"}];
 const ANNOUNCE_X = 1776297600000;
 const START_X    = 1767225600000;
 
 function showErr(m){const e=document.getElementById('err');e.style.display='block';e.textContent=(e.textContent?e.textContent+' | ':'')+m;console.error(m);}
 window.addEventListener('error', ev => showErr(`JS error: ${ev.message} @ ${ev.lineno}`));
 
+const MIN_WEEK = 2;
 function weeklyTrend(points) {
-  // Rolling 3-week centered median: pool prices from week N-1, N, N+1
-  // to smooth small-sample noise without losing the median's outlier resistance.
   const buckets = new Map();
   for (const p of points) {
     const d = new Date(p.x);
@@ -95,17 +78,14 @@ function weeklyTrend(points) {
   }
   const sortedKeys = [...buckets.keys()].sort();
   const out = [];
-  for (let i = 0; i < sortedKeys.length; i++) {
-    const window = [sortedKeys[i-1], sortedKeys[i], sortedKeys[i+1]].filter(Boolean);
-    const pooledPrices = window.flatMap(k => buckets.get(k).prices);
-    const pooledDates  = buckets.get(sortedKeys[i]).dates;
-    if (pooledPrices.length < 3) continue;
-    const sorted = [...pooledPrices].sort((a,b)=>a-b);
-    const med = sorted.length % 2
-      ? sorted[(sorted.length-1)/2]
-      : (sorted[sorted.length/2-1] + sorted[sorted.length/2]) / 2;
-    const midX = pooledDates.sort((a,b)=>a-b)[Math.floor(pooledDates.length/2)];
-    out.push({ x: midX, y: med, count: pooledPrices.length, label: sortedKeys[i] + ' (±1 sem)' });
+  for (const key of sortedKeys) {
+    const prices = buckets.get(key).prices;
+    const dates  = buckets.get(key).dates;
+    if (prices.length < MIN_WEEK) continue;
+    const s = [...prices].sort((a,b)=>a-b);
+    const med = s.length % 2 ? s[(s.length-1)/2] : (s[s.length/2-1]+s[s.length/2])/2;
+    const midX = dates.sort((a,b)=>a-b)[Math.floor(dates.length/2)];
+    out.push({ x: midX, y: med, count: prices.length, label: key });
   }
   return out;
 }
@@ -113,7 +93,6 @@ function weeklyTrend(points) {
 try {
   if (typeof Chart === 'undefined') { showErr('Chart.js failed'); throw new Error('no Chart'); }
   const ctx = document.getElementById('chart').getContext('2d');
-
   const annoLinePlugin = {
     id: 'annoLine',
     afterDatasetsDraw(chart) {
@@ -126,15 +105,14 @@ try {
       c.beginPath(); c.moveTo(x, top); c.lineTo(x, bot); c.stroke();
       c.setLineDash([]);
       c.fillStyle = 'rgba(220,38,38,.9)';
-      const label = '📣 Plaion AES+';
+      const lbl = '📣 Plaion AES+';
       c.font = 'bold 11px sans-serif';
-      const w = c.measureText(label).width + 12;
+      const w = c.measureText(lbl).width + 12;
       c.fillRect(x + 4, top + 4, w, 22);
-      c.fillStyle = '#fff'; c.fillText(label, x + 10, top + 19);
+      c.fillStyle = '#fff'; c.fillText(lbl, x + 10, top + 19);
       c.restore();
     }
   };
-
   let chart;
   function makeChart(yType) {
     if (chart) chart.destroy();
@@ -144,15 +122,13 @@ try {
       type: 'scatter',
       data: { datasets: [
         { label: 'Mercari', data: MER, backgroundColor: 'rgba(245,158,11,.55)', pointRadius: 4, pointStyle: 'circle' },
-        { label: 'Yahoo',   data: YH,  backgroundColor: 'rgba(37,99,235,.65)',   pointRadius: 5, pointStyle: 'triangle' },
+        { label: 'Yahoo',   data: YH,  backgroundColor: 'rgba(37,99,235,.65)',  pointRadius: 5, pointStyle: 'triangle' },
         { label: 'Tendance Mercari', data: merTrend, type: 'line',
           borderColor: '#f59e0b', backgroundColor: '#f59e0b', borderWidth: 2, borderDash: [5,4],
-          pointRadius: 3, pointBackgroundColor: '#fff', pointBorderColor: '#f59e0b',
-          showLine: true, tension: 0.15 },
+          pointRadius: 3, pointBackgroundColor: '#fff', pointBorderColor: '#f59e0b', showLine: true, tension: 0.15 },
         { label: 'Tendance Yahoo', data: yhTrend, type: 'line',
           borderColor: '#1e40af', backgroundColor: '#1e40af', borderWidth: 2,
-          pointRadius: 3, pointBackgroundColor: '#fff', pointBorderColor: '#1e40af',
-          showLine: true, tension: 0.15 },
+          pointRadius: 3, pointBackgroundColor: '#fff', pointBorderColor: '#1e40af', showLine: true, tension: 0.15 },
       ]},
       options: {
         responsive: true, maintainAspectRatio: false,

@@ -62,6 +62,7 @@ const START_X    = 1767225600000;
 function showErr(m){const e=document.getElementById('err');e.style.display='block';e.textContent=(e.textContent?e.textContent+' | ':'')+m;console.error(m);}
 window.addEventListener('error', ev => showErr(`JS error: ${ev.message} @ ${ev.lineno}`));
 
+const MIN_WEEK = 2;
 function weeklyTrend(points) {
   const buckets = new Map();
   for (const p of points) {
@@ -77,15 +78,14 @@ function weeklyTrend(points) {
   }
   const sortedKeys = [...buckets.keys()].sort();
   const out = [];
-  for (let i = 0; i < sortedKeys.length; i++) {
-    const window = [sortedKeys[i-1], sortedKeys[i], sortedKeys[i+1]].filter(Boolean);
-    const pooled = window.flatMap(k => buckets.get(k).prices);
-    const dates  = buckets.get(sortedKeys[i]).dates;
-    if (pooled.length < 3) continue;
-    const s = [...pooled].sort((a,b)=>a-b);
+  for (const key of sortedKeys) {
+    const prices = buckets.get(key).prices;
+    const dates  = buckets.get(key).dates;
+    if (prices.length < MIN_WEEK) continue;
+    const s = [...prices].sort((a,b)=>a-b);
     const med = s.length % 2 ? s[(s.length-1)/2] : (s[s.length/2-1]+s[s.length/2])/2;
     const midX = dates.sort((a,b)=>a-b)[Math.floor(dates.length/2)];
-    out.push({ x: midX, y: med, count: pooled.length, label: sortedKeys[i] + ' (±1 sem)' });
+    out.push({ x: midX, y: med, count: prices.length, label: key });
   }
   return out;
 }

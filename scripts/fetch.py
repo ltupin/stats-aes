@@ -60,7 +60,7 @@ def _mer_body(kw, tk=""):
 async def fetch_mercari(keyword):
     seen, items, tk = set(), [], ""
     async with httpx.AsyncClient() as c:
-        for _ in range(25):
+        for _ in range(80):  # 80×120 = 9600 max ; s'arrête au dernier pageToken
             key = SigningKey.generate(NIST256p)
             r = await c.post(URL_M, json=_mer_body(keyword, tk),
                              headers={"User-Agent": UA, "X-Platform": "web",
@@ -87,7 +87,7 @@ def fetch_yahoo(keyword):
     with httpx.Client(headers={"User-Agent": UA, "Accept-Language": "ja,en;q=0.9"},
                      timeout=20, follow_redirects=True) as c:
         start = 1
-        for _ in range(40):
+        for _ in range(400):  # 400×50 = 20000 max ; s'arrête à totalResultsAvailable
             url = (f"https://auctions.yahoo.co.jp/closedsearch/closedsearch"
                    f"?p={encoded}&va={encoded}&b={start}&n=50&s1=end&o1=d")
             r = c.get(url)
@@ -122,77 +122,107 @@ def fetch_yahoo(keyword):
     return items, total, blocked
 
 
-def write_mercari_csv(path, items):
+MER_HEADER = ["Titre", "URL", "Prix", "Statut", "Created"]
+YH_HEADER  = ["Titre", "URL", "Prix", "BidCount", "Type", "EndDate"]
+URL_COL = 1  # colonne clé (URL) dans les deux schémas — sert au dédoublonnage
+
+
+def mercari_rows(items):
+    rows = []
+    for it in items:
+        name = (it.get("name", "") or "").replace("\n", " ").replace(";", ",")
+        url = f"https://jp.mercari.com/item/{it.get('id', '')}"
+        try:
+            ps = f"¥{int(it.get('price')):,}"
+        except Exception:
+            ps = ""
+        status = (it.get("status", "") or "").replace("ITEM_STATUS_", "")
+        try:
+            cs = datetime.fromtimestamp(int(it.get("created")), tz=timezone.utc)\
+                         .strftime("%Y-%m-%d %H:%M UTC")
+        except Exception:
+            cs = ""
+        rows.append([name, url, ps, status, cs])
+    return rows
+
+
+def yahoo_rows(items):
+    rows = []
+    for it in items:
+        title = (it.get("title", "") or "").replace("\n", " ").replace(";", ",")
+        url = f"https://page.auctions.yahoo.co.jp/jp/auction/{it.get('auctionId', '')}"
+        price = it.get("price") or it.get("buyNowPrice") or 0
+        try:
+            ps = f"¥{int(price):,}"
+        except Exception:
+            ps = ""
+        bid = it.get("bidCount", 0)
+        kind = "Buy-Now" if it.get("isFixedPrice") else "Auction"
+        end = it.get("endTime", "")
+        try:
+            end_str = datetime.fromisoformat(end).strftime("%Y-%m-%d %H:%M %z")
+        except Exception:
+            end_str = end
+        rows.append([title, url, ps, bid, kind, end_str])
+    return rows
+
+
+def merge_write(path, header, new_rows):
+    """Fusion cumulative : conserve toutes les lignes déjà présentes, ajoute les
+    nouvelles (clé = URL), et met à jour les lignes existantes avec les données
+    fraîches. Ne supprime JAMAIS rien → la base ne fait que grandir.
+
+    Retourne (total, added) : nb de lignes après fusion, dont nouvelles."""
+    by_url, order = {}, []
+    if path.exists():
+        with open(path, encoding="utf-8", newline="") as f:
+            rd = csv.reader(f, delimiter=";")
+            next(rd, None)  # header
+            for row in rd:
+                if len(row) <= URL_COL:
+                    continue
+                k = row[URL_COL]
+                if k not in by_url:
+                    order.append(k)
+                by_url[k] = row
+    added = 0
+    for row in new_rows:
+        k = row[URL_COL]
+        if k not in by_url:
+            order.append(k); added += 1
+        by_url[k] = row  # données fraîches gagnent (ex. statut Mercari mis à jour)
     with open(path, "w", encoding="utf-8", newline="") as f:
         w = csv.writer(f, delimiter=";")
-        w.writerow(["Titre", "URL", "Prix", "Statut", "Created"])
-        for it in items:
-            name = (it.get("name", "") or "").replace("\n", " ").replace(";", ",")
-            iid = it.get("id", "")
-            url = f"https://jp.mercari.com/item/{iid}"
-            try:
-                ps = f"¥{int(it.get('price')):,}"
-            except Exception:
-                ps = ""
-            status = (it.get("status", "") or "").replace("ITEM_STATUS_", "")
-            try:
-                cs = datetime.fromtimestamp(int(it.get("created")), tz=timezone.utc)\
-                             .strftime("%Y-%m-%d %H:%M UTC")
-            except Exception:
-                cs = ""
-            w.writerow([name, url, ps, status, cs])
+        w.writerow(header)
+        for k in order:
+            w.writerow(by_url[k])
+    return len(order), added
 
 
-def write_yahoo_csv(path, items):
-    with open(path, "w", encoding="utf-8", newline="") as f:
-        w = csv.writer(f, delimiter=";")
-        w.writerow(["Titre", "URL", "Prix", "BidCount", "Type", "EndDate"])
-        for it in items:
-            title = (it.get("title", "") or "").replace("\n", " ").replace(";", ",")
-            aid = it.get("auctionId", "")
-            url = f"https://page.auctions.yahoo.co.jp/jp/auction/{aid}"
-            price = it.get("price") or it.get("buyNowPrice") or 0
-            try:
-                ps = f"¥{int(price):,}"
-            except Exception:
-                ps = ""
-            bid = it.get("bidCount", 0)
-            kind = "Buy-Now" if it.get("isFixedPrice") else "Auction"
-            end = it.get("endTime", "")
-            try:
-                dt = datetime.fromisoformat(end)
-                end_str = dt.strftime("%Y-%m-%d %H:%M %z")
-            except Exception:
-                end_str = end
-            w.writerow([title, url, ps, bid, kind, end_str])
+def _save(path, rows, header, label, note=""):
+    """Fusionne les lignes fetchées dans le CSV existant (cumulatif).
 
-
-def _save(path, items, writer, label, force, note=""):
-    """Write items unless empty — an empty result would clobber prior data.
-
-    Returns True if written. With force=True, writes even when empty (use for a
-    game that genuinely has 0 sales)."""
-    if not items and not force:
-        exists = path.exists()
-        warn = f"  ⚠️  {label}: 0 item{note} — "
-        warn += (f"CSV existant conservé ({path.name}), non écrasé."
-                 if exists else "rien à écrire (aucun CSV existant).")
-        warn += " Utiliser --force pour écrire un CSV vide."
-        print(warn, file=sys.stderr)
-        return False
-    writer(path, items)
-    print(f"=> {path}")
-    return True
+    Si 0 ligne fetchée (ex. Yahoo bloqué), on ne touche pas au fichier : la base
+    existante est préservée telle quelle."""
+    if not rows:
+        if path.exists():
+            print(f"  ⚠️  {label}: 0 item{note} — base existante préservée "
+                  f"({path.name}, inchangée).", file=sys.stderr)
+        else:
+            print(f"  ⚠️  {label}: 0 item{note} — rien à écrire (pas de base).",
+                  file=sys.stderr)
+        return
+    total, added = merge_write(path, header, rows)
+    print(f"=> {path}  ({total} lignes, +{added} nouvelles)")
 
 
 def main():
     import argparse
-    ap = argparse.ArgumentParser(description="Fetch Mercari + Yahoo for a game key.")
+    ap = argparse.ArgumentParser(description="Fetch Mercari + Yahoo for a game key "
+                                             "(fusion cumulative dans data/raw).")
     ap.add_argument("key")
     ap.add_argument("mercari_kw")
     ap.add_argument("yahoo_kw")
-    ap.add_argument("--force", action="store_true",
-                    help="écrire même si 0 résultat (écrase le CSV existant)")
     args = ap.parse_args()
     key, mer_kw, yh_kw = args.key, args.mercari_kw, args.yahoo_kw
     RAW_DIR.mkdir(parents=True, exist_ok=True)
@@ -211,8 +241,8 @@ def main():
         print("  🚧 Yahoo géo-bloqué (HTTP 403, EEE/UK) — passe par un proxy/VPN "
               "japonais. Données Yahoo existantes préservées.", file=sys.stderr)
 
-    _save(RAW_DIR / f"{key}_mercari.csv", mer, write_mercari_csv, "Mercari", args.force)
-    _save(RAW_DIR / f"{key}_yahoo.csv", yh, write_yahoo_csv, "Yahoo", args.force,
+    _save(RAW_DIR / f"{key}_mercari.csv", mercari_rows(mer), MER_HEADER, "Mercari")
+    _save(RAW_DIR / f"{key}_yahoo.csv", yahoo_rows(yh), YH_HEADER, "Yahoo",
           note=" (bloqué)" if blocked else "")
 
 

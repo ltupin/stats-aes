@@ -158,11 +158,11 @@ PAGE = """<!DOCTYPE html>
          background: #f5f6fa; color: #1a1a2e; margin: 0; padding: 32px 20px 56px; }}
   .wrap {{ max-width: 1100px; margin: 0 auto; }}
   h1 {{ font-size: 1.7rem; margin: 0 0 6px; }}
-  .lede {{ color: #555; font-size: .92rem; line-height: 1.5; margin: 0 0 8px; max-width: 720px; }}
+  .lede {{ color: #555; font-size: .92rem; line-height: 1.5; margin: 0 0 8px; }}
   .meta {{ color: #888; font-size: .8rem; margin: 0 0 28px; }}
   .insight {{ background: linear-gradient(90deg, #fef3c7 0%, #fee2e2 100%);
              border-left: 4px solid var(--hot); padding: 13px 18px; border-radius: 8px;
-             margin: 0 0 32px; font-size: .88rem; line-height: 1.5; max-width: 720px; }}
+             margin: 0 0 32px; font-size: .88rem; line-height: 1.5; }}
   .insight strong {{ color: var(--hot); }}
   section {{ margin-bottom: 36px; }}
   h2 {{ font-size: 1.15rem; margin: 0 0 2px; }}
