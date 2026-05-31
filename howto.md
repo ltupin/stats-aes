@@ -29,7 +29,7 @@ l'étape 4 (validation). Le filtrage par regex se fera dans `report.py`.
 ## Étape 2 — Fetch des données brutes
 
 ```bash
-cd /Users/minux/Statistiques/scripts
+cd scripts
 ../.venv/bin/python fetch.py ff3 \
   "餓狼伝説3 ネオジオ" "餓狼伝説3"
 ```
@@ -190,16 +190,18 @@ Pour rafraîchir une page existante (ex. tous les 1-2 mois pour suivre
 l'effet Plaion qui se propage) :
 
 ```bash
-cd /Users/minux/Statistiques/scripts
+cd scripts
 # Re-fetch
-../.venv/bin/python fetch.py garou \
-  "餓狼 MARK OF THE WOLVES ネオジオ" "餓狼 MARK OF THE WOLVES"
+../.venv/bin/python fetch.py ffs \
+  "餓狼伝説スペシャル ネオジオ" "餓狼伝説スペシャル"
 # Re-filter + report (les exclusions persistantes s'appliquent automatiquement)
-../.venv/bin/python report.py garou
+../.venv/bin/python report.py ffs
 # Validation rapide des nouveaux outliers seulement
-../.venv/bin/python validate.py garou
+../.venv/bin/python validate.py ffs
 # Re-report si des nouveaux drops ont été faits
-../.venv/bin/python report.py garou
+../.venv/bin/python report.py ffs
+# Rafraîchir le sommaire
+../.venv/bin/python build_index.py
 ```
 
 ---
@@ -209,10 +211,11 @@ cd /Users/minux/Statistiques/scripts
 Pour un nouveau jeu **après** avoir édité `GAMES` dans `report.py` :
 
 ```bash
-cd /Users/minux/Statistiques/scripts
+cd scripts
 ../.venv/bin/python fetch.py    KEY "KW_MERCARI" "KW_YAHOO"  && \
 ../.venv/bin/python report.py   KEY                          && \
 ../.venv/bin/python validate.py KEY --all                    && \
 ../.venv/bin/python report.py   KEY                          && \
+../.venv/bin/python build_index.py                           && \
 open ../reports/KEY_trend.html
 ```

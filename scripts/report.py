@@ -77,21 +77,6 @@ BOX_ONLY_RX = re.compile(r"(?:箱|帯|説明書|インスト)(?:のみ|だけ)")
 # Per-game config. INCLUDE = regex the title MUST match. EXCLUDE_GAME = extra
 # substrings (case-insensitive) to drop. exclude_urls = manual URL drops.
 GAMES = {
-    "garou": {
-        "label": "Garou: Mark of the Wolves AES",
-        "INCLUDE": re.compile(
-            r"(餓狼.*(MARK|MOTW|ウルブズ|ウルヴズ|ウルブス|ウルヴス))"
-            r"|MARK\s*OF\s*THE\s*WOLVES|MOTW|マーク・オブ・ザ", re.IGNORECASE),
-        "EXCLUDE_GAME": [
-            "City of the Wolves","シティ・オブ・ザ・ウルブズ","CITY OF THE WOLVES","COTW",
-            "餓狼伝説2","餓狼伝説3","餓狼伝説SPECIAL","リアルバウト","Real Bout","REALBOUT",
-            "キングオブファイターズ","KOF","King of Fighters","KING OF FIGHTERS",
-            "サムライスピリッツ","侍魂","龍虎の拳","メタルスラッグ","Metal Slug",
-            "ワールドヒーローズ","ブレイカーズ","風雲","アテナ","ATHENA","月華",
-        ],
-        # Manuelles : data/exclude_urls/garou.txt (validate.py les y ajoute)
-        "exclude_urls": set(),
-    },
     "samsho1": {
         "label": "Samurai Shodown 1 AES",
         "INCLUDE": re.compile(r"(サムライスピリッツ|侍魂|SAMURAI\s*SHODOWN|"
@@ -121,15 +106,22 @@ GAMES = {
         ],
         "exclude_urls": set(),
     },
-    "ms": {
-        "label": "Metal Slug 1 AES",
-        "INCLUDE": re.compile(r"(メタルスラッグ|Metal\s*Slug|METAL\s*SLUG)", re.IGNORECASE),
+    "ffs": {
+        "label": "Fatal Fury Special AES",
+        "INCLUDE": re.compile(
+            r"(餓狼伝説[\s　]*スペシャル|餓狼伝説[\s　]*SPECIAL"
+            r"|餓狼[\s　]*スペシャル|餓狼[\s　]*SPECIAL"
+            r"|FATAL\s*FURY\s*SPECIAL|Fatal\s*Fury\s*Special)", re.IGNORECASE),
         "EXCLUDE_GAME": [
-            "餓狼伝説","リアルバウト","キングオブファイターズ","KOF","King of Fighters",
-            "サムライスピリッツ","侍魂","龍虎の拳","ワールドヒーローズ","ブレイカーズ","風雲","アテナ",
-            "メタルスラッグ2","メタルスラッグ3","メタルスラッグ4","メタルスラッグ5","メタルスラッグX","メタルスラッグＸ",
-            "Metal Slug 2","Metal Slug 3","Metal Slug 4","Metal Slug 5","Metal Slug X","Metal Slug XX",
-            "メタルスラッグ6","メタルスラッグ7","アンソロジー","Anthology",
+            # Real Bout FF Special (1997) — jeu DIFFÉRENT, principal faux positif
+            "リアルバウト","Real Bout","REALBOUT","REAL BOUT","RB餓狼","ＲＢ",
+            # Autres opus / franchises Fatal Fury
+            "餓狼伝説1","餓狼伝説2","餓狼伝説3","餓狼 MARK","MARK OF THE WOLVES","MOTW",
+            "ウルブズ","ウルヴズ","ウルブス","City of the Wolves","COTW",
+            # Autres franchises SNK
+            "キングオブファイターズ","KOF","King of Fighters","KING OF FIGHTERS",
+            "サムライスピリッツ","侍魂","龍虎の拳","メタルスラッグ","Metal Slug",
+            "ワールドヒーローズ","ブレイカーズ","風雲","アテナ","ATHENA","月華",
         ],
         "exclude_urls": set(),
     },

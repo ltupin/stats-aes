@@ -7,22 +7,24 @@ avec ligne verticale marquant l'annonce Plaion AES+ du 16/04/2026.
 **Standalone** : ne dépend d'aucun autre projet. Venv local + requirements.txt
 embarqués.
 
+> ℹ️ Yahoo Auctions (`closedsearch`) bloque les requêtes depuis l'EEE/UK
+> (HTTP 403). Pour re-fetcher Yahoo, sortir via un réseau/proxy japonais.
+> Mercari n'est pas géo-bloqué.
+
 ## Structure
 
 ```
 Statistiques/
 ├── README.md
 ├── howto.md                      — pas-à-pas pour créer un nouveau comparatif
+├── index.html                    — sommaire (liens + chiffres clés de chaque rapport)
 ├── requirements.txt              — dépendances pip
 ├── .venv/                        — venv local (Python 3.14)
 ├── reports/                      — pages HTML autonomes (Chart.js via CDN)
-│   ├── garou_trend.html
+│   ├── ffs_trend.html
 │   ├── samsho1_trend.html
 │   ├── aof_trend.html
-│   ├── ms_trend.html
-│   ├── kof_{94,95,96,97,98,99,2000,2001,2002}_trend.html
-│   ├── kof_all_versions_trend.html      — KOF avec filtre versions
-│   └── fatal_fury_special_*.html        — legacy mono-source
+│   └── kof_{94,95,96,97,98,99,2000,2001,2002}_trend.html
 ├── data/
 │   ├── kof_data.json                    — données intermédiaires KOF
 │   ├── raw/                             — CSV bruts (Mercari + Yahoo)
@@ -36,37 +38,41 @@ Statistiques/
     ├── fetch.py                  — Mercari + Yahoo paginated fetcher
     ├── report.py                 — filtre + générateur HTML
     ├── validate.py               — validation interactive (drop faux positifs)
-    └── _archive_*.sh             — scripts shell historiques d'exploration
+    └── build_index.py            — régénère index.html depuis les rapports
 ```
 
 ## Installation (premier setup, si .venv absent)
 
 ```bash
-cd /Users/minux/Statistiques
+cd Statistiques          # le dépôt cloné
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 ```
 
 ## Utilisation
 
-Les pages HTML sont autonomes (Chart.js depuis CDN, données inline) —
-double-clic pour ouvrir dans le navigateur.
+Ouvrir **`index.html`** à la racine : sommaire de tous les rapports avec les
+variations clés. Les pages HTML sont autonomes (Chart.js depuis CDN, données
+inline) — double-clic pour ouvrir dans le navigateur.
 
 ### Régénérer un rapport depuis les CSV existants
 
 ```bash
-cd /Users/minux/Statistiques/scripts
-../.venv/bin/python report.py garou
+cd scripts
+../.venv/bin/python report.py ffs
 ../.venv/bin/python report.py --all
+# puis rafraîchir le sommaire :
+../.venv/bin/python build_index.py
 ```
 
 ### Re-fetcher les données brutes d'un jeu (mise à jour)
 
 ```bash
-cd /Users/minux/Statistiques/scripts
-../.venv/bin/python fetch.py garou \
-  "餓狼 MARK OF THE WOLVES ネオジオ" "餓狼 MARK OF THE WOLVES"
-../.venv/bin/python report.py garou
+cd scripts
+../.venv/bin/python fetch.py ffs \
+  "餓狼伝説スペシャル ネオジオ" "餓狼伝説スペシャル"
+../.venv/bin/python report.py ffs
+../.venv/bin/python build_index.py
 ```
 
 ### Ajouter un nouveau jeu
@@ -75,12 +81,13 @@ Voir **[howto.md](howto.md)** pour le pas-à-pas complet avec exemple
 (Fatal Fury 3). Workflow en bref :
 
 ```bash
-cd /Users/minux/Statistiques/scripts
+cd scripts
 ../.venv/bin/python fetch.py    KEY "KW_MERCARI" "KW_YAHOO"
 # … éditer GAMES dans report.py …
 ../.venv/bin/python report.py   KEY
 ../.venv/bin/python validate.py KEY --all   # 🛑 OBLIGATOIRE
 ../.venv/bin/python report.py   KEY
+../.venv/bin/python build_index.py
 open ../reports/KEY_trend.html
 ```
 
@@ -111,14 +118,12 @@ suivants.
 
 | Jeu              | Mercari Δ | Yahoo Δ | Lecture |
 |------------------|-----------|---------|---------|
-| Fatal Fury Sp.   | +163 %    | +134 %  | Bond Plaion massif (jeu pilote) |
+| Fatal Fury Sp.   | +168 %    | +135 %  | Bond Plaion massif (jeu pilote) |
 | KOF '94          | +112 %    | +86 %   | Premier opus, fortes volumes |
 | KOF '95-'97      | +27→+77 % | +32→+77 % | Tendance haussière cohérente |
 | KOF '98-2002     | bruité    | bruité  | Volumes minces, conclusions fragiles |
 | SamSho 1         | +100 %    | +123 %  | Forte hausse symétrique |
 | AOF 1            | +76 %     | +54 %   | Hausse claire malgré faibles volumes |
-| Metal Slug 1     | 0 vente   | 0 vente | Très rare ; AES n'apparaît pas en clear  |
-| Garou MOTW       | n/a       | -3 %    | **Marché déjà saturé** — pas d'effet Plaion |
 
 ## Dépendances
 

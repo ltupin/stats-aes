@@ -1,6 +1,0 @@
-# URLs droppées manuellement après vérification visuelle (validate.py).
-# Une URL par ligne. Le `#` ouvre un commentaire.
-# Ces exclusions persistent à travers les re-fetch et re-report.
-
-# Carte d'instruction Garou seule, ¥8,861 — Yahoo, 2026-03-23
-https://page.auctions.yahoo.co.jp/jp/auction/w1223617338
