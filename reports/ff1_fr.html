@@ -8,18 +8,25 @@
   .src-card { background:rgba(255,255,255,.75); padding:10px 14px; border-radius:6px; font-size:.85rem; border-left:3px solid #2563eb; display:inline-block; }
 </style></head><body>
 <h1>Fatal Fury 1 — 🇫🇷 eBay.fr — 2026</h1>
-<p class="sub">eBay.fr (ventes terminées) · 7 ventes · marché France (€) · données du 31/05/2026</p>
+<p class="sub">eBay.fr (ventes terminées) · 6 ventes · marché France (€) · données du 31/05/2026</p>
 <div class="insight">
   <div class="src-card">
     <strong>🇫🇷 eBay.fr</strong><br>
     Avant 16/04 : 1 ventes · médiane €220<br>
-    Depuis : 6 · médiane <strong>€214</strong> · <strong>-2.7%</strong>
+    Depuis : 5 · médiane <strong>€209</strong> · <strong>-5.0%</strong>
   </div>
 </div>
-<div class="card"><div style="height:540px;position:relative"><canvas id="chart"></canvas></div></div>
+<div class="card">
+  <div class="controls" style="display:flex;gap:14px;flex-wrap:wrap;font-size:.85rem;margin-bottom:10px">
+    <label><input type="checkbox" id="show-eb" checked> 🇫🇷 eBay.fr</label>
+    <label><input type="checkbox" id="show-eb-trend" checked> ↗ Tendance</label>
+    <label><input type="checkbox" id="log-scale"> Échelle log Y</label>
+  </div>
+  <div style="height:540px;position:relative"><canvas id="chart"></canvas></div>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
 <script>
-const EB = [{"x": 1779926400000, "y": 92, "name": "Jeu Neo Geo AES Fatak Fury Garou Densetsu JAP.", "url": "https://www.ebay.fr/itm/168392305211", "source": "ebay"}, {"x": 1779753600000, "y": 236, "name": "Fatal Fury 1 Jap - Neo Geo AES SNK - 100% Original - Version Japonaise", "url": "https://www.ebay.fr/itm/236806390441", "source": "ebay"}, {"x": 1779408000000, "y": 209, "name": "FATAL FURY NEO GEO AES NTSC-J", "url": "https://www.ebay.fr/itm/318338176870", "source": "ebay"}, {"x": 1778976000000, "y": 70, "name": ">> GAROU DENSETSU FATAL FURY NEO GEO AES SNK ARCADE ORIGINAL JAPAN CATALOG! <<", "url": "https://www.ebay.fr/itm/303175336618", "source": "ebay"}, {"x": 1778803200000, "y": 220, "name": "FATAL FURY NEO GEO AES GAROU DENSETSU Version JP　NTSC", "url": "https://www.ebay.fr/itm/327150235343", "source": "ebay"}, {"x": 1778198400000, "y": 250, "name": "Fatal Fury / Dog Tag / NEO GEO AES / US", "url": "https://www.ebay.fr/itm/366395951315", "source": "ebay"}, {"x": 1772841600000, "y": 220, "name": "FATAL FURY Neo Geo AES Jap Original", "url": "https://www.ebay.fr/itm/317944598686", "source": "ebay"}];
+const EB = [{"x": 1779926400000, "y": 92, "name": "Jeu Neo Geo AES Fatak Fury Garou Densetsu JAP.", "url": "https://www.ebay.fr/itm/168392305211", "source": "ebay"}, {"x": 1779753600000, "y": 236, "name": "Fatal Fury 1 Jap - Neo Geo AES SNK - 100% Original - Version Japonaise", "url": "https://www.ebay.fr/itm/236806390441", "source": "ebay"}, {"x": 1779408000000, "y": 209, "name": "FATAL FURY NEO GEO AES NTSC-J", "url": "https://www.ebay.fr/itm/318338176870", "source": "ebay"}, {"x": 1778976000000, "y": 70, "name": ">> GAROU DENSETSU FATAL FURY NEO GEO AES SNK ARCADE ORIGINAL JAPAN CATALOG! <<", "url": "https://www.ebay.fr/itm/303175336618", "source": "ebay"}, {"x": 1778803200000, "y": 220, "name": "FATAL FURY NEO GEO AES GAROU DENSETSU Version JP　NTSC", "url": "https://www.ebay.fr/itm/327150235343", "source": "ebay"}, {"x": 1772841600000, "y": 220, "name": "FATAL FURY Neo Geo AES Jap Original", "url": "https://www.ebay.fr/itm/317944598686", "source": "ebay"}];
 const ANNOUNCE_X = 1776297600000; const START_X = 1767225600000;
 const MIN_WEEK = 2;
 function weeklyTrend(points) {
@@ -55,18 +62,33 @@ const annoLine = { id:'annoLine', afterDatasetsDraw(ch){
   c.fillStyle='rgba(220,38,38,.9)'; c.font='bold 11px sans-serif'; const l='📣 Plaion AES+';
   c.fillRect(x+4,ch.chartArea.top+4,c.measureText(l).width+12,22); c.fillStyle='#fff'; c.fillText(l,x+10,ch.chartArea.top+19); c.restore();
 } };
-new Chart(document.getElementById('chart').getContext('2d'), {
-  type:'scatter',
-  data:{ datasets:[
-    { label:'eBay.fr', data:EB, backgroundColor:'rgba(37,99,235,.6)', pointRadius:4 },
-    { label:'Tendance', data:weeklyTrend(EB), type:'line', borderColor:'#1e40af', borderWidth:2,
-       pointRadius:3, pointBackgroundColor:'#fff', pointBorderColor:'#1e40af', showLine:true, tension:.15 } ]},
-  options:{ responsive:true, maintainAspectRatio:false, parsing:{xAxisKey:'x',yAxisKey:'y'},
-    plugins:{ legend:{position:'top'}, tooltip:{ callbacks:{
-      title:i=>new Date(i[0].parsed.x).toLocaleDateString('fr-FR',{year:'numeric',month:'short',day:'numeric'}),
-      label:c=>{const p=c.raw; return p.source==='ebay'?[`🇫🇷 €${p.y.toLocaleString()}`,p.name.slice(0,60)]:`médiane €${Math.round(p.y).toLocaleString()}`;} } } },
-    scales:{ x:{ type:'linear', min:START_X, ticks:{ callback:v=>new Date(v).toLocaleDateString('fr-FR',{month:'short',day:'2-digit'}) }, title:{display:true,text:'Date'} },
-      y:{ title:{display:true,text:'Prix (€)'}, ticks:{ callback:v=>'€'+v.toLocaleString() } } },
-    onClick:(e,it)=>{ if(it.length){const p=it[0].element.$context.raw; if(p.url)window.open(p.url,'_blank');} } },
-  plugins:[annoLine] });
+const ctx = document.getElementById('chart').getContext('2d');
+let chart;
+function makeChart(yType) {
+  if (chart) chart.destroy();
+  chart = new Chart(ctx, {
+    type:'scatter',
+    data:{ datasets:[
+      { label:'eBay.fr', data:EB, backgroundColor:'rgba(37,99,235,.6)', pointRadius:4 },
+      { label:'Tendance', data:weeklyTrend(EB), type:'line', borderColor:'#1e40af', borderWidth:2,
+         pointRadius:3, pointBackgroundColor:'#fff', pointBorderColor:'#1e40af', showLine:true, tension:.15 } ]},
+    options:{ responsive:true, maintainAspectRatio:false, parsing:{xAxisKey:'x',yAxisKey:'y'},
+      plugins:{ legend:{position:'top'}, tooltip:{ callbacks:{
+        title:i=>new Date(i[0].parsed.x).toLocaleDateString('fr-FR',{year:'numeric',month:'short',day:'numeric'}),
+        label:c=>{const p=c.raw; return p.source==='ebay'?[`🇫🇷 €${p.y.toLocaleString()}`,p.name.slice(0,60)]:`médiane €${Math.round(p.y).toLocaleString()}`;} } } },
+      scales:{ x:{ type:'linear', min:START_X, ticks:{ callback:v=>new Date(v).toLocaleDateString('fr-FR',{month:'short',day:'2-digit'}) }, title:{display:true,text:'Date'} },
+        y:{ type:yType, title:{display:true,text:'Prix (€)'}, ticks:{ callback:v=>'€'+v.toLocaleString() } } },
+      onClick:(e,it)=>{ if(it.length){const p=it[0].element.$context.raw; if(p.url)window.open(p.url,'_blank');} } },
+    plugins:[annoLine] });
+  refreshVisibility();
+}
+function refreshVisibility() {
+  if (!chart) return;
+  chart.setDatasetVisibility(0, document.getElementById('show-eb').checked);
+  chart.setDatasetVisibility(1, document.getElementById('show-eb-trend').checked);
+  chart.update();
+}
+makeChart('linear');
+['show-eb','show-eb-trend'].forEach(id => document.getElementById(id).addEventListener('change', refreshVisibility));
+document.getElementById('log-scale').addEventListener('change', e => makeChart(e.target.checked ? 'logarithmic' : 'linear'));
 </script></body></html>

@@ -16,7 +16,14 @@
     Depuis : 5 · médiane <strong>€319</strong> · <strong>+25.1%</strong>
   </div>
 </div>
-<div class="card"><div style="height:540px;position:relative"><canvas id="chart"></canvas></div></div>
+<div class="card">
+  <div class="controls" style="display:flex;gap:14px;flex-wrap:wrap;font-size:.85rem;margin-bottom:10px">
+    <label><input type="checkbox" id="show-eb" checked> 🇫🇷 eBay.fr</label>
+    <label><input type="checkbox" id="show-eb-trend" checked> ↗ Tendance</label>
+    <label><input type="checkbox" id="log-scale"> Échelle log Y</label>
+  </div>
+  <div style="height:540px;position:relative"><canvas id="chart"></canvas></div>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
 <script>
 const EB = [{"x": 1779408000000, "y": 319, "name": "The King of Fighters 96 AES Neo Geo Jap kof 96 Fonctionnement confirmé", "url": "https://www.ebay.fr/itm/318338284942", "source": "ebay"}, {"x": 1779408000000, "y": 299, "name": "King Of Fighters 96 Neo Geo AES Jap", "url": "https://www.ebay.fr/itm/147306121691", "source": "ebay"}, {"x": 1778976000000, "y": 329, "name": "the King of Fighters '96 KOF SNK NEO GEO AES NTSC Japan", "url": "https://www.ebay.fr/itm/257507600144", "source": "ebay"}, {"x": 1777939200000, "y": 329, "name": "NEO GEO - AES - King Of Fighters 96 - Japan", "url": "https://www.ebay.fr/itm/305565564365", "source": "ebay"}, {"x": 1777593600000, "y": 163, "name": "KOF96 The King of Fighters 96 SNK Neo Geo AES", "url": "https://www.ebay.fr/itm/226306612433", "source": "ebay"}, {"x": 1772928000000, "y": 255, "name": "Jeu King Of Fighters 96 Neo Geo AES", "url": "https://www.ebay.fr/itm/236445227782", "source": "ebay"}];
@@ -55,18 +62,33 @@ const annoLine = { id:'annoLine', afterDatasetsDraw(ch){
   c.fillStyle='rgba(220,38,38,.9)'; c.font='bold 11px sans-serif'; const l='📣 Plaion AES+';
   c.fillRect(x+4,ch.chartArea.top+4,c.measureText(l).width+12,22); c.fillStyle='#fff'; c.fillText(l,x+10,ch.chartArea.top+19); c.restore();
 } };
-new Chart(document.getElementById('chart').getContext('2d'), {
-  type:'scatter',
-  data:{ datasets:[
-    { label:'eBay.fr', data:EB, backgroundColor:'rgba(37,99,235,.6)', pointRadius:4 },
-    { label:'Tendance', data:weeklyTrend(EB), type:'line', borderColor:'#1e40af', borderWidth:2,
-       pointRadius:3, pointBackgroundColor:'#fff', pointBorderColor:'#1e40af', showLine:true, tension:.15 } ]},
-  options:{ responsive:true, maintainAspectRatio:false, parsing:{xAxisKey:'x',yAxisKey:'y'},
-    plugins:{ legend:{position:'top'}, tooltip:{ callbacks:{
-      title:i=>new Date(i[0].parsed.x).toLocaleDateString('fr-FR',{year:'numeric',month:'short',day:'numeric'}),
-      label:c=>{const p=c.raw; return p.source==='ebay'?[`🇫🇷 €${p.y.toLocaleString()}`,p.name.slice(0,60)]:`médiane €${Math.round(p.y).toLocaleString()}`;} } } },
-    scales:{ x:{ type:'linear', min:START_X, ticks:{ callback:v=>new Date(v).toLocaleDateString('fr-FR',{month:'short',day:'2-digit'}) }, title:{display:true,text:'Date'} },
-      y:{ title:{display:true,text:'Prix (€)'}, ticks:{ callback:v=>'€'+v.toLocaleString() } } },
-    onClick:(e,it)=>{ if(it.length){const p=it[0].element.$context.raw; if(p.url)window.open(p.url,'_blank');} } },
-  plugins:[annoLine] });
+const ctx = document.getElementById('chart').getContext('2d');
+let chart;
+function makeChart(yType) {
+  if (chart) chart.destroy();
+  chart = new Chart(ctx, {
+    type:'scatter',
+    data:{ datasets:[
+      { label:'eBay.fr', data:EB, backgroundColor:'rgba(37,99,235,.6)', pointRadius:4 },
+      { label:'Tendance', data:weeklyTrend(EB), type:'line', borderColor:'#1e40af', borderWidth:2,
+         pointRadius:3, pointBackgroundColor:'#fff', pointBorderColor:'#1e40af', showLine:true, tension:.15 } ]},
+    options:{ responsive:true, maintainAspectRatio:false, parsing:{xAxisKey:'x',yAxisKey:'y'},
+      plugins:{ legend:{position:'top'}, tooltip:{ callbacks:{
+        title:i=>new Date(i[0].parsed.x).toLocaleDateString('fr-FR',{year:'numeric',month:'short',day:'numeric'}),
+        label:c=>{const p=c.raw; return p.source==='ebay'?[`🇫🇷 €${p.y.toLocaleString()}`,p.name.slice(0,60)]:`médiane €${Math.round(p.y).toLocaleString()}`;} } } },
+      scales:{ x:{ type:'linear', min:START_X, ticks:{ callback:v=>new Date(v).toLocaleDateString('fr-FR',{month:'short',day:'2-digit'}) }, title:{display:true,text:'Date'} },
+        y:{ type:yType, title:{display:true,text:'Prix (€)'}, ticks:{ callback:v=>'€'+v.toLocaleString() } } },
+      onClick:(e,it)=>{ if(it.length){const p=it[0].element.$context.raw; if(p.url)window.open(p.url,'_blank');} } },
+    plugins:[annoLine] });
+  refreshVisibility();
+}
+function refreshVisibility() {
+  if (!chart) return;
+  chart.setDatasetVisibility(0, document.getElementById('show-eb').checked);
+  chart.setDatasetVisibility(1, document.getElementById('show-eb-trend').checked);
+  chart.update();
+}
+makeChart('linear');
+['show-eb','show-eb-trend'].forEach(id => document.getElementById(id).addEventListener('change', refreshVisibility));
+document.getElementById('log-scale').addEventListener('change', e => makeChart(e.target.checked ? 'logarithmic' : 'linear'));
 </script></body></html>

@@ -89,6 +89,11 @@ BOX_ONLY_RX = re.compile(r"(?:箱|帯|説明書|インスト)(?:のみ|だけ)")
 CD_RX = re.compile(
     r"ネオ[・･\s]*ジオ[・･\s]*CD|NEO[\s・･-]*GEO[\s・･-]*CD"
     r"|CD[\s]*(?:ソフト|ROM)|CD[-ー]ROM", re.IGNORECASE)
+# Versions US/occidentales (≠ AES japonais). Épargne « US seller » (= vendeur US,
+# jeu japonais) et « made in japan » seul.
+US_RX = re.compile(
+    r"\b(?:US|USA)\b(?!\s*seller)|\bNTSC-?U\b|us\s*version|usa\s*version"
+    r"|version\s*us\b|am[ée]ricaine|english\s*usa|\beuro\b\s*version", re.IGNORECASE)
 
 # Per-game config. INCLUDE = regex the title MUST match. EXCLUDE_GAME = extra
 # substrings (case-insensitive) to drop. exclude_urls = manual URL drops.
@@ -368,7 +373,7 @@ def build_ebay_filter(key):
         tl = title.lower()
         if SET_RX.search(title) or NB_HON_RX.search(title) or BOX_ONLY_RX.search(title):
             return False
-        if CD_RX.search(title):
+        if CD_RX.search(title) or US_RX.search(title):  # CD ou version US/occidentale
             return False
         return not any(e in tl for e in EXCLUDE_COMMON_LC)
     return keep
@@ -693,7 +698,14 @@ def gen_fr_html(label, eb):
     Depuis : {s[2]} · médiane <strong>€{s[3]:,}</strong> · <strong>{s[4]:+.1f}%</strong>
   </div>
 </div>
-<div class="card"><div style="height:540px;position:relative"><canvas id="chart"></canvas></div></div>
+<div class="card">
+  <div class="controls" style="display:flex;gap:14px;flex-wrap:wrap;font-size:.85rem;margin-bottom:10px">
+    <label><input type="checkbox" id="show-eb" checked> 🇫🇷 eBay.fr</label>
+    <label><input type="checkbox" id="show-eb-trend" checked> ↗ Tendance</label>
+    <label><input type="checkbox" id="log-scale"> Échelle log Y</label>
+  </div>
+  <div style="height:540px;position:relative"><canvas id="chart"></canvas></div>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
 <script>
 const EB = {json.dumps(eb, ensure_ascii=False)};
@@ -706,20 +718,35 @@ const annoLine = {{ id:'annoLine', afterDatasetsDraw(ch){{
   c.fillStyle='rgba(220,38,38,.9)'; c.font='bold 11px sans-serif'; const l='📣 Plaion AES+';
   c.fillRect(x+4,ch.chartArea.top+4,c.measureText(l).width+12,22); c.fillStyle='#fff'; c.fillText(l,x+10,ch.chartArea.top+19); c.restore();
 }} }};
-new Chart(document.getElementById('chart').getContext('2d'), {{
-  type:'scatter',
-  data:{{ datasets:[
-    {{ label:'eBay.fr', data:EB, backgroundColor:'rgba(37,99,235,.6)', pointRadius:4 }},
-    {{ label:'Tendance', data:weeklyTrend(EB), type:'line', borderColor:'#1e40af', borderWidth:2,
-       pointRadius:3, pointBackgroundColor:'#fff', pointBorderColor:'#1e40af', showLine:true, tension:.15 }} ]}},
-  options:{{ responsive:true, maintainAspectRatio:false, parsing:{{xAxisKey:'x',yAxisKey:'y'}},
-    plugins:{{ legend:{{position:'top'}}, tooltip:{{ callbacks:{{
-      title:i=>new Date(i[0].parsed.x).toLocaleDateString('fr-FR',{{year:'numeric',month:'short',day:'numeric'}}),
-      label:c=>{{const p=c.raw; return p.source==='ebay'?[`🇫🇷 €${{p.y.toLocaleString()}}`,p.name.slice(0,60)]:`médiane €${{Math.round(p.y).toLocaleString()}}`;}} }} }} }},
-    scales:{{ x:{{ type:'linear', min:START_X, ticks:{{ callback:v=>new Date(v).toLocaleDateString('fr-FR',{{month:'short',day:'2-digit'}}) }}, title:{{display:true,text:'Date'}} }},
-      y:{{ title:{{display:true,text:'Prix (€)'}}, ticks:{{ callback:v=>'€'+v.toLocaleString() }} }} }},
-    onClick:(e,it)=>{{ if(it.length){{const p=it[0].element.$context.raw; if(p.url)window.open(p.url,'_blank');}} }} }},
-  plugins:[annoLine] }});
+const ctx = document.getElementById('chart').getContext('2d');
+let chart;
+function makeChart(yType) {{
+  if (chart) chart.destroy();
+  chart = new Chart(ctx, {{
+    type:'scatter',
+    data:{{ datasets:[
+      {{ label:'eBay.fr', data:EB, backgroundColor:'rgba(37,99,235,.6)', pointRadius:4 }},
+      {{ label:'Tendance', data:weeklyTrend(EB), type:'line', borderColor:'#1e40af', borderWidth:2,
+         pointRadius:3, pointBackgroundColor:'#fff', pointBorderColor:'#1e40af', showLine:true, tension:.15 }} ]}},
+    options:{{ responsive:true, maintainAspectRatio:false, parsing:{{xAxisKey:'x',yAxisKey:'y'}},
+      plugins:{{ legend:{{position:'top'}}, tooltip:{{ callbacks:{{
+        title:i=>new Date(i[0].parsed.x).toLocaleDateString('fr-FR',{{year:'numeric',month:'short',day:'numeric'}}),
+        label:c=>{{const p=c.raw; return p.source==='ebay'?[`🇫🇷 €${{p.y.toLocaleString()}}`,p.name.slice(0,60)]:`médiane €${{Math.round(p.y).toLocaleString()}}`;}} }} }} }},
+      scales:{{ x:{{ type:'linear', min:START_X, ticks:{{ callback:v=>new Date(v).toLocaleDateString('fr-FR',{{month:'short',day:'2-digit'}}) }}, title:{{display:true,text:'Date'}} }},
+        y:{{ type:yType, title:{{display:true,text:'Prix (€)'}}, ticks:{{ callback:v=>'€'+v.toLocaleString() }} }} }},
+      onClick:(e,it)=>{{ if(it.length){{const p=it[0].element.$context.raw; if(p.url)window.open(p.url,'_blank');}} }} }},
+    plugins:[annoLine] }});
+  refreshVisibility();
+}}
+function refreshVisibility() {{
+  if (!chart) return;
+  chart.setDatasetVisibility(0, document.getElementById('show-eb').checked);
+  chart.setDatasetVisibility(1, document.getElementById('show-eb-trend').checked);
+  chart.update();
+}}
+makeChart('linear');
+['show-eb','show-eb-trend'].forEach(id => document.getElementById(id).addEventListener('change', refreshVisibility));
+document.getElementById('log-scale').addEventListener('change', e => makeChart(e.target.checked ? 'logarithmic' : 'linear'));
 </script></body></html>
 """
 
