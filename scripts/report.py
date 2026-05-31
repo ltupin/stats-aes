@@ -78,6 +78,11 @@ EXCLUDE_COMMON_LC = [s.lower() for s in [
 SET_RX      = re.compile(r"(?<!カ)セット")
 NB_HON_RX   = re.compile(r"\d+本")
 BOX_ONLY_RX = re.compile(r"(?:箱|帯|説明書|インスト)(?:のみ|だけ)")
+# NEOGEO CD (≠ AES) — tolère 中黒/espaces ("ネオ・ジオ CD") et le "CD" demi-chasse
+# isolé ("CD ソフト", "CD-ROM") que la liste de substrings ne couvrait pas.
+CD_RX = re.compile(
+    r"ネオ[・･\s]*ジオ[・･\s]*CD|NEO[\s・･-]*GEO[\s・･-]*CD"
+    r"|CD[\s]*(?:ソフト|ROM)|CD[-ー]ROM", re.IGNORECASE)
 
 # Per-game config. INCLUDE = regex the title MUST match. EXCLUDE_GAME = extra
 # substrings (case-insensitive) to drop. exclude_urls = manual URL drops.
@@ -185,6 +190,7 @@ def build_filter(cfg, key):
         tl = title.lower()
         if SET_RX.search(title) or NB_HON_RX.search(title) or BOX_ONLY_RX.search(title):
             return False
+        if CD_RX.search(title): return False  # NEOGEO CD (≠ AES)
         if any(e in tl for e in EXCLUDE_COMMON_LC): return False
         if any(e in tl for e in EXG):               return False
         return True
