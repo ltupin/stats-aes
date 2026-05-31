@@ -36,7 +36,8 @@ ANNOUNCE   = datetime(2026, 4, 16, tzinfo=timezone.utc)  # Plaion AES+ announcem
 START      = datetime(2026, 1, 1,  tzinfo=timezone.utc)
 announce_x = int(ANNOUNCE.timestamp() * 1000)
 start_x    = int(START.timestamp() * 1000)
-PRICE_FLOOR = 5000  # ¥ — drop sub-floor as not real cart sales
+PRICE_FLOOR = 5000  # ¥ — drop sub-floor as not real cart sales (marché Japon)
+EUR_FLOOR   = 30    # € — idem marché France (eBay.fr) : sous 30€ = notices/inserts
 
 # Common excludes — applied case-insensitively to every game.
 EXCLUDE_COMMON_LC = [s.lower() for s in [
@@ -59,6 +60,10 @@ EXCLUDE_COMMON_LC = [s.lower() for s in [
     "フィギュア","クリアファイル","ジオラマ","グッズ","ブロマイド","下敷き","ポストカード",
     "ハンカチ","タオル","Tシャツ","Ｔシャツ","缶ケース","プラモデル",
     "ガン消し","ガンケシ","消しゴム","ケシゴム","リペイント","ガチャ","ガシャポン","食玩","カードダス",
+    # FR/EN (eBay) — pas une cartouche jouable
+    "no game","sans jeu","sans le jeu","without game","box only","boite seule","boîte seule",
+    "case only","manual only","notice seule","jaquette seule","empty box","repro","reproduction",
+    "bootleg","custom label","aftermarket",
     "アートブック","イラスト集","サウンドトラック","サントラ","OST","オリジナルサウンドトラック",
     "予約特典","特典","ラバーマット","デスクマット","プレイマット",
     "色紙","原画","映画",
@@ -288,6 +293,79 @@ for _v in KOF_VERSIONS:
         "EXCLUDE_GAME": _KOF_OTHER_FRANCHISES,
         "exclude_urls": set(),
     }
+
+
+# ── Marché France (eBay.fr) ─────────────────────────────────────────────────
+# Filtres eBay (titres latins) par jeu : INCLUDE + EXCLUDE (regex, gère les n°
+# de version au bord de mot). La distinction SS1/SS2 reprend la logique validée.
+EBAY = {
+    "samsho1": {
+        "INCLUDE": re.compile(r"samurai\s*(?:shodown|spirits|showdown)", re.I),
+        "EXCLUDE": re.compile(r"\b(2|ii|3|iii|4|iv|5|v|6|vi)\b|shin|真|zankuro|斬紅郎"
+                              r"|amakusa|天草|tenka|\bzero\b|\bsen\b|anthology|collection"
+                              r"|perfect|special", re.I),
+    },
+    "samsho2": {
+        "INCLUDE": re.compile(r"shin\s*samurai|真サムライ|真侍魂|haohmaru|覇王丸地獄変"
+                              r"|samurai\s*(?:shodown|spirits|showdown)\s*(?:2|ii)\b", re.I),
+        "EXCLUDE": re.compile(r"\b(3|iii|4|iv|5|v|6|vi)\b|zankuro|amakusa|\bzero\b"
+                              r"|anthology|collection", re.I),
+    },
+}
+
+
+def build_ebay_filter(key):
+    cfg = EBAY[key]
+    INC, EXC = cfg["INCLUDE"], cfg["EXCLUDE"]
+    EX_URLS = load_exclude_urls(key + "_fr")
+
+    def keep(title, url):
+        if url in EX_URLS:
+            return False
+        if not INC.search(title) or EXC.search(title):
+            return False
+        tl = title.lower()
+        if SET_RX.search(title) or NB_HON_RX.search(title) or BOX_ONLY_RX.search(title):
+            return False
+        if CD_RX.search(title):
+            return False
+        return not any(e in tl for e in EXCLUDE_COMMON_LC)
+    return keep
+
+
+def gather_ebay(key):
+    """Lit data/raw/{raw}_ebay_fr.csv → points € filtrés (>= EUR_FLOOR, >= START)."""
+    if key not in EBAY:
+        return []
+    keep = build_ebay_filter(key)
+    raw_key = GAMES[key].get("raw", key)
+    path = RAW_DIR / f"{raw_key}_ebay_fr.csv"
+    if not path.exists():
+        return []
+    pts = []
+    with open(path, encoding="utf-8") as f:
+        rd = csv.reader(f, delimiter=";"); next(rd, None)
+        for row in rd:
+            if len(row) < 4:
+                continue
+            title, url, ps, ds = row
+            try:
+                p = int(ps.replace("€", "").replace(" ", "").replace(",", ""))
+            except ValueError:
+                continue
+            if p < EUR_FLOOR or p > 50000:
+                continue
+            try:
+                dt = datetime.strptime(ds.strip(), "%Y-%m-%d").replace(tzinfo=timezone.utc)
+            except ValueError:
+                continue
+            if dt < START:
+                continue
+            if not keep(title, url):
+                continue
+            pts.append({"x": int(dt.timestamp() * 1000), "y": p,
+                        "name": title, "url": url, "source": "ebay"})
+    return pts
 
 
 # ── Filter ────────────────────────────────────────────────────────────────
@@ -554,13 +632,64 @@ try {{
 """
 
 
-def write_filtered_csv(path, mer, yh):
+def gen_fr_html(label, eb):
+    s = stats_split(eb)
+    return f"""<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8"><title>{label} — eBay.fr — 2026</title>
+<style>
+  body {{ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; background:#f5f6fa; color:#1a1a2e; padding:24px; max-width:1400px; margin:0 auto; }}
+  h1 {{ font-size:1.4rem; margin:0 0 4px; }} p.sub {{ color:#666; font-size:.85rem; margin:0 0 20px; }}
+  .card {{ background:#fff; border-radius:12px; padding:20px; box-shadow:0 1px 4px rgba(0,0,0,.08); margin-bottom:20px; }}
+  .insight {{ background:linear-gradient(90deg,#dbeafe,#ede9fe); border-left:4px solid #2563eb; padding:14px 18px; border-radius:8px; margin-bottom:20px; }}
+  .src-card {{ background:rgba(255,255,255,.75); padding:10px 14px; border-radius:6px; font-size:.85rem; border-left:3px solid #2563eb; display:inline-block; }}
+</style></head><body>
+<h1>{label} — 🇫🇷 eBay.fr — 2026</h1>
+<p class="sub">eBay.fr (ventes terminées) · {len(eb)} ventes · marché France (€) · données du {datetime.now(timezone.utc).strftime('%d/%m/%Y')}</p>
+<div class="insight">
+  <div class="src-card">
+    <strong>🇫🇷 eBay.fr</strong><br>
+    Avant 16/04 : {s[0]} ventes · médiane €{s[1]:,}<br>
+    Depuis : {s[2]} · médiane <strong>€{s[3]:,}</strong> · <strong>{s[4]:+.1f}%</strong>
+  </div>
+</div>
+<div class="card"><div style="height:540px;position:relative"><canvas id="chart"></canvas></div></div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
+<script>
+const EB = {json.dumps(eb, ensure_ascii=False)};
+const ANNOUNCE_X = {announce_x}; const START_X = {start_x};
+{_ROLLING_FN}
+const annoLine = {{ id:'annoLine', afterDatasetsDraw(ch){{
+  const x=ch.scales.x.getPixelForValue(ANNOUNCE_X); if(isNaN(x))return; const c=ch.ctx;
+  c.save(); c.strokeStyle='#dc2626'; c.lineWidth=2; c.setLineDash([6,4]);
+  c.beginPath(); c.moveTo(x,ch.chartArea.top); c.lineTo(x,ch.chartArea.bottom); c.stroke(); c.setLineDash([]);
+  c.fillStyle='rgba(220,38,38,.9)'; c.font='bold 11px sans-serif'; const l='📣 Plaion AES+';
+  c.fillRect(x+4,ch.chartArea.top+4,c.measureText(l).width+12,22); c.fillStyle='#fff'; c.fillText(l,x+10,ch.chartArea.top+19); c.restore();
+}} }};
+new Chart(document.getElementById('chart').getContext('2d'), {{
+  type:'scatter',
+  data:{{ datasets:[
+    {{ label:'eBay.fr', data:EB, backgroundColor:'rgba(37,99,235,.6)', pointRadius:4 }},
+    {{ label:'Tendance', data:weeklyTrend(EB), type:'line', borderColor:'#1e40af', borderWidth:2,
+       pointRadius:3, pointBackgroundColor:'#fff', pointBorderColor:'#1e40af', showLine:true, tension:.15 }} ]}},
+  options:{{ responsive:true, maintainAspectRatio:false, parsing:{{xAxisKey:'x',yAxisKey:'y'}},
+    plugins:{{ legend:{{position:'top'}}, tooltip:{{ callbacks:{{
+      title:i=>new Date(i[0].parsed.x).toLocaleDateString('fr-FR',{{year:'numeric',month:'short',day:'numeric'}}),
+      label:c=>{{const p=c.raw; return p.source==='ebay'?[`🇫🇷 €${{p.y.toLocaleString()}}`,p.name.slice(0,60)]:`médiane €${{Math.round(p.y).toLocaleString()}}`;}} }} }} }},
+    scales:{{ x:{{ type:'linear', min:START_X, ticks:{{ callback:v=>new Date(v).toLocaleDateString('fr-FR',{{month:'short',day:'2-digit'}}) }}, title:{{display:true,text:'Date'}} }},
+      y:{{ title:{{display:true,text:'Prix (€)'}}, ticks:{{ callback:v=>'€'+v.toLocaleString() }} }} }},
+    onClick:(e,it)=>{{ if(it.length){{const p=it[0].element.$context.raw; if(p.url)window.open(p.url,'_blank');}} }} }},
+  plugins:[annoLine] }});
+</script></body></html>
+"""
+
+
+def write_filtered_csv(path, mer, yh, currency="¥"):
     with open(path, "w", encoding="utf-8", newline="") as f:
         w = csv.writer(f, delimiter=";")
         w.writerow(["Source","Titre","URL","Prix","Date"])
         for p in sorted(mer + yh, key=lambda x: x["x"]):
             d = datetime.fromtimestamp(p["x"]/1000, tz=timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
-            w.writerow([p["source"].capitalize(), p["name"], p["url"], f"¥{p['y']:,}", d])
+            w.writerow([p["source"].capitalize(), p["name"], p["url"], f"{currency}{p['y']:,}", d])
 
 
 def run(key):
@@ -571,8 +700,16 @@ def run(key):
     write_filtered_csv(FIL_DIR / f"{key}_filtered.csv", mer, yh)
     (RPT_DIR / f"{key}_trend.html").write_text(gen_html(cfg["label"], mer, yh), encoding="utf-8")
     s_m = stats_split(mer); s_y = stats_split(yh)
-    print(f"{cfg['label']:<35} | Mer {len(mer):>3} (¥{s_m[1]:>7,}→¥{s_m[3]:>7,} {s_m[4]:+.0f}%) "
-          f"| Yh {len(yh):>3} (¥{s_y[1]:>7,}→¥{s_y[3]:>7,} {s_y[4]:+.0f}%)")
+    line = (f"{cfg['label']:<35} | Mer {len(mer):>3} (¥{s_m[1]:>7,}→¥{s_m[3]:>7,} {s_m[4]:+.0f}%) "
+            f"| Yh {len(yh):>3} (¥{s_y[1]:>7,}→¥{s_y[3]:>7,} {s_y[4]:+.0f}%)")
+    # Marché France (eBay.fr) — rapport séparé si données présentes
+    eb = gather_ebay(key)
+    if eb:
+        write_filtered_csv(FIL_DIR / f"{key}_fr_filtered.csv", eb, [], currency="€")
+        (RPT_DIR / f"{key}_fr.html").write_text(gen_fr_html(cfg["label"], eb), encoding="utf-8")
+        s_e = stats_split(eb)
+        line += f"  || 🇫🇷 eB {len(eb):>3} (€{s_e[1]:>5,}→€{s_e[3]:>5,} {s_e[4]:+.0f}%)"
+    print(line)
 
 
 def main():
