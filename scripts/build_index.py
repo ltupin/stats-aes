@@ -63,15 +63,20 @@ def render_rows(sources):
     out = ""
     for s in sources:
         icon = ICON.get(s["label"], "•")
-        if s["pre"] == "0" and s["post"] == "0":
-            out += (f'<div class="src"><span class="src-name">{icon} {s["label"]}</span>'
-                    f'<span class="src-medians na">aucune donnée</span></div>')
-            continue
         c = s["cur"]
+        if s["pre"] == "0" and s["post"] == "0":
+            mid = '<span class="src-medians na">aucune donnée</span>'
+            delta = ""
+        elif s["pre"] == "0":  # pas de vente avant l'annonce → pas de variation
+            mid = (f'<span class="src-medians">{c}{s["post"]} <span class="n">'
+                   f'({s["n"]} depuis)</span></span>')
+            delta = '<span class="delta flat">n/a</span>'
+        else:
+            mid = (f'<span class="src-medians">{c}{s["pre"]} → {c}{s["post"]}'
+                   f'<span class="n">({s["n"]})</span></span>')
+            delta = f'<span class="delta {delta_class(s["delta"])}">{s["delta"]:+.0f}%</span>'
         out += (f'<div class="src"><span class="src-name">{icon} {s["label"]}</span>'
-                f'<span class="src-medians">{c}{s["pre"]} → {c}{s["post"]}'
-                f'<span class="n">({s["n"]})</span></span>'
-                f'<span class="delta {delta_class(s["delta"])}">{s["delta"]:+.0f}%</span></div>')
+                f'{mid}{delta}</div>')
     return out
 
 

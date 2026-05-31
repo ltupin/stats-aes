@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8"><title>KOF ’99 — eBay.fr — 2026</title>
+<style>
+  body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; background:#f5f6fa; color:#1a1a2e; padding:24px; max-width:1400px; margin:0 auto; }
+  h1 { font-size:1.4rem; margin:0 0 4px; } p.sub { color:#666; font-size:.85rem; margin:0 0 20px; }
+  .card { background:#fff; border-radius:12px; padding:20px; box-shadow:0 1px 4px rgba(0,0,0,.08); margin-bottom:20px; }
+  .insight { background:linear-gradient(90deg,#dbeafe,#ede9fe); border-left:4px solid #2563eb; padding:14px 18px; border-radius:8px; margin-bottom:20px; }
+  .src-card { background:rgba(255,255,255,.75); padding:10px 14px; border-radius:6px; font-size:.85rem; border-left:3px solid #2563eb; display:inline-block; }
+</style></head><body>
+<h1>KOF ’99 — 🇫🇷 eBay.fr — 2026</h1>
+<p class="sub">eBay.fr (ventes terminées) · 5 ventes · marché France (€) · données du 31/05/2026</p>
+<div class="insight">
+  <div class="src-card">
+    <strong>🇫🇷 eBay.fr</strong><br>
+    Avant 16/04 : 0 ventes · médiane €0<br>
+    Depuis : 5 · médiane <strong>€429</strong> · <strong>+0.0%</strong>
+  </div>
+</div>
+<div class="card"><div style="height:540px;position:relative"><canvas id="chart"></canvas></div></div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
+<script>
+const EB = [{"x": 1779753600000, "y": 559, "name": "the King of Fighters '99 KOF SNK Neo Geo AES Japan NTSC", "url": "https://www.ebay.fr/itm/257507757606", "source": "ebay"}, {"x": 1779580800000, "y": 59, "name": "neo geo aes insert king of fighters 99 jp", "url": "https://www.ebay.fr/itm/327163701867", "source": "ebay"}, {"x": 1778803200000, "y": 420, "name": "The King of Fighters 99 Jap KOF - Neo Geo AES SNK - Complet + Reg et Phone Card", "url": "https://www.ebay.fr/itm/236810914639", "source": "ebay"}, {"x": 1778716800000, "y": 429, "name": "The King of Fighters 99 Snk Neo Geo Aes Japan Ntsc Phone Card All Complete", "url": "https://www.ebay.fr/itm/206125066265", "source": "ebay"}, {"x": 1778112000000, "y": 475, "name": "the King of Fighters '99 KOF SNK Neo Geo AES Japan NTSC", "url": "https://www.ebay.fr/itm/256893238242", "source": "ebay"}];
+const ANNOUNCE_X = 1776297600000; const START_X = 1767225600000;
+const MIN_WEEK = 2;
+function weeklyTrend(points) {
+  const buckets = new Map();
+  for (const p of points) {
+    const d = new Date(p.x);
+    const tmp = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+    tmp.setUTCDate(tmp.getUTCDate() + 3 - (tmp.getUTCDay() + 6) % 7);
+    const weekYear = tmp.getUTCFullYear();
+    const week1 = new Date(Date.UTC(weekYear, 0, 4));
+    const week = 1 + Math.round(((tmp - week1) / 86400000 - 3 + (week1.getUTCDay() + 6) % 7) / 7);
+    const key = `${weekYear}-W${String(week).padStart(2,'0')}`;
+    if (!buckets.has(key)) buckets.set(key, { prices: [], dates: [] });
+    buckets.get(key).prices.push(p.y); buckets.get(key).dates.push(p.x);
+  }
+  const sortedKeys = [...buckets.keys()].sort();
+  const out = [];
+  for (const key of sortedKeys) {
+    const prices = buckets.get(key).prices;
+    const dates  = buckets.get(key).dates;
+    if (prices.length < MIN_WEEK) continue;
+    const s = [...prices].sort((a,b)=>a-b);
+    const med = s.length % 2 ? s[(s.length-1)/2] : (s[s.length/2-1]+s[s.length/2])/2;
+    const midX = dates.sort((a,b)=>a-b)[Math.floor(dates.length/2)];
+    out.push({ x: midX, y: med, count: prices.length, label: key });
+  }
+  return out;
+}
+const annoLine = { id:'annoLine', afterDatasetsDraw(ch){
+  const x=ch.scales.x.getPixelForValue(ANNOUNCE_X); if(isNaN(x))return; const c=ch.ctx;
+  c.save(); c.strokeStyle='#dc2626'; c.lineWidth=2; c.setLineDash([6,4]);
+  c.beginPath(); c.moveTo(x,ch.chartArea.top); c.lineTo(x,ch.chartArea.bottom); c.stroke(); c.setLineDash([]);
+  c.fillStyle='rgba(220,38,38,.9)'; c.font='bold 11px sans-serif'; const l='📣 Plaion AES+';
+  c.fillRect(x+4,ch.chartArea.top+4,c.measureText(l).width+12,22); c.fillStyle='#fff'; c.fillText(l,x+10,ch.chartArea.top+19); c.restore();
+} };
+new Chart(document.getElementById('chart').getContext('2d'), {
+  type:'scatter',
+  data:{ datasets:[
+    { label:'eBay.fr', data:EB, backgroundColor:'rgba(37,99,235,.6)', pointRadius:4 },
+    { label:'Tendance', data:weeklyTrend(EB), type:'line', borderColor:'#1e40af', borderWidth:2,
+       pointRadius:3, pointBackgroundColor:'#fff', pointBorderColor:'#1e40af', showLine:true, tension:.15 } ]},
+  options:{ responsive:true, maintainAspectRatio:false, parsing:{xAxisKey:'x',yAxisKey:'y'},
+    plugins:{ legend:{position:'top'}, tooltip:{ callbacks:{
+      title:i=>new Date(i[0].parsed.x).toLocaleDateString('fr-FR',{year:'numeric',month:'short',day:'numeric'}),
+      label:c=>{const p=c.raw; return p.source==='ebay'?[`🇫🇷 €${p.y.toLocaleString()}`,p.name.slice(0,60)]:`médiane €${Math.round(p.y).toLocaleString()}`;} } } },
+    scales:{ x:{ type:'linear', min:START_X, ticks:{ callback:v=>new Date(v).toLocaleDateString('fr-FR',{month:'short',day:'2-digit'}) }, title:{display:true,text:'Date'} },
+      y:{ title:{display:true,text:'Prix (€)'}, ticks:{ callback:v=>'€'+v.toLocaleString() } } },
+    onClick:(e,it)=>{ if(it.length){const p=it[0].element.$context.raw; if(p.url)window.open(p.url,'_blank');} } },
+  plugins:[annoLine] });
+</script></body></html>

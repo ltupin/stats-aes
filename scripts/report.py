@@ -311,18 +311,59 @@ EBAY = {
         "EXCLUDE": re.compile(r"\b(3|iii|4|iv|5|v|6|vi)\b|zankuro|amakusa|\bzero\b"
                               r"|anthology|collection", re.I),
     },
+    "ffs": {
+        "INCLUDE": re.compile(r"(?:fatal\s*fury|garou\s*densetsu|餓狼伝説)\s*"
+                              r"(?:special|spécial|スペシャル)", re.I),
+        "EXCLUDE": re.compile(r"real\s*bout|realbout|リアルバウト|\b(2|3)\b"
+                              r"|mark\s*of\s*the\s*wolves|wolves", re.I),
+    },
+    "ff1": {
+        "INCLUDE": re.compile(r"fatal\s*fury|garou\s*densetsu|餓狼伝説", re.I),
+        "EXCLUDE": re.compile(r"\b(2|ii|3|iii)\b|special|spécial|スペシャル|real\s*bout"
+                              r"|realbout|リアルバウト|mark\s*of\s*the\s*wolves|wolves"
+                              r"|\bmotw\b|wild\s*ambition", re.I),
+    },
+    "ff2": {
+        "INCLUDE": re.compile(r"(?:fatal\s*fury|garou\s*densetsu|餓狼伝説)\s*(?:2|ii)\b", re.I),
+        "EXCLUDE": re.compile(r"special|spécial|スペシャル|real\s*bout|realbout|リアルバウト"
+                              r"|\b3\b|\biii\b|mark\s*of\s*the\s*wolves|wolves", re.I),
+    },
+    "ff3": {
+        "INCLUDE": re.compile(r"(?:fatal\s*fury|garou\s*densetsu|餓狼伝説)\s*(?:3|iii)\b"
+                              r"|road\s*to\s*the\s*final|遥かなる闘い", re.I),
+        "EXCLUDE": re.compile(r"special|spécial|スペシャル|real\s*bout|realbout|リアルバウト"
+                              r"|\b2\b|\bii\b|mark\s*of\s*the\s*wolves|wolves", re.I),
+    },
+    "aof": {
+        "INCLUDE": re.compile(r"art\s*of\s*fighting|ryuuko|ryūko|龍虎の拳", re.I),
+        "EXCLUDE": re.compile(r"\b(2|ii|3|iii)\b|外伝", re.I),
+    },
+    "aof2": {
+        "INCLUDE": re.compile(r"art\s*of\s*fighting\s*(?:2|ii)\b|龍虎の拳\s*[2２]", re.I),
+        "EXCLUDE": re.compile(r"\b(3|iii)\b|外伝", re.I),
+    },
+    "wh2": {
+        "INCLUDE": re.compile(r"world\s*heroes\s*(?:2|ii)\b|ワールドヒーローズ\s*[2２]", re.I),
+        "EXCLUDE": re.compile(r"\bjet\b|perfect|gorgeous|\b(1|3|iii)\b", re.I),
+    },
 }
 
 
 def build_ebay_filter(key):
-    cfg = EBAY[key]
-    INC, EXC = cfg["INCLUDE"], cfg["EXCLUDE"]
     EX_URLS = load_exclude_urls(key + "_fr")
+    if key.startswith("kof_"):           # versions KOF : classifieur (marche en latin)
+        ver = key[len("kof_"):]
+        inc, exc = (lambda t: kof_version(t) == ver), None
+    else:
+        cfg = EBAY[key]
+        inc, exc = cfg["INCLUDE"].search, cfg["EXCLUDE"]
 
     def keep(title, url):
         if url in EX_URLS:
             return False
-        if not INC.search(title) or EXC.search(title):
+        if not inc(title):
+            return False
+        if exc and exc.search(title):
             return False
         tl = title.lower()
         if SET_RX.search(title) or NB_HON_RX.search(title) or BOX_ONLY_RX.search(title):
@@ -335,7 +376,7 @@ def build_ebay_filter(key):
 
 def gather_ebay(key):
     """Lit data/raw/{raw}_ebay_fr.csv → points € filtrés (>= EUR_FLOOR, >= START)."""
-    if key not in EBAY:
+    if key not in EBAY and not key.startswith("kof_"):
         return []
     keep = build_ebay_filter(key)
     raw_key = GAMES[key].get("raw", key)

@@ -30,7 +30,8 @@ Statistiques/
 │   ├── aof2_trend.html
 │   ├── ff1_trend.html
 │   ├── wh2_trend.html
-│   └── kof_{94,95,96,97,98,99,2000,2001,2002}_trend.html
+│   ├── kof_{94,95,96,97,98,99,2000,2001,2002}_trend.html
+│   └── {key}_fr.html               — marché France (eBay.fr, €) par jeu
 ├── data/
 │   ├── raw/                             — CSV bruts (Mercari + Yahoo), CUMULATIFS
 │   │   ├── {key}_mercari.csv                Titre;URL;Prix;Statut;Created
@@ -41,9 +42,10 @@ Statistiques/
 │       └── {key}.txt                        une URL par ligne, # = commentaire
 └── scripts/
     ├── fetch.py                  — Mercari + Yahoo fetcher (fusion CUMULATIVE)
-    ├── report.py                 — filtre + générateur HTML
+    ├── ebay_fetch.py             — eBay.fr (ventes terminées) via vrai Chrome/Playwright
+    ├── report.py                 — filtre + générateur HTML (Japon ¥ + France €)
     ├── validate.py               — validation interactive (drop faux positifs)
-    └── build_index.py            — régénère index.html depuis les rapports
+    └── build_index.py            — index.html avec bascule 🇯🇵 Japon / 🇫🇷 France
 ```
 
 ## Installation (premier setup, si .venv absent)
@@ -120,6 +122,11 @@ suivants.
 - **Données cumulatives** : `fetch.py` **fusionne** dans les CSV existants
   (clé = URL) et ne supprime jamais rien → la base ne fait que grandir, même
   si Yahoo retire une vieille annonce de sa fenêtre `closedsearch`
+- **Marché France (eBay.fr)** : marché **distinct** (€), collecté via un vrai
+  Chrome (`ebay_fetch.py`, Playwright) car eBay bloque les requêtes simples.
+  Rapports séparés `{key}_fr.html`, filtres latins (no game/repro/lots/CD/
+  mauvaises plateformes) et distinction de versions (SS1≠SS2…). La home bascule
+  entre 🇯🇵 Japon (Mercari+Yahoo, ¥) et 🇫🇷 France (eBay.fr, €). Jamais mélangés.
 - **KOF** : les 9 versions (’94→2002) sont régénérables — un classifieur
   d'affectation unique (`kof_version`) lit le n° collé au nom de la franchise
   et alimente `data/raw/kof_*.csv` partagé (champ `raw` dans `GAMES`)
