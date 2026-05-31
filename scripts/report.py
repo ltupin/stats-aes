@@ -189,6 +189,56 @@ GAMES = {
         ],
         "exclude_urls": set(),
     },
+    "samsho2": {
+        "label": "Samurai Shodown 2 AES",
+        # SS2 = 真サムライスピリッツ (préfixe 真). Le « 真 » distingue de SS1.
+        "INCLUDE": re.compile(
+            r"真[\s　]*サムライスピリッツ|真[\s　]*侍魂|真[\s　]*SAMURAI"
+            r"|SAMURAI\s*SHODOWN\s*(?:2|II)(?!I)|SAMURAI\s*SPIRITS\s*(?:2|II)(?!I)"
+            r"|覇王丸地獄変", re.IGNORECASE),
+        "EXCLUDE_GAME": [
+            # Autres Samurai Shodown
+            "斬紅郎","無双剣","天草降臨","アマクサ","零","ゼロ","六番勝負","6番勝負","羅刹",
+            "サムライスピリッツ3","サムライスピリッツ4","サムライスピリッツ5","サムライスピリッツ6",
+            "SAMURAI SHODOWN III","SAMURAI SHODOWN IV","SAMURAI SHODOWN V","SAMURAI SHODOWN VI",
+            # Autres franchises SNK
+            "キングオブファイターズ","KOF","King of Fighters","餓狼伝説","リアルバウト",
+            "龍虎の拳","メタルスラッグ","Metal Slug","ワールドヒーローズ","ブレイカーズ",
+            "風雲","アテナ","月華",
+        ],
+        "exclude_urls": set(),
+    },
+    "aof2": {
+        "label": "Art of Fighting 2 AES",
+        "INCLUDE": re.compile(r"龍虎の拳[\s　]*[2２](?![0-9０-９])"
+                              r"|龍虎の拳[\s　]*II(?!I)|Art\s*of\s*Fighting\s*2",
+                              re.IGNORECASE),
+        "EXCLUDE_GAME": [
+            "龍虎の拳3","龍虎3","龍虎III","Art of Fighting 3","AOF3","外伝",
+            "キングオブファイターズ","KOF","King of Fighters","餓狼伝説","リアルバウト",
+            "サムライスピリッツ","侍魂","メタルスラッグ","Metal Slug",
+            "ワールドヒーローズ","ブレイカーズ","風雲","アテナ","月華",
+        ],
+        "exclude_urls": set(),
+    },
+    "ff1": {
+        "label": "Fatal Fury 1 AES",
+        # FF1 = 餓狼伝説 SANS chiffre 2-9, sans Special, ni Real Bout/MOTW.
+        # « 餓狼伝説1 » (explicite) reste accepté (le lookahead n'exclut que 2-9).
+        "INCLUDE": re.compile(
+            r"餓狼伝説(?![\s　]*[2-9２-９]|[\s　]*スペシャル|[\s　]*SPECIAL"
+            r"|[\s　]*III|[\s　]*II)|FATAL\s*FURY(?!\s*(?:2|3|SPECIAL|II|III))",
+            re.IGNORECASE),
+        "EXCLUDE_GAME": [
+            "餓狼伝説2","餓狼伝説3","スペシャル","SPECIAL","リアルバウト","Real Bout",
+            "REALBOUT","REAL BOUT","RB餓狼","ＲＢ","餓狼 MARK","MARK OF THE WOLVES",
+            "MOTW","ウルブズ","ウルヴズ","City of the Wolves","COTW",
+            "キングオブファイターズ","KOF","King of Fighters","サムライスピリッツ","侍魂",
+            "龍虎の拳","メタルスラッグ","Metal Slug","ワールドヒーローズ","ブレイカーズ",
+            "風雲","アテナ","月華",
+        ],
+        "exclude_urls": set(),
+    },
 }
 
 # ── KOF : versions régénérables (affectation UNIQUE par titre) ───────────────

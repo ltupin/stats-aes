@@ -25,7 +25,10 @@ Statistiques/
 │   ├── ffs_trend.html
 │   ├── ff3_trend.html
 │   ├── samsho1_trend.html
+│   ├── samsho2_trend.html
 │   ├── aof_trend.html
+│   ├── aof2_trend.html
+│   ├── ff1_trend.html
 │   ├── wh2_trend.html
 │   └── kof_{94,95,96,97,98,99,2000,2001,2002}_trend.html
 ├── data/
@@ -125,9 +128,12 @@ suivants.
 
 | Jeu              | Mercari Δ | Yahoo Δ | Lecture |
 |------------------|-----------|---------|---------|
-| Fatal Fury 2     | +119 %    | n/a*    | Forte hausse ; *Yahoo non fetché (géo-bloc) |
-| Fatal Fury Sp.   | +168 %    | +135 %  | Bond Plaion massif (jeu pilote) |
-| Fatal Fury 3     | +19 %     | n/a*    | Hausse modérée, déjà cher/rare ; *Mercari only |
+| Fatal Fury 1     | +81 %     | +11 %   | Original, très courant → effet Yahoo faible |
+| Fatal Fury 2     | +119 %    | +92 %   | Forte hausse |
+| Fatal Fury Sp.   | +168 %    | +137 %  | Bond Plaion massif (jeu pilote) |
+| Fatal Fury 3     | +19 %     | +47 %   | Déjà cher/rare |
+| Art of Fighting 2| +147 %    | +156 %  | Très forte hausse (ajouté via discover) |
+| Samurai Shodown 2| +137 %    | +150 %  | Très forte hausse (ajouté via discover) |
 | KOF '94          | +112 %    | +86 %   | Premier opus, fortes volumes |
 | KOF '95-'97      | +27→+77 % | +32→+77 % | Tendance haussière cohérente |
 | KOF '98-2002     | bruité    | bruité  | Volumes minces, conclusions fragiles |
