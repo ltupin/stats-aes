@@ -63,22 +63,16 @@ def group_of(name):
     return "main"
 
 
-MAIN_ORDER = ["ff2_trend.html", "ffs_trend.html", "ff3_trend.html",
-              "samsho1_trend.html", "aof_trend.html"]
-
-
 def sort_key(rep):
-    name = rep["file"]
-    if name in MAIN_ORDER:
-        return (0, MAIN_ORDER.index(name))
-    # kof_all_versions first, then numeric years
-    if name == "kof_all_versions_trend.html":
-        return (0, -1)
-    m = re.search(r"kof_(\d+)", name)
-    if m:
-        yr = int(m.group(1))
-        return (1, yr if yr > 90 else yr + 2000)  # 94→94, 2000→2000
-    return (2, name)
+    """Jeux principaux : ordre alphabétique par label. KOF : par année."""
+    g = group_of(rep["file"])
+    if g == "kof":
+        m = re.search(r"kof_(\d+)", rep["file"])
+        yr = int(m.group(1)) if m else 0
+        return (1, yr if yr > 90 else yr + 2000, "")
+    if g == "legacy":
+        return (2, 0, rep["title"].lower())
+    return (0, 0, rep["title"].lower())  # main, alphabétique
 
 
 def delta_class(d):

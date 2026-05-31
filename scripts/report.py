@@ -89,7 +89,7 @@ CD_RX = re.compile(
 # substrings (case-insensitive) to drop. exclude_urls = manual URL drops.
 GAMES = {
     "samsho1": {
-        "label": "Samurai Shodown 1 AES",
+        "label": "Samurai Shodown 1",
         "INCLUDE": re.compile(r"(サムライスピリッツ|侍魂|SAMURAI\s*SHODOWN|"
                               r"Samurai\s*Shodown|SAMURAI\s*SPIRITS)", re.IGNORECASE),
         "EXCLUDE_GAME": [
@@ -105,7 +105,7 @@ GAMES = {
         "exclude_urls": set(),
     },
     "aof": {
-        "label": "Art of Fighting 1 AES",
+        "label": "Art of Fighting 1",
         "INCLUDE": re.compile(r"(龍虎の拳|Art\s*of\s*Fighting|ART\s*OF\s*FIGHTING|AOF)",
                               re.IGNORECASE),
         "EXCLUDE_GAME": [
@@ -118,7 +118,7 @@ GAMES = {
         "exclude_urls": set(),
     },
     "ffs": {
-        "label": "Fatal Fury Special AES",
+        "label": "Fatal Fury Special",
         "INCLUDE": re.compile(
             r"(餓狼伝説[\s　]*スペシャル|餓狼伝説[\s　]*SPECIAL"
             r"|餓狼[\s　]*スペシャル|餓狼[\s　]*SPECIAL"
@@ -137,7 +137,7 @@ GAMES = {
         "exclude_urls": set(),
     },
     "ff2": {
-        "label": "Fatal Fury 2 AES",
+        "label": "Fatal Fury 2",
         # Le « 2 » après 餓狼伝説 distingue du Special (餓狼伝説スペシャル, sans chiffre).
         # (?![0-9０-９]) évite 20周年 / 2本 etc.
         "INCLUDE": re.compile(
@@ -158,7 +158,7 @@ GAMES = {
         "exclude_urls": set(),
     },
     "ff3": {
-        "label": "Fatal Fury 3 AES",
+        "label": "Fatal Fury 3",
         # Le « 3 » après 餓狼伝説, ou le sous-titre 遥かなる闘い (Road to Final Victory).
         "INCLUDE": re.compile(
             r"(餓狼伝説[\s　]*[3３](?![0-9０-９])"
@@ -176,7 +176,7 @@ GAMES = {
         "exclude_urls": set(),
     },
     "wh2": {
-        "label": "World Heroes 2 AES",
+        "label": "World Heroes 2",
         # Le « 2 » après ワールドヒーローズ. Exclure WH2 JET et WH Perfect (jeux ≠).
         "INCLUDE": re.compile(r"ワールドヒーローズ[\s　]*[2２](?![0-9０-９])"
                               r"|World\s*Heroes\s*2", re.IGNORECASE),
@@ -190,7 +190,7 @@ GAMES = {
         "exclude_urls": set(),
     },
     "samsho2": {
-        "label": "Samurai Shodown 2 AES",
+        "label": "Samurai Shodown 2",
         # SS2 = 真サムライスピリッツ (préfixe 真). Le « 真 » distingue de SS1.
         "INCLUDE": re.compile(
             r"真[\s　]*サムライスピリッツ|真[\s　]*侍魂|真[\s　]*SAMURAI"
@@ -209,7 +209,7 @@ GAMES = {
         "exclude_urls": set(),
     },
     "aof2": {
-        "label": "Art of Fighting 2 AES",
+        "label": "Art of Fighting 2",
         "INCLUDE": re.compile(r"龍虎の拳[\s　]*[2２](?![0-9０-９])"
                               r"|龍虎の拳[\s　]*II(?!I)|Art\s*of\s*Fighting\s*2",
                               re.IGNORECASE),
@@ -222,7 +222,7 @@ GAMES = {
         "exclude_urls": set(),
     },
     "ff1": {
-        "label": "Fatal Fury 1 AES",
+        "label": "Fatal Fury 1",
         # FF1 = 餓狼伝説 SANS chiffre 2-9, sans Special, ni Real Bout/MOTW.
         # « 餓狼伝説1 » (explicite) reste accepté (le lookahead n'exclut que 2-9).
         "INCLUDE": re.compile(
@@ -282,7 +282,7 @@ _KOF_OTHER_FRANCHISES = [
 ]
 for _v in KOF_VERSIONS:
     GAMES[f"kof_{_v}"] = {
-        "label": f"KOF {('’' + _v) if len(_v) == 2 else _v} AES",
+        "label": f"KOF {('’' + _v) if len(_v) == 2 else _v}",
         "raw": "kof",  # lit kof_mercari.csv / kof_yahoo.csv
         "INCLUDE": (lambda ver: (lambda title: kof_version(title) == ver))(_v),
         "EXCLUDE_GAME": _KOF_OTHER_FRANCHISES,
