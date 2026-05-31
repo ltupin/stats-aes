@@ -94,6 +94,16 @@ CD_RX = re.compile(
 US_RX = re.compile(
     r"\b(?:US|USA)\b(?!\s*seller)|\bNTSC-?U\b|us\s*version|usa\s*version"
     r"|version\s*us\b|am[ée]ricaine|english\s*usa|\beuro\b\s*version", re.IGNORECASE)
+# Neuf / scellé (gonfle les prix). NEW_BARE = "new"/"neuf" seuls, SAUF s'il
+# s'agit d'un descriptif d'occasion proche du neuf (LIKENEW) → conservé.
+SEALED_RX = re.compile(
+    r"sealed|brand[\s-]*new|factory\s*sealed|\bnib\b|\bbnib\b|\bnos\b|unopened"
+    r"|scell|sous\s*blister|\bblister\b|jamais\s*ouvert|non\s*ouvert|neuf\s*sous|\bneuve\b",
+    re.IGNORECASE)
+NEW_BARE_RX = re.compile(r"\bnew\b|\bneuf\b", re.IGNORECASE)
+LIKENEW_RX  = re.compile(
+    r"like[\s-]*new|comme\s*neuf|proche\s*du\s*neuf|[ée]tat\s*neuf|quasi[\s-]*neuf"
+    r"|presque\s*neuf|near\s*mint", re.IGNORECASE)
 
 # Per-game config. INCLUDE = regex the title MUST match. EXCLUDE_GAME = extra
 # substrings (case-insensitive) to drop. exclude_urls = manual URL drops.
@@ -374,6 +384,10 @@ def build_ebay_filter(key):
         if SET_RX.search(title) or NB_HON_RX.search(title) or BOX_ONLY_RX.search(title):
             return False
         if CD_RX.search(title) or US_RX.search(title):  # CD ou version US/occidentale
+            return False
+        if SEALED_RX.search(title):                      # neuf / scellé
+            return False
+        if NEW_BARE_RX.search(title) and not LIKENEW_RX.search(title):
             return False
         return not any(e in tl for e in EXCLUDE_COMMON_LC)
     return keep
