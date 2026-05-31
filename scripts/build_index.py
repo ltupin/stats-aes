@@ -190,7 +190,8 @@ PAGE = """<!DOCTYPE html>
   <p class="lede">Suivi des prix d'occasion (Mercari Japon + Yahoo Auctions Japon)
     des jeux Neo Geo AES, pour mesurer l'effet de l'annonce de la console
     <strong>Plaion Neo Geo AES+</strong>.</p>
-  <p class="meta">Données du {now} · {n} rapports · variation = médiane avant vs depuis le 16/04/2026</p>
+  <p class="meta">Données du {now} · {n} rapports · variation = médiane avant vs depuis le 16/04/2026
+    · <a href="podcast.html">🎙️ script de présentation</a></p>
 
   <div class="insight">
     📣 <strong>16 avril 2026</strong> — Plaion annonce la <strong>Neo Geo AES+</strong>,
