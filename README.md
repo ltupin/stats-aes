@@ -26,6 +26,7 @@ Statistiques/
 │   ├── ff3_trend.html
 │   ├── samsho1_trend.html
 │   ├── aof_trend.html
+│   ├── wh2_trend.html
 │   └── kof_{94,95,96,97,98,99,2000,2001,2002}_trend.html
 ├── data/
 │   ├── raw/                             — CSV bruts (Mercari + Yahoo), CUMULATIFS
@@ -130,7 +131,8 @@ suivants.
 | KOF '94          | +112 %    | +86 %   | Premier opus, fortes volumes |
 | KOF '95-'97      | +27→+77 % | +32→+77 % | Tendance haussière cohérente |
 | KOF '98-2002     | bruité    | bruité  | Volumes minces, conclusions fragiles |
-| SamSho 1         | +100 %    | +123 %  | Forte hausse symétrique |
+| SamSho 1         | +100 %    | +100 %  | Forte hausse symétrique |
+| World Heroes 2   | +150 %    | +91 %   | Ajouté via discover.py (≈5 ventes/sem) |
 | AOF 1            | +76 %     | +54 %   | Hausse claire malgré faibles volumes |
 
 ## Dépendances
