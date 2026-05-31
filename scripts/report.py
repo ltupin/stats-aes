@@ -429,8 +429,6 @@ def gen_html(label, mer, yh):
 <p class="sub">Mercari {len(mer)} ventes · Yahoo {len(yh)} ventes · données du {datetime.now(timezone.utc).strftime('%d/%m/%Y')}</p>
 
 <div class="insight">
-  <h3>📣 Effet de l'annonce Plaion Neo Geo AES+ (16 avril 2026)</h3>
-  <p>Plaion a annoncé le 16/04/2026 la sortie en novembre d'une nouvelle console <strong>Neo Geo AES+</strong> compatible avec les cartouches d'origine.</p>
   <div class="split">
     <div class="src-card mer">
       <strong>🟡 Mercari</strong><br>
