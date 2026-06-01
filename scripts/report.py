@@ -64,6 +64,9 @@ EXCLUDE_COMMON_LC = [s.lower() for s in [
     "no game","sans jeu","sans le jeu","without game","box only","boite seule","boîte seule",
     "case only","manual only","notice seule","jaquette seule","empty box","repro","reproduction",
     "bootleg","custom label","aftermarket",
+    # coque/PCB seuls (cartouche vide, sans jeu dedans)
+    "empty cartridge","cartridge shell","empty shell","shell only","coque vide","coque seule",
+    "boitier vide","boîtier vide","no pcb","without pcb","sans pcb","pcb only",
     "アートブック","イラスト集","サウンドトラック","サントラ","OST","オリジナルサウンドトラック",
     "予約特典","特典","ラバーマット","デスクマット","プレイマット",
     "色紙","原画","映画",
@@ -324,7 +327,10 @@ EBAY = {
         "INCLUDE": re.compile(r"shin\s*samurai|真サムライ|真侍魂|haohmaru|覇王丸地獄変"
                               r"|samurai\s*(?:shodown|spirits|showdown)\s*(?:2|ii)\b", re.I),
         "EXCLUDE": re.compile(r"\b(3|iii|4|iv|5|v|6|vi)\b|zankuro|amakusa|\bzero\b"
-                              r"|anthology|collection", re.I),
+                              r"|anthology|collection"
+                              # autre franchise présente = lot/erreur (ex. lot de notices)
+                              r"|fatal\s*fury|garou|餓狼|king\s*of\s*fighters|\bkof\b"
+                              r"|metal\s*slug|world\s*heroes|art\s*of\s*fighting|龍虎", re.I),
     },
     "ffs": {
         "INCLUDE": re.compile(r"(?:fatal\s*fury|garou\s*densetsu|餓狼伝説)\s*"
