@@ -60,6 +60,9 @@ EXCLUDE_COMMON_LC = [s.lower() for s in [
     "フィギュア","クリアファイル","ジオラマ","グッズ","ブロマイド","下敷き","ポストカード",
     "ハンカチ","タオル","Tシャツ","Ｔシャツ","缶ケース","プラモデル",
     "ガン消し","ガンケシ","消しゴム","ケシゴム","リペイント","ガチャ","ガシャポン","食玩","カードダス",
+    "同人","手描き","手書き","イラスト集","空ケース","ケースのみ","ジャケットのみ","ジャケットだけ",
+    "switch","ネオジオコレクション","neogeo collection","neo geo collection",
+    "ギャラクシーファイト","galaxy fight",
     # FR/EN (eBay) — pas une cartouche jouable
     "no game","sans jeu","sans le jeu","without game","box only","boite seule","boîte seule",
     "case only","manual only","notice seule","jaquette seule","empty box","repro","reproduction",
