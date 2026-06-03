@@ -108,6 +108,12 @@ SEALED_RX = re.compile(
     r"|scell|sous\s*blister|\bblister\b|jamais\s*ouvert|non\s*ouvert|neuf\s*sous|\bneuve\b",
     re.IGNORECASE)
 NEW_BARE_RX = re.compile(r"\bnew\b|\bneuf\b", re.IGNORECASE)
+# Titre qui COMMENCE par un mot de paperasse = c'est la notice/le manuel seul,
+# pas le jeu (ex. "Notice Manual The King Of Fighters 95"). Tolère "NOUVELLE
+# ANNONCE" / "New listing" qu'eBay colle parfois en tête.
+MANUAL_LEAD_RX = re.compile(
+    r"^\s*(?:nouvelle annonce|new listing)?\s*"
+    r"(?:notice|manual|manuel|livret|inserts?|jaquette|booklet)\b", re.IGNORECASE)
 LIKENEW_RX  = re.compile(
     r"like[\s-]*new|comme\s*neuf|proche\s*du\s*neuf|[ée]tat\s*neuf|quasi[\s-]*neuf"
     r"|presque\s*neuf|near\s*mint", re.IGNORECASE)
@@ -398,6 +404,8 @@ def build_ebay_filter(key):
         if SEALED_RX.search(title):                      # neuf / scellé
             return False
         if NEW_BARE_RX.search(title) and not LIKENEW_RX.search(title):
+            return False
+        if MANUAL_LEAD_RX.search(title):                 # notice/manuel seul
             return False
         return not any(e in tl for e in EXCLUDE_COMMON_LC)
     return keep

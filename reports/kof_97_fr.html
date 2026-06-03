@@ -8,12 +8,12 @@
   .src-card { background:rgba(255,255,255,.75); padding:10px 14px; border-radius:6px; font-size:.85rem; border-left:3px solid #2563eb; display:inline-block; }
 </style></head><body>
 <h1>KOF ’97 — 🇫🇷 eBay.fr — 2026</h1>
-<p class="sub">eBay.fr (ventes terminées) · 11 ventes · marché France (€) · données du 03/06/2026</p>
+<p class="sub">eBay.fr (ventes terminées) · 10 ventes · marché France (€) · données du 03/06/2026</p>
 <div class="insight">
   <div class="src-card">
     <strong>🇫🇷 eBay.fr</strong><br>
     Avant 16/04 : 2 ventes · médiane €230<br>
-    Depuis : 9 · médiane <strong>€299</strong> · <strong>+30.0%</strong>
+    Depuis : 8 · médiane <strong>€304</strong> · <strong>+32.2%</strong>
   </div>
 </div>
 <div class="card">
@@ -26,7 +26,7 @@
 </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
 <script>
-const EB = [{"x": 1780185600000, "y": 299, "name": "King Of Fighters 97 Neo Geo Aes 100% Original No Convert", "url": "https://www.ebay.fr/itm/236837175608", "source": "ebay"}, {"x": 1779235200000, "y": 48, "name": "NEOGEO AES - The King Of Fighters '97 Manuel - JAP VERSION - 100% Original", "url": "https://www.ebay.fr/itm/287342276165", "source": "ebay"}, {"x": 1779062400000, "y": 329, "name": "Jeu SNK neo geo AES king of fighters 97 complet", "url": "https://www.ebay.fr/itm/147306124982", "source": "ebay"}, {"x": 1778976000000, "y": 330, "name": "KING OF FIGHTERS 97 NEO GEO AES 100% ORIGINAL CIB OVP", "url": "https://www.ebay.fr/itm/800006377903", "source": "ebay"}, {"x": 1778976000000, "y": 369, "name": "the King of Fighters '97 KOF SNK NEO GEO AES NTSC Japan", "url": "https://www.ebay.fr/itm/267670575260", "source": "ebay"}, {"x": 1778630400000, "y": 45, "name": "Notice AES King of Fighters 97 (KOF 97) Neo Geo SNK d'origine", "url": "https://www.ebay.fr/itm/256686758152", "source": "ebay"}, {"x": 1778457600000, "y": 275, "name": "Jeu SNK neo geo AES king of fighters 97 complet", "url": "https://www.ebay.fr/itm/206261138346", "source": "ebay"}, {"x": 1777939200000, "y": 264, "name": "NEOGEO AES - The King Of Fighters '97 - JAP VERSION - 100% Original Complet", "url": "https://www.ebay.fr/itm/287280356875", "source": "ebay"}, {"x": 1777766400000, "y": 309, "name": "the King of Fighters '97 KOF SNK NEO GEO AES NTSC Japan", "url": "https://www.ebay.fr/itm/267653081462", "source": "ebay"}, {"x": 1773619200000, "y": 230, "name": "KING OF FIGHTERS 97 Neo Geo AES Original", "url": "https://www.ebay.fr/itm/227259364620", "source": "ebay"}, {"x": 1773619200000, "y": 230, "name": "KING OF FIGHTERS 97 Neo Geo AES Original", "url": "https://www.ebay.fr/itm/227254820244", "source": "ebay"}];
+const EB = [{"x": 1780185600000, "y": 299, "name": "King Of Fighters 97 Neo Geo Aes 100% Original No Convert", "url": "https://www.ebay.fr/itm/236837175608", "source": "ebay"}, {"x": 1779235200000, "y": 48, "name": "NEOGEO AES - The King Of Fighters '97 Manuel - JAP VERSION - 100% Original", "url": "https://www.ebay.fr/itm/287342276165", "source": "ebay"}, {"x": 1779062400000, "y": 329, "name": "Jeu SNK neo geo AES king of fighters 97 complet", "url": "https://www.ebay.fr/itm/147306124982", "source": "ebay"}, {"x": 1778976000000, "y": 330, "name": "KING OF FIGHTERS 97 NEO GEO AES 100% ORIGINAL CIB OVP", "url": "https://www.ebay.fr/itm/800006377903", "source": "ebay"}, {"x": 1778976000000, "y": 369, "name": "the King of Fighters '97 KOF SNK NEO GEO AES NTSC Japan", "url": "https://www.ebay.fr/itm/267670575260", "source": "ebay"}, {"x": 1778457600000, "y": 275, "name": "Jeu SNK neo geo AES king of fighters 97 complet", "url": "https://www.ebay.fr/itm/206261138346", "source": "ebay"}, {"x": 1777939200000, "y": 264, "name": "NEOGEO AES - The King Of Fighters '97 - JAP VERSION - 100% Original Complet", "url": "https://www.ebay.fr/itm/287280356875", "source": "ebay"}, {"x": 1777766400000, "y": 309, "name": "the King of Fighters '97 KOF SNK NEO GEO AES NTSC Japan", "url": "https://www.ebay.fr/itm/267653081462", "source": "ebay"}, {"x": 1773619200000, "y": 230, "name": "KING OF FIGHTERS 97 Neo Geo AES Original", "url": "https://www.ebay.fr/itm/227259364620", "source": "ebay"}, {"x": 1773619200000, "y": 230, "name": "KING OF FIGHTERS 97 Neo Geo AES Original", "url": "https://www.ebay.fr/itm/227254820244", "source": "ebay"}];
 const ANNOUNCE_X = 1776297600000; const START_X = 1767225600000;
 const MIN_WEEK = 2;
 function weeklyTrend(points) {
