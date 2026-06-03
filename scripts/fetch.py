@@ -230,13 +230,23 @@ def main():
     print(f"=== {key} ===")
     print(f"Mercari keyword: {mer_kw}")
     t0 = time.time()
-    mer = asyncio.run(fetch_mercari(mer_kw))
-    print(f"  → {len(mer)} items in {time.time()-t0:.1f}s")
+    try:
+        mer = asyncio.run(fetch_mercari(mer_kw))
+        print(f"  → {len(mer)} items in {time.time()-t0:.1f}s")
+    except Exception as e:
+        mer = []
+        print(f"  ⚠️ Mercari indisponible ({type(e).__name__}) — base préservée.",
+              file=sys.stderr)
 
     print(f"Yahoo   keyword: {yh_kw}")
     t0 = time.time()
-    yh, total, blocked = fetch_yahoo(yh_kw)
-    print(f"  → {len(yh)}/{total} items in {time.time()-t0:.1f}s")
+    try:
+        yh, total, blocked = fetch_yahoo(yh_kw)
+        print(f"  → {len(yh)}/{total} items in {time.time()-t0:.1f}s")
+    except Exception as e:
+        yh, total, blocked = [], None, False
+        print(f"  ⚠️ Yahoo indisponible ({type(e).__name__}) — base préservée.",
+              file=sys.stderr)
     if blocked:
         print("  🚧 Yahoo géo-bloqué (HTTP 403, EEE/UK) — passe par un proxy/VPN "
               "japonais. Données Yahoo existantes préservées.", file=sys.stderr)
