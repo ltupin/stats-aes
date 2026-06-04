@@ -89,7 +89,7 @@ EXCLUDE_COMMON_LC = [s.lower() for s in [
     "オンラインコレクション","ONLINE COLLECTION",
 ]]
 SET_RX      = re.compile(r"(?<!カ)セット")
-NB_HON_RX   = re.compile(r"\d+本")
+NB_HON_RX   = re.compile(r"\d+\s*[本点]")  # N本 / N点 = lot de N articles
 BOX_ONLY_RX = re.compile(r"(?:箱|帯|説明書|インスト)(?:のみ|だけ)")
 # NEOGEO CD (≠ AES) — tolère 中黒/espaces ("ネオ・ジオ CD") et le "CD" demi-chasse
 # isolé ("CD ソフト", "CD-ROM") que la liste de substrings ne couvrait pas.
