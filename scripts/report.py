@@ -75,7 +75,7 @@ EXCLUDE_COMMON_LC = [s.lower() for s in [
     "予約特典","特典","ラバーマット","デスクマット","プレイマット",
     "色紙","原画","映画",
     "テレホンカード","テレカ","テレフォンカード","テレフォン カード",
-    "新品同様","新品 同様","新品未使用","新品 未使用","未開封",
+    "新品未使用","新品 未使用","未開封",
     "PS2ソフト","PS4ソフト","Switchソフト","XBOX","スイッチ","アケアカ","ARCADE ARCHIVES","Arcade Archives",
     "ニンテンドー","Nintendo","PlayStation","ドリームキャスト","Dreamcast","DREAMCAST","ドリキャス","DC版",
     "アーケード","ACA NEOGEO","Wii","WII","セガサターン","Saturn",
@@ -90,6 +90,9 @@ EXCLUDE_COMMON_LC = [s.lower() for s in [
 ]]
 SET_RX      = re.compile(r"(?<!カ)セット")
 NB_HON_RX   = re.compile(r"\d+\s*[本点]")  # N本 / N点 = lot de N articles
+# Neuf/scellé japonais (exclu, comme le neuf/scellé eBay) — mais on GARDE
+# l'occasion « comme neuf » 新品同様 / ほぼ新品.
+JP_NEW_RX = re.compile(r"(?<!ほぼ)新品(?!同様)")
 BOX_ONLY_RX = re.compile(r"(?:箱|帯|説明書|インスト)(?:のみ|だけ)")
 # NEOGEO CD (≠ AES) — tolère 中黒/espaces ("ネオ・ジオ CD") et le "CD" demi-chasse
 # isolé ("CD ソフト", "CD-ROM") que la liste de substrings ne couvrait pas.
@@ -399,6 +402,7 @@ def build_ebay_filter(key):
         tl = title.lower()
         if SET_RX.search(title) or NB_HON_RX.search(title) or BOX_ONLY_RX.search(title):
             return False
+        if JP_NEW_RX.search(title): return False  # neuf/scellé (garde 新品同様)
         if CD_RX.search(title) or US_RX.search(title):  # CD ou version US/occidentale
             return False
         if SEALED_RX.search(title):                      # neuf / scellé
@@ -461,6 +465,7 @@ def build_filter(cfg, key):
         tl = title.lower()
         if SET_RX.search(title) or NB_HON_RX.search(title) or BOX_ONLY_RX.search(title):
             return False
+        if JP_NEW_RX.search(title): return False  # neuf/scellé (garde 新品同様)
         if CD_RX.search(title): return False  # NEOGEO CD (≠ AES)
         if any(e in tl for e in EXCLUDE_COMMON_LC): return False
         if any(e in tl for e in EXG):               return False
