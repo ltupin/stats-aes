@@ -168,7 +168,8 @@ PAGE = """<!DOCTYPE html>
 </style></head><body class="show-jp">
 <div class="wrap">
   <h1>📊 Statistiques Neo Geo AES</h1>
-  <p class="meta">Données du {now} · {njp} jeux · 🇯🇵 Japon (Mercari + Yahoo) vs 🇫🇷 France (eBay.fr, {nfr} jeux)</p>
+  <p class="meta">Données du {now} · {njp} jeux · 🇯🇵 Japon (Mercari + Yahoo) vs 🇫🇷 France (eBay.fr, {nfr} jeux)
+    · <a href="reports/france_global.html">🇫🇷 vue d'ensemble France</a></p>
   <div class="toggle">
     <button data-m="jp" class="on">🇯🇵 Japon</button>
     <button data-m="fr">🇫🇷 France</button>
