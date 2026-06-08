@@ -114,10 +114,13 @@ def fetch_ebay_fr(keyword, pages, ctx):
 
 _SUFFIX_RX = re.compile(
     r"\s*(La page s'ouvre dans une nouvelle fen.tre.*$|Opens in a new window or tab.*$)", re.I)
+# Badge eBay collé en tête du titre (annonce récente) — pas un état "neuf".
+_BADGE_RX = re.compile(r"^\s*(?:nouvelle annonce|new listing)\s*", re.I)
 
 
 def clean_title(t):
-    return _SUFFIX_RX.sub("", (t or "")).replace("\n", " ").replace(";", ",").strip()
+    t = _BADGE_RX.sub("", (t or ""))
+    return _SUFFIX_RX.sub("", t).replace("\n", " ").replace(";", ",").strip()
 
 
 def to_csv_rows(items):
