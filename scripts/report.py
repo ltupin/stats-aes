@@ -117,6 +117,11 @@ NEW_BARE_RX = re.compile(r"\bnew\b|\bneuf\b", re.IGNORECASE)
 MANUAL_LEAD_RX = re.compile(
     r"^\s*(?:nouvelle annonce|new listing)?\s*"
     r"(?:notice|manual|manuel|livret|inserts?|jaquette|booklet)\b", re.IGNORECASE)
+# Combo paperasse au milieu du titre = notice/insert seuls (ex. "AES insert et
+# notice KOF95"), pas la cartouche.
+PAPERWORK_RX = re.compile(
+    r"inserts?[\s,]+(?:et\s+|and\s+|&\s+)?notice|notice[\s,]+(?:et\s+|and\s+|&\s+)?inserts?",
+    re.IGNORECASE)
 LIKENEW_RX  = re.compile(
     r"like[\s-]*new|comme\s*neuf|proche\s*du\s*neuf|[ée]tat\s*neuf|quasi[\s-]*neuf"
     r"|presque\s*neuf|near\s*mint", re.IGNORECASE)
@@ -409,7 +414,7 @@ def build_ebay_filter(key):
             return False
         if NEW_BARE_RX.search(title) and not LIKENEW_RX.search(title):
             return False
-        if MANUAL_LEAD_RX.search(title):                 # notice/manuel seul
+        if MANUAL_LEAD_RX.search(title) or PAPERWORK_RX.search(title):  # notice/insert seul
             return False
         return not any(e in tl for e in EXCLUDE_COMMON_LC)
     return keep
