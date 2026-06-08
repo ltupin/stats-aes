@@ -17,13 +17,13 @@
   .nav a{color:#2563eb;text-decoration:none}
 </style></head><body><div class="wrap">
 <div class="nav"><a href="../index.html">← sommaire</a> · <a href="france_global.html">🇫🇷 France</a> · <a href="japan_global.html">🇯🇵 Japon</a></div>
-<h1>🇫🇷 Marché France (eBay.fr) — vue d'ensemble · 18 jeux Neo Geo AES</h1>
-<p class="sub">Données du 08/06/2026 · agrégat de tous les titres, prix normalisés · source : eBay.fr (ventes terminées)</p>
+<h1>🇯🇵 Marché Japon (Yahoo Auctions) — vue d'ensemble · 18 jeux Neo Geo AES</h1>
+<p class="sub">Données du 08/06/2026 · agrégat de tous les titres, prix normalisés · source : Yahoo Auctions (enchères clôturées, dates de vente réelles)</p>
 <div class="cards">
-  <div class="stat"><div class="v">268</div><div class="l">ventes totales</div></div>
-  <div class="stat"><div class="v">27</div><div class="l">avant 16/04</div></div>
-  <div class="stat"><div class="v">241</div><div class="l">depuis 16/04</div></div>
-  <div class="stat"><div class="v">0.6 → 1.0</div><div class="l">indice prix (avant → depuis)</div></div>
+  <div class="stat"><div class="v">1506</div><div class="l">ventes totales</div></div>
+  <div class="stat"><div class="v">587</div><div class="l">avant 16/04</div></div>
+  <div class="stat"><div class="v">919</div><div class="l">depuis 16/04</div></div>
+  <div class="stat"><div class="v">0.52 → 1.0</div><div class="l">indice prix (avant → depuis)</div></div>
 </div>
 <div class="card">
   <div style="height:460px;position:relative"><canvas id="c"></canvas></div>
@@ -35,7 +35,7 @@ post-annonce de SON titre, donc un opus à 600 et un autre à 150 comptent parei
 Indice qui monte = ventes au-dessus du prix habituel ; volume qui retombe = activité qui se calme.
 Les semaines à moins de 2 ventes n'ont pas de point d'indice.</p>
 </div>
-<script>const DATA={"labels": ["2026-W10", "2026-W11", "2026-W12", "2026-W13", "2026-W14", "2026-W18", "2026-W19", "2026-W20", "2026-W21", "2026-W22", "2026-W23", "2026-W24"], "vol": [7, 4, 10, 5, 1, 21, 72, 38, 52, 32, 21, 5], "idx": [0.541, 0.512, 0.556, 0.698, null, 0.936, 0.95, 1.012, 1.026, 1.089, 0.995, 1.04], "announce": "2026-W16"};</script>
+<script>const DATA={"labels": ["2026-W01", "2026-W02", "2026-W03", "2026-W04", "2026-W05", "2026-W06", "2026-W07", "2026-W08", "2026-W09", "2026-W10", "2026-W11", "2026-W12", "2026-W13", "2026-W14", "2026-W15", "2026-W16", "2026-W17", "2026-W18", "2026-W19", "2026-W20", "2026-W21", "2026-W22", "2026-W23", "2026-W24"], "vol": [15, 41, 34, 62, 23, 42, 54, 44, 38, 44, 27, 39, 47, 18, 32, 79, 113, 120, 173, 133, 122, 124, 78, 4], "idx": [0.625, 0.61, 0.624, 0.504, 0.474, 0.509, 0.481, 0.563, 0.498, 0.521, 0.682, 0.478, 0.457, 0.607, 0.49, 0.552, 0.682, 0.974, 1.038, 1.083, 1.097, 1.074, 1.257, 1.375], "announce": "2026-W16"};</script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
 <script>
 const annoLine = { id:'anno', afterDatasetsDraw(ch){
