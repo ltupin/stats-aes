@@ -54,19 +54,26 @@ def generate(cfg):
         for x, y in sales:
             pts.append((k, x, y))
 
+    def monday_ms(x):
+        d = dt.datetime.fromtimestamp(x / 1000, dt.timezone.utc)
+        m = (d - dt.timedelta(days=d.isoweekday() - 1)).replace(
+            hour=0, minute=0, second=0, microsecond=0)
+        return int(m.timestamp() * 1000)
+
     weeks = {}
     for k, x, y in pts:
-        b = weeks.setdefault(isoweek(x), {"n": 0, "ratios": []})
+        b = weeks.setdefault(isoweek(x), {"n": 0, "ratios": [], "ms": monday_ms(x)})
         b["n"] += 1
         if base.get(k):
             b["ratios"].append(y / base[k])
-    order = sorted(weeks)
+    order = sorted(weeks, key=lambda w: weeks[w]["ms"])
     data = {
-        "labels": order,
-        "vol": [weeks[w]["n"] for w in order],
-        "idx": [round(statistics.median(weeks[w]["ratios"]), 3)
-                if len(weeks[w]["ratios"]) >= 2 else None for w in order],
-        "announce": isoweek(report.announce_x),
+        "vol": [{"x": weeks[w]["ms"], "y": weeks[w]["n"]} for w in order],
+        "idx": [{"x": weeks[w]["ms"],
+                 "y": round(statistics.median(weeks[w]["ratios"]), 3)
+                 if len(weeks[w]["ratios"]) >= 2 else None} for w in order],
+        "announce_x": report.announce_x,
+        "start_x": report.start_x,
     }
     pre = [y / base[k] for k, x, y in pts if x < report.announce_x and base.get(k)]
     post = [y / base[k] for k, x, y in pts if x >= report.announce_x and base.get(k)]
@@ -129,27 +136,36 @@ Les semaines à moins de 2 ventes n'ont pas de point d'indice.</p>
 
 CHART_JS = """<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
 <script>
-const annoLine = { id:'anno', afterDatasetsDraw(ch){
-  const ai=DATA.labels.indexOf(DATA.announce); if(ai<0) return;
-  const x=ch.scales.x.getPixelForTick(ai); if(isNaN(x)) return; const c=ch.ctx;
+const ANNOUNCE_X = DATA.announce_x, START_X = DATA.start_x;
+const annoLinePlugin = { id:'annoLine', afterDatasetsDraw(chart){
+  const x = chart.scales.x.getPixelForValue(ANNOUNCE_X); if(isNaN(x)) return;
+  const c = chart.ctx, top = chart.chartArea.top, bot = chart.chartArea.bottom;
   c.save(); c.strokeStyle='#dc2626'; c.lineWidth=2; c.setLineDash([6,4]);
-  c.beginPath(); c.moveTo(x,ch.chartArea.top); c.lineTo(x,ch.chartArea.bottom); c.stroke(); c.setLineDash([]);
-  c.fillStyle='rgba(220,38,38,.9)'; c.font='bold 11px sans-serif';
-  c.fillText('📣 Plaion 16/04', x+6, ch.chartArea.top+14); c.restore();
+  c.beginPath(); c.moveTo(x,top); c.lineTo(x,bot); c.stroke(); c.setLineDash([]);
+  c.fillStyle='rgba(220,38,38,.9)'; const lbl='📣 Plaion AES+'; c.font='bold 11px sans-serif';
+  const w=c.measureText(lbl).width+12; c.fillRect(x+4,top+4,w,22);
+  c.fillStyle='#fff'; c.fillText(lbl,x+10,top+19); c.restore();
 }};
 new Chart(document.getElementById('c').getContext('2d'),{
-  data:{ labels:DATA.labels, datasets:[
-    { type:'bar', label:'Ventes / semaine', yAxisID:'y', data:DATA.vol,
-      backgroundColor: DATA.labels.map(w=> w>=DATA.announce ? 'rgba(37,99,235,.55)':'rgba(150,150,160,.45)') },
+  data:{ datasets:[
+    { type:'bar', label:'Ventes / semaine', yAxisID:'y', data:DATA.vol, barThickness:14,
+      backgroundColor: DATA.vol.map(p=> p.x>=ANNOUNCE_X ? 'rgba(37,99,235,.55)':'rgba(150,150,160,.45)') },
     { type:'line', label:'Indice de prix', yAxisID:'y1', data:DATA.idx, spanGaps:true,
       borderColor:'#dc2626', backgroundColor:'#dc2626', borderWidth:2, pointRadius:3, tension:.2 } ]},
-  options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:'top'},
-      tooltip:{ callbacks:{ label:c=> c.dataset.type==='bar' ? ` ${c.raw} ventes`
-        : (c.raw!=null?` indice ${c.raw.toFixed(2)}`:'') } } },
-    scales:{ y:{ position:'left', title:{display:true,text:'ventes / semaine'}, beginAtZero:true },
-      y1:{ position:'right', title:{display:true,text:'indice de prix'}, grid:{drawOnChartArea:false}, suggestedMin:0.6, suggestedMax:1.3 },
-      x:{ ticks:{ maxRotation:90, minRotation:60, font:{size:9} } } },
-  plugins:[annoLine] }});
+  options:{ responsive:true, maintainAspectRatio:false, parsing:{xAxisKey:'x',yAxisKey:'y'},
+    plugins:{ legend:{position:'top'},
+      tooltip:{ callbacks:{
+        title:i=>new Date(i[0].parsed.x).toLocaleDateString('fr-FR',{year:'numeric',month:'short',day:'numeric'}),
+        label:c=> c.dataset.type==='bar' ? ` ${c.parsed.y} ventes`
+          : (c.parsed.y!=null?` indice ${c.parsed.y.toFixed(2)}`:'') } } },
+    scales:{
+      x:{ type:'linear', min:START_X,
+          ticks:{ callback:v=>new Date(v).toLocaleDateString('fr-FR',{month:'short',day:'2-digit'}) },
+          title:{display:true,text:'Semaine'} },
+      y:{ position:'left', title:{display:true,text:'ventes / semaine'}, beginAtZero:true },
+      y1:{ position:'right', title:{display:true,text:'indice de prix'}, grid:{drawOnChartArea:false}, suggestedMin:0.6, suggestedMax:1.3 } },
+  },
+  plugins:[annoLinePlugin] });
 </script></body></html>
 """
 
