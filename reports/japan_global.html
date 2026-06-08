@@ -40,7 +40,7 @@ Les semaines à moins de 2 ventes n'ont pas de point d'indice.</p>
 <script>
 const annoLine = { id:'anno', afterDatasetsDraw(ch){
   const ai=DATA.labels.indexOf(DATA.announce); if(ai<0) return;
-  const x=ch.scales.x.getPixelForValue(ai); const c=ch.ctx;
+  const x=ch.scales.x.getPixelForTick(ai); if(isNaN(x)) return; const c=ch.ctx;
   c.save(); c.strokeStyle='#dc2626'; c.lineWidth=2; c.setLineDash([6,4]);
   c.beginPath(); c.moveTo(x,ch.chartArea.top); c.lineTo(x,ch.chartArea.bottom); c.stroke(); c.setLineDash([]);
   c.fillStyle='rgba(220,38,38,.9)'; c.font='bold 11px sans-serif';
