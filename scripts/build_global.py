@@ -31,10 +31,12 @@ def yahoo_points(k):
     return [(p["x"], p["y"]) for p in yh]
 
 
+_MAR1 = int(dt.datetime(2026, 3, 1, tzinfo=dt.timezone.utc).timestamp() * 1000)
 MARKETS = {
     "france": {"file": "france_global.html", "flag": "🇫🇷", "cur": "€",
                "market": "France (eBay.fr)", "src": ebay_points,
-               "note_src": "eBay.fr (ventes terminées)"},
+               "note_src": "eBay.fr (ventes terminées)",
+               "start_x": _MAR1},  # eBay.fr : aucune vente avant mars
     "japan":  {"file": "japan_global.html", "flag": "🇯🇵", "cur": "¥",
                "market": "Japon (Yahoo Auctions)", "src": yahoo_points,
                "note_src": "Yahoo Auctions (enchères clôturées, dates de vente réelles)"},
@@ -73,7 +75,7 @@ def generate(cfg):
                  "y": round(statistics.median(weeks[w]["ratios"]), 3)
                  if len(weeks[w]["ratios"]) >= 2 else None} for w in order],
         "announce_x": report.announce_x,
-        "start_x": report.start_x,
+        "start_x": cfg.get("start_x", report.start_x),
     }
     pre = [y / base[k] for k, x, y in pts if x < report.announce_x and base.get(k)]
     post = [y / base[k] for k, x, y in pts if x >= report.announce_x and base.get(k)]
