@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8"><title>Real Bout Fatal Fury — Mercari & Yahoo Auctions — 2026</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f5f6fa; color: #1a1a2e; padding: 24px; max-width: 1400px; margin: 0 auto; }
+  h1 { font-size: 1.4rem; margin: 0 0 4px 0; }
+  p.sub { color: #666; font-size: .85rem; margin: 0 0 20px 0; }
+  .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,.08); margin-bottom: 20px; }
+  .controls { display: flex; gap: 14px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; font-size: .85rem; }
+  .controls label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+  canvas { max-width: 100%; }
+  .insight { background: linear-gradient(90deg, #fef3c7 0%, #fee2e2 100%); border-left: 4px solid #dc2626; padding: 14px 18px; border-radius: 8px; margin-bottom: 20px; }
+  .insight h3 { margin: 0 0 6px 0; font-size: 1rem; }
+  .insight p  { margin: 0; font-size: .88rem; line-height: 1.5; }
+  .insight strong { color: #dc2626; font-size: 1.05em; }
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+  .src-card { background: rgba(255,255,255,.75); padding: 10px 14px; border-radius: 6px; font-size: .82rem; }
+  .src-card.mer { border-left: 3px solid #f59e0b; }
+  .src-card.yh  { border-left: 3px solid #2563eb; }
+  .errbox { background: #fee; border: 1px solid #c33; padding: 10px; font-family: monospace; font-size: .8rem; color: #c00; display: none; margin: 10px 0; border-radius: 6px; }
+</style></head><body>
+
+<h1>Real Bout Fatal Fury — Mercari &amp; Yahoo Auctions — 2026</h1>
+<p class="sub">Mercari 3 ventes · Yahoo 43 ventes · données du 10/06/2026</p>
+
+<div class="insight">
+  <div class="split">
+    <div class="src-card mer">
+      <strong>🟡 Mercari</strong><br>
+      Avant 16/04 : 2 ventes · médiane ¥45,000<br>
+      Depuis : 1 · médiane <strong>¥32,000</strong> · <strong>-28.9%</strong>
+    </div>
+    <div class="src-card yh">
+      <strong>🔵 Yahoo</strong><br>
+      Avant 16/04 : 23 ventes · médiane ¥23,800<br>
+      Depuis : 20 · médiane <strong>¥27,500</strong> · <strong>+15.5%</strong>
+    </div>
+  </div>
+</div>
+
+<div id="err" class="errbox"></div>
+
+<div class="card">
+  <div class="controls">
+    <label><input type="checkbox" id="show-mer" checked> 🟡 Mercari</label>
+    <label><input type="checkbox" id="show-yh"  checked> 🔵 Yahoo</label>
+    <label><input type="checkbox" id="show-mer-trend" checked> ↗ Tendance Mercari</label>
+    <label><input type="checkbox" id="show-yh-trend"  checked> ↗ Tendance Yahoo</label>
+    <label><input type="checkbox" id="log-scale"> Échelle log Y</label>
+  </div>
+  <div style="height:560px;position:relative"><canvas id="chart"></canvas></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
+<script>
+const MER = [{"x": 1778141820000, "y": 32000, "name": "【即購入ok】ネオジオ リアルバウト餓狼伝説", "url": "https://jp.mercari.com/item/m15631515602", "status": "SOLD_OUT", "source": "mercari"}, {"x": 1773495180000, "y": 25000, "name": "【中古】NEOGEO ROM リアルバウト餓狼伝説", "url": "https://jp.mercari.com/item/m58071879038", "status": "SOLD_OUT", "source": "mercari"}, {"x": 1771149540000, "y": 65000, "name": "【希少】ネオジオ リアルバウト餓狼伝説　★ ネオジオROM★", "url": "https://jp.mercari.com/item/m15087856326", "status": "SOLD_OUT", "source": "mercari"}];
+const YH  = [{"x": 1780839720000, "y": 64350, "name": "中古◆NEOGEO ネオジオ REAL BOUT リアルバウト餓狼伝説 ROMカセット 説明書付 SNK◆F1378", "url": "https://page.auctions.yahoo.co.jp/jp/auction/u1232220338", "bid": 33, "kind": "Auction", "source": "yahoo"}, {"x": 1780278180000, "y": 53000, "name": "【NG】 リアルバウト餓狼伝説", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z618095544", "bid": 1, "kind": "Buy-Now", "source": "yahoo"}, {"x": 1779889020000, "y": 47190, "name": "NG リアルバウト餓狼伝説", "url": "https://page.auctions.yahoo.co.jp/jp/auction/m1231122767", "bid": 11, "kind": "Auction", "source": "yahoo"}, {"x": 1779538380000, "y": 18040, "name": "○NG ネオジオROM REALBOUT リアルバウト餓狼伝説 SNK エス・エヌ・ケイ【IO", "url": "https://page.auctions.yahoo.co.jp/jp/auction/w1230328136", "bid": 21, "kind": "Auction", "source": "yahoo"}, {"x": 1779484860000, "y": 59800, "name": "ネオジオ ロム リアルバウト餓狼伝説 NEOGEO ROM SNK 人気作", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z613365944", "bid": 1, "kind": "Buy-Now", "source": "yahoo"}, {"x": 1779454140000, "y": 32000, "name": "NG ネオジオROM リアルバウト餓狼伝説 説明書欠品 Real Bout Fatal Fury NEOGEO NEO-GEO ロム カセット 動作確認済", "url": "https://page.auctions.yahoo.co.jp/jp/auction/e1230108733", "bid": 1, "kind": "Auction", "source": "yahoo"}, {"x": 1779232560000, "y": 17900, "name": "リアルバウト餓狼伝説 NEOGEO ネオジオROM ネオジオ SNK ROM ソフトのみ REAL BOUT", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z606700082", "bid": 1, "kind": "Buy-Now", "source": "yahoo"}, {"x": 1779029160000, "y": 6750, "name": "リアルバウト餓狼伝説(カートリッジ)", "url": "https://page.auctions.yahoo.co.jp/jp/auction/o1229703698", "bid": 8, "kind": "Auction", "source": "yahoo"}, {"x": 1779020400000, "y": 49500, "name": "動作保証品 NG ネオジオROM REAL BOUT 餓狼伝説 リアルバウト餓狼伝説 SNK エス・エヌ・ケイ 箱説付 箱説付【10", "url": "https://page.auctions.yahoo.co.jp/jp/auction/p1229663719", "bid": 27, "kind": "Auction", "source": "yahoo"}, {"x": 1778851560000, "y": 36601, "name": "(W34402)リアルバウト餓狼伝説 NEOGEO ROM ネオジオ ロム カセット ゲーム 動作未確認 ジャンク", "url": "https://page.auctions.yahoo.co.jp/jp/auction/c1229427403", "bid": 25, "kind": "Auction", "source": "yahoo"}, {"x": 1778424780000, "y": 18000, "name": "リアルバウト餓狼伝説スぺシャル(カートリッジ)", "url": "https://page.auctions.yahoo.co.jp/jp/auction/f1228986174", "bid": 20, "kind": "Auction", "source": "yahoo"}, {"x": 1778422320000, "y": 8250, "name": "リアルバウト餓狼伝説 　　SNKネオジオ用ソフト", "url": "https://page.auctions.yahoo.co.jp/jp/auction/d1228165978", "bid": 4, "kind": "Auction", "source": "yahoo"}, {"x": 1778362920000, "y": 24800, "name": "リアルバウト餓狼伝説 ネオジオ ROM NEOGEO SNK 説明書欠品", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z606904612", "bid": 1, "kind": "Buy-Now", "source": "yahoo"}, {"x": 1777985520000, "y": 24751, "name": "動作保証品 NG ネオジオROM REAL BOUT 餓狼伝説 リアルバウト餓狼伝説 SNK エス・エヌ・ケイ 箱付【10", "url": "https://page.auctions.yahoo.co.jp/jp/auction/d1228350277", "bid": 23, "kind": "Auction", "source": "yahoo"}, {"x": 1777389240000, "y": 18000, "name": "ネオジオソフト リアルバウト餓狼伝説", "url": "https://page.auctions.yahoo.co.jp/jp/auction/u1228146097", "bid": 2, "kind": "Auction", "source": "yahoo"}, {"x": 1777213800000, "y": 55000, "name": "●格闘ゲーム【リアルバウト餓狼伝説】ネオジオROM レトロゲーム　箱　説明書あり　0121 テリー　舞", "url": "https://page.auctions.yahoo.co.jp/jp/auction/o1216797030", "bid": 1, "kind": "Buy-Now", "source": "yahoo"}, {"x": 1777210380000, "y": 33000, "name": "SNK リアルバウト餓狼伝説 NEOGEO ネオジオ", "url": "https://page.auctions.yahoo.co.jp/jp/auction/b1227585049", "bid": 19, "kind": "Auction", "source": "yahoo"}, {"x": 1777147380000, "y": 27000, "name": "ネオジオ　リアルバウト餓狼伝説", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z597868710", "bid": 1, "kind": "Buy-Now", "source": "yahoo"}, {"x": 1777125000000, "y": 22550, "name": "mW654a [人気] NEOGEO ソフト リアルバウト餓狼伝説 / ネオジオ ROM カセット☆ | ゲーム X", "url": "https://page.auctions.yahoo.co.jp/jp/auction/x1227445967", "bid": 31, "kind": "Auction", "source": "yahoo"}, {"x": 1776947940000, "y": 28000, "name": "【NG】 リアルバウト餓狼伝説", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z552850136", "bid": 1, "kind": "Buy-Now", "source": "yahoo"}, {"x": 1776260400000, "y": 25000, "name": "NEOGEO リアルバウト餓狼伝説 ネオジオ ROM ロムカセット ソフト REALBOUT SNK", "url": "https://page.auctions.yahoo.co.jp/jp/auction/e1226188056", "bid": 22, "kind": "Auction", "source": "yahoo"}, {"x": 1776256440000, "y": 23650, "name": "動作保証品 NG ネオジオROM リアルバウト餓狼伝説 箱説付【10", "url": "https://page.auctions.yahoo.co.jp/jp/auction/k1226058800", "bid": 21, "kind": "Auction", "source": "yahoo"}, {"x": 1776161040000, "y": 22010, "name": "ネオジオROM　リアルバウト餓狼伝説　当時物", "url": "https://page.auctions.yahoo.co.jp/jp/auction/n1225861148", "bid": 24, "kind": "Auction", "source": "yahoo"}, {"x": 1776089820000, "y": 21670, "name": "NEOGEO ロムカセット リアルバウト餓狼伝説 REALBOUT 箱 説明書付き SNK レトロゲーム ジャンク B11120600", "url": "https://page.auctions.yahoo.co.jp/jp/auction/b1226178526", "bid": 7, "kind": "Auction", "source": "yahoo"}, {"x": 1776001140000, "y": 15500, "name": "SNK NEOGEO ネオジオ ROMカセット リアルバウト餓狼伝説 説明書無し", "url": "https://page.auctions.yahoo.co.jp/jp/auction/o1225927508", "bid": 6, "kind": "Auction", "source": "yahoo"}, {"x": 1775996100000, "y": 25850, "name": "ネオジオソフト リアルバウト餓狼伝説 SNK ケース・説明書付 NEOGEO_長Dt55", "url": "https://page.auctions.yahoo.co.jp/jp/auction/w1225878828", "bid": 21, "kind": "Auction", "source": "yahoo"}, {"x": 1775859000000, "y": 23800, "name": "NEOGEO ネオジオ リアルバウト餓狼伝説 SNK 餓狼伝説 REAL BOUT ROM ロムカセット NG", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z590615222", "bid": 1, "kind": "Buy-Now", "source": "yahoo"}, {"x": 1775218620000, "y": 25000, "name": "【NG】 リアルバウト餓狼伝説 B", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z586258626", "bid": 1, "kind": "Buy-Now", "source": "yahoo"}, {"x": 1774787880000, "y": 21500, "name": "NEOGEO リアルバウト餓狼伝説 ネオジオ ROM ロムカセット ソフト REALBOUT SNK", "url": "https://page.auctions.yahoo.co.jp/jp/auction/h1224114173", "bid": 3, "kind": "Auction", "source": "yahoo"}, {"x": 1774699380000, "y": 17050, "name": "動作保証品 NG ネオジオROM リアルバウト餓狼伝説 箱付【10", "url": "https://page.auctions.yahoo.co.jp/jp/auction/d1223917371", "bid": 18, "kind": "Auction", "source": "yahoo"}, {"x": 1774184580000, "y": 24000, "name": "動作確認済 ［ NEOGEO ROMカセット ］ リアルバウト餓狼伝説 【中古品】［取説有り］ ネオジオ ロムカセット", "url": "https://page.auctions.yahoo.co.jp/jp/auction/v1223192915", "bid": 13, "kind": "Auction", "source": "yahoo"}, {"x": 1773479040000, "y": 33000, "name": "●【リアルバウト餓狼伝説】ネオジオROM レトロゲーム　箱　説明書あり　格闘ゲーム", "url": "https://page.auctions.yahoo.co.jp/jp/auction/g1218610352", "bid": 1, "kind": "Buy-Now", "source": "yahoo"}, {"x": 1773051240000, "y": 23750, "name": "ネオジオROM　リアルバウト餓狼伝説　当時物", "url": "https://page.auctions.yahoo.co.jp/jp/auction/q1221742533", "bid": 20, "kind": "Auction", "source": "yahoo"}, {"x": 1772457360000, "y": 50001, "name": "美品 ネオジオ リアルバウト餓狼伝説 餓狼伝説3 箱説明書有り レトロゲーム NEOGEO", "url": "https://page.auctions.yahoo.co.jp/jp/auction/p1221213331", "bid": 33, "kind": "Auction", "source": "yahoo"}, {"x": 1771931820000, "y": 27280, "name": "【中古】NG）リアルバウト 餓狼伝説[240024513899]", "url": "https://page.auctions.yahoo.co.jp/jp/auction/o1186300320", "bid": 1, "kind": "Auction", "source": "yahoo"}, {"x": 1771290840000, "y": 14000, "name": "△A369-41 SNK NEOGEO ROM ネオジオ ロム カセット REAL BOUT リアルバウト 餓狼伝説 【説明書なし】【動作未確認】【傷みあり】", "url": "https://page.auctions.yahoo.co.jp/jp/auction/s1217021147", "bid": 1, "kind": "Auction", "source": "yahoo"}, {"x": 1770817440000, "y": 19800, "name": "NG リアルバウト餓狼伝説", "url": "https://page.auctions.yahoo.co.jp/jp/auction/v1218918676", "bid": 1, "kind": "Auction", "source": "yahoo"}, {"x": 1770474540000, "y": 30800, "name": "1円〜 ネオジオ ロムカセット リアルバウト 餓狼伝説", "url": "https://page.auctions.yahoo.co.jp/jp/auction/w1218554495", "bid": 37, "kind": "Auction", "source": "yahoo"}, {"x": 1769348220000, "y": 23500, "name": "Yn5150 SNK NEOGEO ROM ネオジオ ロムカセットリアルバウト 餓狼伝説 説明書あり 簡易動作確認済 中古", "url": "https://page.auctions.yahoo.co.jp/jp/auction/v1216523795", "bid": 22, "kind": "Auction", "source": "yahoo"}, {"x": 1769345820000, "y": 25501, "name": "リアルバウト餓狼伝説 / NEOGEO ネオジオ", "url": "https://page.auctions.yahoo.co.jp/jp/auction/o1216521734", "bid": 34, "kind": "Auction", "source": "yahoo"}, {"x": 1768830120000, "y": 25850, "name": "mW157a [箱説有] NEOGEO ソフト リアルバウト餓狼伝説 / ネオジオ ROM カセット☆ | ゲーム X", "url": "https://page.auctions.yahoo.co.jp/jp/auction/j1216037860", "bid": 17, "kind": "Auction", "source": "yahoo"}, {"x": 1768478820000, "y": 29800, "name": "●格闘ゲーム【リアルバウト餓狼伝説】ネオジオROM レトロゲーム　箱　説明書あり　0107", "url": "https://page.auctions.yahoo.co.jp/jp/auction/t1215071569", "bid": 1, "kind": "Buy-Now", "source": "yahoo"}, {"x": 1768133880000, "y": 22000, "name": "◆◇キ360 NEOGEO ネオジオ ロムカセット ROM リアルバウト餓狼伝説 REAL BOUT SNK◇◆", "url": "https://page.auctions.yahoo.co.jp/jp/auction/m1215204932", "bid": 4, "kind": "Auction", "source": "yahoo"}];
+const ANNOUNCE_X = 1776297600000;
+const START_X    = 1767225600000;
+
+function showErr(m){const e=document.getElementById('err');e.style.display='block';e.textContent=(e.textContent?e.textContent+' | ':'')+m;console.error(m);}
+window.addEventListener('error', ev => showErr(`JS error: ${ev.message} @ ${ev.lineno}`));
+
+const MIN_WEEK = 2;
+function weeklyTrend(points) {
+  const buckets = new Map();
+  for (const p of points) {
+    const d = new Date(p.x);
+    const tmp = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+    tmp.setUTCDate(tmp.getUTCDate() + 3 - (tmp.getUTCDay() + 6) % 7);
+    const weekYear = tmp.getUTCFullYear();
+    const week1 = new Date(Date.UTC(weekYear, 0, 4));
+    const week = 1 + Math.round(((tmp - week1) / 86400000 - 3 + (week1.getUTCDay() + 6) % 7) / 7);
+    const key = `${weekYear}-W${String(week).padStart(2,'0')}`;
+    if (!buckets.has(key)) buckets.set(key, { prices: [], dates: [] });
+    buckets.get(key).prices.push(p.y); buckets.get(key).dates.push(p.x);
+  }
+  const sortedKeys = [...buckets.keys()].sort();
+  const out = [];
+  for (const key of sortedKeys) {
+    const prices = buckets.get(key).prices;
+    const dates  = buckets.get(key).dates;
+    if (prices.length < MIN_WEEK) continue;
+    const s = [...prices].sort((a,b)=>a-b);
+    const med = s.length % 2 ? s[(s.length-1)/2] : (s[s.length/2-1]+s[s.length/2])/2;
+    const midX = dates.sort((a,b)=>a-b)[Math.floor(dates.length/2)];
+    out.push({ x: midX, y: med, count: prices.length, label: key });
+  }
+  return out;
+}
+
+try {
+  if (typeof Chart === 'undefined') { showErr('Chart.js failed'); throw new Error('no Chart'); }
+  const ctx = document.getElementById('chart').getContext('2d');
+  const annoLinePlugin = {
+    id: 'annoLine',
+    afterDatasetsDraw(chart) {
+      const x = chart.scales.x.getPixelForValue(ANNOUNCE_X);
+      if (isNaN(x)) return;
+      const c = chart.ctx;
+      const top = chart.chartArea.top, bot = chart.chartArea.bottom;
+      c.save();
+      c.strokeStyle = '#dc2626'; c.lineWidth = 2; c.setLineDash([6,4]);
+      c.beginPath(); c.moveTo(x, top); c.lineTo(x, bot); c.stroke();
+      c.setLineDash([]);
+      c.fillStyle = 'rgba(220,38,38,.9)';
+      const lbl = '📣 Plaion AES+';
+      c.font = 'bold 11px sans-serif';
+      const w = c.measureText(lbl).width + 12;
+      c.fillRect(x + 4, top + 4, w, 22);
+      c.fillStyle = '#fff'; c.fillText(lbl, x + 10, top + 19);
+      c.restore();
+    }
+  };
+  let chart;
+  function makeChart(yType) {
+    if (chart) chart.destroy();
+    const merTrend = weeklyTrend(MER);
+    const yhTrend  = weeklyTrend(YH);
+    chart = new Chart(ctx, {
+      type: 'scatter',
+      data: { datasets: [
+        { label: 'Mercari', data: MER, backgroundColor: 'rgba(245,158,11,.55)', pointRadius: 4, pointStyle: 'circle' },
+        { label: 'Yahoo',   data: YH,  backgroundColor: 'rgba(37,99,235,.65)',  pointRadius: 5, pointStyle: 'triangle' },
+        { label: 'Tendance Mercari', data: merTrend, type: 'line',
+          borderColor: '#f59e0b', backgroundColor: '#f59e0b', borderWidth: 2, borderDash: [5,4],
+          pointRadius: 3, pointBackgroundColor: '#fff', pointBorderColor: '#f59e0b', showLine: true, tension: 0.15 },
+        { label: 'Tendance Yahoo', data: yhTrend, type: 'line',
+          borderColor: '#1e40af', backgroundColor: '#1e40af', borderWidth: 2,
+          pointRadius: 3, pointBackgroundColor: '#fff', pointBorderColor: '#1e40af', showLine: true, tension: 0.15 },
+      ]},
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        parsing: { xAxisKey: 'x', yAxisKey: 'y' },
+        plugins: {
+          legend: { position: 'top' },
+          tooltip: { callbacks: {
+            title: items => new Date(items[0].parsed.x).toLocaleDateString('fr-FR', { year: 'numeric', month: 'short', day: 'numeric' }),
+            label: c => {
+              const p = c.raw;
+              if (p.source === 'mercari') return [`🟡 Mercari ¥${p.y.toLocaleString()} — ${p.status}`, p.name.slice(0, 60)];
+              if (p.source === 'yahoo')   return [`🔵 Yahoo ¥${p.y.toLocaleString()} — ${p.kind} (${p.bid} bids)`, p.name.slice(0, 60)];
+              if (p.label) return `${p.label} : médiane ¥${Math.round(p.y).toLocaleString()} (${p.count})`;
+              return `¥${Math.round(p.y).toLocaleString()}`;
+            }
+          } }
+        },
+        scales: {
+          x: { type: 'linear', min: START_X,
+               ticks: { callback: v => new Date(v).toLocaleDateString('fr-FR', {month:'short', day:'2-digit'}) },
+               title: { display: true, text: 'Date' } },
+          y: { type: yType, title: { display: true, text: 'Prix (¥)' },
+               ticks: { callback: v => '¥' + v.toLocaleString() } },
+        },
+        onClick: (evt, items) => { if (items.length) { const p = items[0].element.$context.raw; if (p.url) window.open(p.url, '_blank'); } },
+      },
+      plugins: [annoLinePlugin],
+    });
+    refreshVisibility();
+  }
+  function refreshVisibility() {
+    if (!chart) return;
+    chart.setDatasetVisibility(0, document.getElementById('show-mer').checked);
+    chart.setDatasetVisibility(1, document.getElementById('show-yh').checked);
+    chart.setDatasetVisibility(2, document.getElementById('show-mer-trend').checked);
+    chart.setDatasetVisibility(3, document.getElementById('show-yh-trend').checked);
+    chart.update();
+  }
+  makeChart('linear');
+  ['show-mer','show-yh','show-mer-trend','show-yh-trend'].forEach(id =>
+    document.getElementById(id).addEventListener('change', refreshVisibility));
+  document.getElementById('log-scale').addEventListener('change', e => makeChart(e.target.checked ? 'logarithmic' : 'linear'));
+} catch(e) { showErr(`Exception: ${e.message}`); }
+</script></body></html>

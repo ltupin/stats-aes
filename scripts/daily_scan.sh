@@ -20,6 +20,8 @@ GAMES=(
   "ff3|餓狼伝説3 ネオジオ|餓狼伝説3"
   "wh2|ワールドヒーローズ2 ネオジオ|ワールドヒーローズ2"
   "kof|キングオブファイターズ ネオジオ|キングオブファイターズ"
+  "rb1|リアルバウト餓狼伝説 ネオジオ|リアルバウト餓狼伝説"
+  "rb2|リアルバウト餓狼伝説2 ネオジオ|リアルバウト餓狼伝説2"
 )
 
 echo "===== daily_scan $(date '+%Y-%m-%d %H:%M') ====="
@@ -37,24 +39,24 @@ PY
 # 1) IP FR garantie
 "$SC/vpn.sh" down >/dev/null 2>&1 || true
 
-# 2) Phase France : eBay.fr + Mercari
+# 2) Phase France : eBay.fr (marché France)
 echo "--- Phase FR : eBay.fr ---"
 "$PY" ebay_fetch.py --all --pages 2 2>&1 | grep -E '=>' || true
-echo "--- Phase FR : Mercari ---"
-for g in "${GAMES[@]}"; do IFS='|' read -r k mk yk <<< "$g"
-  "$PY" fetch.py "$k" "$mk" "$yk" --source mercari 2>&1 | grep -E '=>|⚠️' || true
-done
 
-# 3) Phase Japon : Yahoo (VPN up → fetch → down)
+# 3) Phase Japon : Mercari + Yahoo sous VPN JP (certaines annonces Mercari
+#    ne sont visibles que depuis une IP japonaise) → VPN up → fetch → down
 echo "--- VPN up (JP) ---"
 if "$SC/vpn.sh" up; then
-  echo "--- Phase JP : Yahoo ---"
+  echo "--- Phase JP : Mercari + Yahoo ---"
   for g in "${GAMES[@]}"; do IFS='|' read -r k mk yk <<< "$g"
-    "$PY" fetch.py "$k" "$mk" "$yk" --source yahoo 2>&1 | grep -E '=>|⚠️' || true
+    "$PY" fetch.py "$k" "$mk" "$yk" --source both 2>&1 | grep -E '=>|⚠️' || true
   done
   "$SC/vpn.sh" down || true
 else
-  echo "⚠️ VPN JP indisponible — Yahoo sauté (données préservées)."
+  echo "⚠️ VPN JP indisponible — Mercari+Yahoo sautés. Repli Mercari en IP FR :"
+  for g in "${GAMES[@]}"; do IFS='|' read -r k mk yk <<< "$g"
+    "$PY" fetch.py "$k" "$mk" "$yk" --source mercari 2>&1 | grep -E '=>|⚠️' || true
+  done
 fi
 
 # 4) Régénération

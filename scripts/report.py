@@ -230,6 +230,34 @@ GAMES = {
         ],
         "exclude_urls": set(),
     },
+    "rb1": {
+        "label": "Real Bout Fatal Fury",
+        # RB1 = リアルバウト餓狼伝説 SANS 2 ni スペシャル (lookahead).
+        "INCLUDE": re.compile(
+            r"リアルバウト[\s　]*餓狼伝説(?![\s　]*(?:[2２]|スペシャル|SPECIAL|ニューカマーズ))"
+            r"|REAL\s*BOUT\s*FATAL\s*FURY(?!\s*(?:2|special))", re.IGNORECASE),
+        "EXCLUDE_GAME": [
+            "スペシャル","SPECIAL","ドミネイテッド","DOMINATED","ニューカマーズ","NEWCOMERS",
+            "キングオブファイターズ","KOF","King of Fighters","サムライスピリッツ","侍魂",
+            "龍虎の拳","メタルスラッグ","Metal Slug","ワールドヒーローズ","MARK OF THE WOLVES",
+            "餓狼 MARK","アテナ","月華",
+        ],
+        "exclude_urls": set(),
+    },
+    "rb2": {
+        "label": "Real Bout Fatal Fury 2",
+        # RB2 = リアルバウト餓狼伝説2 (ザ・ニューカマーズ).
+        "INCLUDE": re.compile(
+            r"リアルバウト[\s　]*餓狼伝説[\s　]*[2２]|リアルバウト.*ニューカマーズ"
+            r"|REAL\s*BOUT\s*FATAL\s*FURY\s*2|Real\s*Bout.*Newcomers", re.IGNORECASE),
+        "EXCLUDE_GAME": [
+            "スペシャル","SPECIAL","ドミネイテッド","DOMINATED",
+            "キングオブファイターズ","KOF","King of Fighters","サムライスピリッツ","侍魂",
+            "龍虎の拳","メタルスラッグ","Metal Slug","ワールドヒーローズ","MARK OF THE WOLVES",
+            "餓狼 MARK","アテナ","月華",
+        ],
+        "exclude_urls": set(),
+    },
     "samsho2": {
         "label": "Samurai Shodown 2",
         # SS2 = 真サムライスピリッツ (préfixe 真). Le « 真 » distingue de SS1.
@@ -384,6 +412,19 @@ EBAY = {
     "wh2": {
         "INCLUDE": re.compile(r"world\s*heroes\s*(?:2|ii)\b|ワールドヒーローズ\s*[2２]", re.I),
         "EXCLUDE": re.compile(r"\bjet\b|perfect|gorgeous|\b(1|3|iii)\b", re.I),
+    },
+    "rb1": {
+        "INCLUDE": re.compile(r"real\s*bout|リアルバウト", re.I),
+        "EXCLUDE": re.compile(r"\b(2|ii)\b|special|spécial|newcomers|dominated|スペシャル"
+                              r"|餓狼伝説[\s　]*[2２]|mark\s*of\s*the\s*wolves|kof|king\s*of\s*fighters"
+                              r"|samurai|art\s*of\s*fighting|龍虎|metal\s*slug|world\s*heroes", re.I),
+    },
+    "rb2": {
+        "INCLUDE": re.compile(r"real\s*bout.*(?:\b2\b|\bii\b|newcomers)|リアルバウト.*[2２]"
+                              r"|newcomers", re.I),
+        "EXCLUDE": re.compile(r"special|spécial|dominated|スペシャル|mark\s*of\s*the\s*wolves"
+                              r"|kof|king\s*of\s*fighters|samurai|art\s*of\s*fighting|龍虎"
+                              r"|metal\s*slug|world\s*heroes", re.I),
     },
 }
 
