@@ -223,37 +223,40 @@ def main():
     ap.add_argument("key")
     ap.add_argument("mercari_kw")
     ap.add_argument("yahoo_kw")
+    ap.add_argument("--source", choices=["both", "mercari", "yahoo"], default="both",
+                    help="ne collecter qu'une source (ex. mercari sur IP FR, yahoo sur IP JP)")
     args = ap.parse_args()
     key, mer_kw, yh_kw = args.key, args.mercari_kw, args.yahoo_kw
     RAW_DIR.mkdir(parents=True, exist_ok=True)
-
     print(f"=== {key} ===")
-    print(f"Mercari keyword: {mer_kw}")
-    t0 = time.time()
-    try:
-        mer = asyncio.run(fetch_mercari(mer_kw))
-        print(f"  → {len(mer)} items in {time.time()-t0:.1f}s")
-    except Exception as e:
-        mer = []
-        print(f"  ⚠️ Mercari indisponible ({type(e).__name__}) — base préservée.",
-              file=sys.stderr)
 
-    print(f"Yahoo   keyword: {yh_kw}")
-    t0 = time.time()
-    try:
-        yh, total, blocked = fetch_yahoo(yh_kw)
-        print(f"  → {len(yh)}/{total} items in {time.time()-t0:.1f}s")
-    except Exception as e:
-        yh, total, blocked = [], None, False
-        print(f"  ⚠️ Yahoo indisponible ({type(e).__name__}) — base préservée.",
-              file=sys.stderr)
-    if blocked:
-        print("  🚧 Yahoo géo-bloqué (HTTP 403, EEE/UK) — passe par un proxy/VPN "
-              "japonais. Données Yahoo existantes préservées.", file=sys.stderr)
+    if args.source in ("both", "mercari"):
+        print(f"Mercari keyword: {mer_kw}")
+        t0 = time.time()
+        try:
+            mer = asyncio.run(fetch_mercari(mer_kw))
+            print(f"  → {len(mer)} items in {time.time()-t0:.1f}s")
+        except Exception as e:
+            mer = []
+            print(f"  ⚠️ Mercari indisponible ({type(e).__name__}) — base préservée.",
+                  file=sys.stderr)
+        _save(RAW_DIR / f"{key}_mercari.csv", mercari_rows(mer), MER_HEADER, "Mercari")
 
-    _save(RAW_DIR / f"{key}_mercari.csv", mercari_rows(mer), MER_HEADER, "Mercari")
-    _save(RAW_DIR / f"{key}_yahoo.csv", yahoo_rows(yh), YH_HEADER, "Yahoo",
-          note=" (bloqué)" if blocked else "")
+    if args.source in ("both", "yahoo"):
+        print(f"Yahoo   keyword: {yh_kw}")
+        t0 = time.time()
+        try:
+            yh, total, blocked = fetch_yahoo(yh_kw)
+            print(f"  → {len(yh)}/{total} items in {time.time()-t0:.1f}s")
+        except Exception as e:
+            yh, total, blocked = [], None, False
+            print(f"  ⚠️ Yahoo indisponible ({type(e).__name__}) — base préservée.",
+                  file=sys.stderr)
+        if blocked:
+            print("  🚧 Yahoo géo-bloqué (HTTP 403, EEE/UK) — passe par un proxy/VPN "
+                  "japonais. Données Yahoo existantes préservées.", file=sys.stderr)
+        _save(RAW_DIR / f"{key}_yahoo.csv", yahoo_rows(yh), YH_HEADER, "Yahoo",
+              note=" (bloqué)" if blocked else "")
 
 
 if __name__ == "__main__":
