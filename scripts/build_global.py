@@ -245,14 +245,13 @@ HEADER = """<h1>{flag} Marché {market} — vue d'ensemble</h1>
 
 CHART2_HTML = """<div class="card">
   <h2>Offre — annonces Mercari mises en vente / semaine</h2>
-  <p class="cap">Par semaine de mise en ligne : 🔵 déjà vendues + ⬜ encore en vente = offre totale arrivée sur le marché. La hauteur de barre = niveau d'offre (baisse = moins de vendeurs). À comparer aux ventes ci-dessus : si l'offre tient mais les ventes baissent → demande en repli ; si l'offre baisse aussi → repli d'offre. (Yahoo/eBay n'exposent que les ventes ; seul Mercari donne l'offre.)</p>
-  <p class="cap">⚠️ Les dernières semaines sous-estiment « déjà vendues » : ces annonces récentes n'ont pas encore eu le temps de se vendre.</p>
+  <p class="cap">🔵 déjà vendues + ⬜ encore en vente = offre totale (par semaine de mise en ligne). Les annonces récentes n'ont pas encore eu le temps de se vendre.</p>
   <div style="height:360px;position:relative"><canvas id="c2"></canvas></div>
 </div>"""
 
-CHART2_NOTE = """<div class="note">ℹ️ <b>Offre vs demande non disponible côté France</b> : eBay n'expose
-que les <i>ventes terminées</i> (pas les annonces invendues), contrairement aux enchères Yahoo.
-Voir la <a href="japan_global.html">vue Japon</a> pour l'analyse offre/demande.</div>"""
+CHART2_NOTE = """<div class="note">ℹ️ Offre non affichée ici : côté France on ne collecte pour
+l'instant que les <i>ventes terminées</i> eBay (pas encore les annonces actives invendues).
+Voir la <a href="japan_global.html">vue Japon</a> (offre Mercari).</div>"""
 
 CHART_JS = """<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
 <script>
