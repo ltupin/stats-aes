@@ -36,6 +36,8 @@ EBAY_KW = {
     "kof":     "King of Fighters Neo Geo AES",
     "rb1":     "Real Bout Fatal Fury Neo Geo AES",
     "rb2":     "Real Bout Fatal Fury 2 Neo Geo AES",
+    "samsho3": "Samurai Shodown 3 Neo Geo AES",
+    "samsho4": "Samurai Shodown 4 Neo Geo AES",
 }
 
 JS_EXTRACT = r"""() => {

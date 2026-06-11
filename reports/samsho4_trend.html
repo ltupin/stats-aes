@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8"><title>Samurai Shodown 4 — Mercari & Yahoo Auctions — 2026</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f5f6fa; color: #1a1a2e; padding: 24px; max-width: 1400px; margin: 0 auto; }
+  h1 { font-size: 1.4rem; margin: 0 0 4px 0; }
+  p.sub { color: #666; font-size: .85rem; margin: 0 0 20px 0; }
+  .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,.08); margin-bottom: 20px; }
+  .controls { display: flex; gap: 14px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; font-size: .85rem; }
+  .controls label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+  canvas { max-width: 100%; }
+  .insight { background: linear-gradient(90deg, #fef3c7 0%, #fee2e2 100%); border-left: 4px solid #dc2626; padding: 14px 18px; border-radius: 8px; margin-bottom: 20px; }
+  .insight h3 { margin: 0 0 6px 0; font-size: 1rem; }
+  .insight p  { margin: 0; font-size: .88rem; line-height: 1.5; }
+  .insight strong { color: #dc2626; font-size: 1.05em; }
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+  .src-card { background: rgba(255,255,255,.75); padding: 10px 14px; border-radius: 6px; font-size: .82rem; }
+  .src-card.mer { border-left: 3px solid #f59e0b; }
+  .src-card.yh  { border-left: 3px solid #2563eb; }
+  .errbox { background: #fee; border: 1px solid #c33; padding: 10px; font-family: monospace; font-size: .8rem; color: #c00; display: none; margin: 10px 0; border-radius: 6px; }
+</style></head><body>
+
+<h1>Samurai Shodown 4 — Mercari &amp; Yahoo Auctions — 2026</h1>
+<p class="sub">Mercari 6 ventes · Yahoo 28 ventes · données du 11/06/2026</p>
+
+<div class="insight">
+  <div class="split">
+    <div class="src-card mer">
+      <strong>🟡 Mercari</strong><br>
+      Avant 16/04 : 2 ventes · médiane ¥50,000<br>
+      Depuis : 4 · médiane <strong>¥56,900</strong> · <strong>+13.8%</strong>
+    </div>
+    <div class="src-card yh">
+      <strong>🔵 Yahoo</strong><br>
+      Avant 16/04 : 11 ventes · médiane ¥52,000<br>
+      Depuis : 17 · médiane <strong>¥58,000</strong> · <strong>+11.5%</strong>
+    </div>
+  </div>
+</div>
+
+<div id="err" class="errbox"></div>
+
+<div class="card">
+  <div class="controls">
+    <label><input type="checkbox" id="show-mer" checked> 🟡 Mercari</label>
+    <label><input type="checkbox" id="show-yh"  checked> 🔵 Yahoo</label>
+    <label><input type="checkbox" id="show-mer-trend" checked> ↗ Tendance Mercari</label>
+    <label><input type="checkbox" id="show-yh-trend"  checked> ↗ Tendance Yahoo</label>
+    <label><input type="checkbox" id="log-scale"> Échelle log Y</label>
+  </div>
+  <div style="height:560px;position:relative"><canvas id="chart"></canvas></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
+<script>
+const MER = [{"x": 1779358500000, "y": 99800, "name": "ネオジオ　サムライスピリッツ　天草降臨　NEOGEO ROM", "url": "https://jp.mercari.com/item/m31602619136", "status": "SOLD_OUT", "source": "mercari"}, {"x": 1778895000000, "y": 44800, "name": "サムライスピリッツ天草降臨 NEO GEO ROM", "url": "https://jp.mercari.com/item/m87474771042", "status": "SOLD_OUT", "source": "mercari"}, {"x": 1776775980000, "y": 45000, "name": "専用品NEO GEOロムカセット サムライスピリッツ天草降臨", "url": "https://jp.mercari.com/item/m46253529192", "status": "SOLD_OUT", "source": "mercari"}, {"x": 1776606660000, "y": 68800, "name": "【動作確認済】NEOGEO サムライスピリッツ 天草降臨 説明書付", "url": "https://jp.mercari.com/item/m34340727452", "status": "SOLD_OUT", "source": "mercari"}, {"x": 1770538740000, "y": 56000, "name": "☆ネオジオ ROM　サムライスピリッツ　天草降臨　箱説はがきつき☆", "url": "https://jp.mercari.com/item/m55568533951", "status": "SOLD_OUT", "source": "mercari"}, {"x": 1768623900000, "y": 44000, "name": "NEOGEO サムライスピリッツ 天草降臨 　ROM カセット", "url": "https://jp.mercari.com/item/m30957129633", "status": "SOLD_OUT", "source": "mercari"}];
+const YH  = [{"x": 1780922280000, "y": 122000, "name": "NG ネオジオROM サムライスピリッツ 天草降臨 箱・説明書・ハガキ付 Samurai Shodown IV Amakusa's Revenge NEOGEO ロム カセット 動作OK", "url": "https://page.auctions.yahoo.co.jp/jp/auction/l1229776294", "bid": 22, "kind": "Auction", "source": "yahoo"}, {"x": 1780663200000, "y": 61600, "name": "ネオジオ ロム サムライスピリッツ 天草降臨 NEOGEO ROM", "url": "https://page.auctions.yahoo.co.jp/jp/auction/x1232099098", "bid": 46, "kind": "Auction", "source": "yahoo"}, {"x": 1780356120000, "y": 90000, "name": "ネオジオ ロム サムライスピリッツ 天草降臨 NEOGEO ROM", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z619640166", "bid": 1, "kind": "Buy-Now", "source": "yahoo"}, {"x": 1780309560000, "y": 101000, "name": "サムライスピリッツ天草降臨　ネオジオNEOGEO ロムROM", "url": "https://page.auctions.yahoo.co.jp/jp/auction/c1231854494", "bid": 17, "kind": "Auction", "source": "yahoo"}, {"x": 1779628920000, "y": 32000, "name": "【送料無料・動作確認済】ネオジオ サムライスピリッツ 天草降臨 ROMカセットのみ", "url": "https://page.auctions.yahoo.co.jp/jp/auction/s1230374609", "bid": 27, "kind": "Auction", "source": "yahoo"}, {"x": 1779037920000, "y": 75000, "name": "ネオジオ　サムライスピリッツ天草降臨", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z611150176", "bid": 1, "kind": "Buy-Now", "source": "yahoo"}, {"x": 1779027540000, "y": 9000, "name": "サムライスピリッツ 天草降臨　　SNKネオジオ用ソフト", "url": "https://page.auctions.yahoo.co.jp/jp/auction/e1229411006", "bid": 6, "kind": "Auction", "source": "yahoo"}, {"x": 1778781840000, "y": 70000, "name": "ネオジオ ロム サムライスピリッツ 天草降臨 NEOGEO ROM", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z609679744", "bid": 1, "kind": "Buy-Now", "source": "yahoo"}, {"x": 1778765700000, "y": 22000, "name": "ジャンク SNK NEOGEO サムライスピリッツ天草降臨", "url": "https://page.auctions.yahoo.co.jp/jp/auction/n1229632129", "bid": 32, "kind": "Auction", "source": "yahoo"}, {"x": 1778607780000, "y": 70000, "name": "ネオジオ ロム サムライスピリッツ 天草降臨 NEOGEO ROM", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z607907482", "bid": 1, "kind": "Buy-Now", "source": "yahoo"}, {"x": 1778587980000, "y": 122100, "name": "動作品 NG ネオジオROM サムライスピリッツ 天草降臨 箱説付【10", "url": "https://page.auctions.yahoo.co.jp/jp/auction/c1228971439", "bid": 53, "kind": "Auction", "source": "yahoo"}, {"x": 1778187300000, "y": 37489, "name": "【中古】 NEOGEO ・ ネオジオ ソフト サムライスピリッツ天草降臨", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z605921178", "bid": 1, "kind": "Buy-Now", "source": "yahoo"}, {"x": 1777555800000, "y": 19600, "name": "【PS】 サムライスピリッツ天草降臨スペシャル", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z449985926", "bid": 1, "kind": "Buy-Now", "source": "yahoo"}, {"x": 1777294860000, "y": 44003, "name": "1円〜 動作品 NG ネオジオROM サムライスピリッツ 天草降臨 侍魂 箱説付【10", "url": "https://page.auctions.yahoo.co.jp/jp/auction/k1227451952", "bid": 24, "kind": "Auction", "source": "yahoo"}, {"x": 1777083600000, "y": 58000, "name": "サムライ スピリッツ 天草降臨 NG 【NEOGEO】", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z596404488", "bid": 1, "kind": "Buy-Now", "source": "yahoo"}, {"x": 1776690660000, "y": 50600, "name": "サムライスピリッツ天草降臨 SNK ネオジオROM ☆6759", "url": "https://page.auctions.yahoo.co.jp/jp/auction/v1226898012", "bid": 7, "kind": "Auction", "source": "yahoo"}, {"x": 1776345600000, "y": 53000, "name": "ネオジオ NEOGEOロムカセット 侍魂 サムライスピリッツ 天草降臨 テレビゲーム ゲームソフト", "url": "https://page.auctions.yahoo.co.jp/jp/auction/l1226403867", "bid": 40, "kind": "Auction", "source": "yahoo"}, {"x": 1775826240000, "y": 52000, "name": "ネオジオ　ロム　サムライスピリッツ　天草降臨　　ROM", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z583098200", "bid": 1, "kind": "Buy-Now", "source": "yahoo"}, {"x": 1775742660000, "y": 53350, "name": "【箱付き】【動作品】サムライスピリッツ天草降臨 ネオジオ NEOGEO", "url": "https://page.auctions.yahoo.co.jp/jp/auction/f1225542319", "bid": 10, "kind": "Auction", "source": "yahoo"}, {"x": 1773669960000, "y": 60512, "name": "【箱付き】【動作品】サムライスピリッツ天草降臨 ネオジオ NEOGEO", "url": "https://page.auctions.yahoo.co.jp/jp/auction/u1222673298", "bid": 16, "kind": "Auction", "source": "yahoo"}, {"x": 1771676700000, "y": 55000, "name": "1円〜 動作品 NG ネオジオROM サムライスピリッツ天草降臨 侍魂 エス・エヌ・ケイ SNK 箱説ハガキ付【10", "url": "https://page.auctions.yahoo.co.jp/jp/auction/r1219810580", "bid": 39, "kind": "Auction", "source": "yahoo"}, {"x": 1771246020000, "y": 56555, "name": "〈管104209〉【NEGEO】ネオジオ ROM サムライスピリッツ SAMURAI SPIRITS 侍魂 天草降臨 箱 説明書付き　動作未チェック 中古現状品", "url": "https://page.auctions.yahoo.co.jp/jp/auction/c1219488162", "bid": 9, "kind": "Auction", "source": "yahoo"}, {"x": 1770822480000, "y": 59180, "name": "ネオジオ NEOGEOロムカセット 侍魂 サムライスピリッツ 天草降臨 テレビゲーム ゲームソフト 付属品あり 現状品", "url": "https://page.auctions.yahoo.co.jp/jp/auction/t1219040643", "bid": 6, "kind": "Auction", "source": "yahoo"}, {"x": 1770570120000, "y": 48000, "name": "サムライ スピリッツ 天草降臨 NG 【NEOGEO】", "url": "https://page.auctions.yahoo.co.jp/jp/auction/z555525296", "bid": 1, "kind": "Buy-Now", "source": "yahoo"}, {"x": 1770386220000, "y": 40700, "name": "#【SNK NEOGEO サムライスピリッツ 天草降臨 ネオジオ ゲームソフト ロムカセット 元箱 レトロ 動作未確認 ジャンク品】R01231", "url": "https://page.auctions.yahoo.co.jp/jp/auction/e1218189743", "bid": 10, "kind": "Auction", "source": "yahoo"}, {"x": 1769346240000, "y": 44000, "name": "サムライスピリッツ 天草降臨 / NEOGEO ネオジオ", "url": "https://page.auctions.yahoo.co.jp/jp/auction/j1216519138", "bid": 64, "kind": "Auction", "source": "yahoo"}, {"x": 1769176860000, "y": 45000, "name": "6274 NEOGEO ネオジオ 天草降臨 ROM SNK ソフト 動作未確認　サムライスピリッツ", "url": "https://page.auctions.yahoo.co.jp/jp/auction/w1216161376", "bid": 15, "kind": "Auction", "source": "yahoo"}, {"x": 1768310100000, "y": 50051, "name": "【箱付き】【動作品】サムライスピリッツ天草降臨 ネオジオ NEOGEO", "url": "https://page.auctions.yahoo.co.jp/jp/auction/w1215213221", "bid": 8, "kind": "Auction", "source": "yahoo"}];
+const ANNOUNCE_X = 1776297600000;
+const START_X    = 1767225600000;
+
+function showErr(m){const e=document.getElementById('err');e.style.display='block';e.textContent=(e.textContent?e.textContent+' | ':'')+m;console.error(m);}
+window.addEventListener('error', ev => showErr(`JS error: ${ev.message} @ ${ev.lineno}`));
+
+const MIN_WEEK = 2;
+function weeklyTrend(points) {
+  const buckets = new Map();
+  for (const p of points) {
+    const d = new Date(p.x);
+    const tmp = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+    tmp.setUTCDate(tmp.getUTCDate() + 3 - (tmp.getUTCDay() + 6) % 7);
+    const weekYear = tmp.getUTCFullYear();
+    const week1 = new Date(Date.UTC(weekYear, 0, 4));
+    const week = 1 + Math.round(((tmp - week1) / 86400000 - 3 + (week1.getUTCDay() + 6) % 7) / 7);
+    const key = `${weekYear}-W${String(week).padStart(2,'0')}`;
+    if (!buckets.has(key)) buckets.set(key, { prices: [], dates: [] });
+    buckets.get(key).prices.push(p.y); buckets.get(key).dates.push(p.x);
+  }
+  const sortedKeys = [...buckets.keys()].sort();
+  const out = [];
+  for (const key of sortedKeys) {
+    const prices = buckets.get(key).prices;
+    const dates  = buckets.get(key).dates;
+    if (prices.length < MIN_WEEK) continue;
+    const s = [...prices].sort((a,b)=>a-b);
+    const med = s.length % 2 ? s[(s.length-1)/2] : (s[s.length/2-1]+s[s.length/2])/2;
+    const midX = dates.sort((a,b)=>a-b)[Math.floor(dates.length/2)];
+    out.push({ x: midX, y: med, count: prices.length, label: key });
+  }
+  return out;
+}
+
+try {
+  if (typeof Chart === 'undefined') { showErr('Chart.js failed'); throw new Error('no Chart'); }
+  const ctx = document.getElementById('chart').getContext('2d');
+  const annoLinePlugin = {
+    id: 'annoLine',
+    afterDatasetsDraw(chart) {
+      const x = chart.scales.x.getPixelForValue(ANNOUNCE_X);
+      if (isNaN(x)) return;
+      const c = chart.ctx;
+      const top = chart.chartArea.top, bot = chart.chartArea.bottom;
+      c.save();
+      c.strokeStyle = '#dc2626'; c.lineWidth = 2; c.setLineDash([6,4]);
+      c.beginPath(); c.moveTo(x, top); c.lineTo(x, bot); c.stroke();
+      c.setLineDash([]);
+      c.fillStyle = 'rgba(220,38,38,.9)';
+      const lbl = '📣 Plaion AES+';
+      c.font = 'bold 11px sans-serif';
+      const w = c.measureText(lbl).width + 12;
+      c.fillRect(x + 4, top + 4, w, 22);
+      c.fillStyle = '#fff'; c.fillText(lbl, x + 10, top + 19);
+      c.restore();
+    }
+  };
+  let chart;
+  function makeChart(yType) {
+    if (chart) chart.destroy();
+    const merTrend = weeklyTrend(MER);
+    const yhTrend  = weeklyTrend(YH);
+    chart = new Chart(ctx, {
+      type: 'scatter',
+      data: { datasets: [
+        { label: 'Mercari', data: MER, backgroundColor: 'rgba(245,158,11,.55)', pointRadius: 4, pointStyle: 'circle' },
+        { label: 'Yahoo',   data: YH,  backgroundColor: 'rgba(37,99,235,.65)',  pointRadius: 5, pointStyle: 'triangle' },
+        { label: 'Tendance Mercari', data: merTrend, type: 'line',
+          borderColor: '#f59e0b', backgroundColor: '#f59e0b', borderWidth: 2, borderDash: [5,4],
+          pointRadius: 3, pointBackgroundColor: '#fff', pointBorderColor: '#f59e0b', showLine: true, tension: 0.15 },
+        { label: 'Tendance Yahoo', data: yhTrend, type: 'line',
+          borderColor: '#1e40af', backgroundColor: '#1e40af', borderWidth: 2,
+          pointRadius: 3, pointBackgroundColor: '#fff', pointBorderColor: '#1e40af', showLine: true, tension: 0.15 },
+      ]},
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        parsing: { xAxisKey: 'x', yAxisKey: 'y' },
+        plugins: {
+          legend: { position: 'top' },
+          tooltip: { callbacks: {
+            title: items => new Date(items[0].parsed.x).toLocaleDateString('fr-FR', { year: 'numeric', month: 'short', day: 'numeric' }),
+            label: c => {
+              const p = c.raw;
+              if (p.source === 'mercari') return [`🟡 Mercari ¥${p.y.toLocaleString()} — ${p.status}`, p.name.slice(0, 60)];
+              if (p.source === 'yahoo')   return [`🔵 Yahoo ¥${p.y.toLocaleString()} — ${p.kind} (${p.bid} bids)`, p.name.slice(0, 60)];
+              if (p.label) return `${p.label} : médiane ¥${Math.round(p.y).toLocaleString()} (${p.count})`;
+              return `¥${Math.round(p.y).toLocaleString()}`;
+            }
+          } }
+        },
+        scales: {
+          x: { type: 'linear', min: START_X,
+               ticks: { callback: v => new Date(v).toLocaleDateString('fr-FR', {month:'short', day:'2-digit'}) },
+               title: { display: true, text: 'Date' } },
+          y: { type: yType, title: { display: true, text: 'Prix (¥)' },
+               ticks: { callback: v => '¥' + v.toLocaleString() } },
+        },
+        onClick: (evt, items) => { if (items.length) { const p = items[0].element.$context.raw; if (p.url) window.open(p.url, '_blank'); } },
+      },
+      plugins: [annoLinePlugin],
+    });
+    refreshVisibility();
+  }
+  function refreshVisibility() {
+    if (!chart) return;
+    chart.setDatasetVisibility(0, document.getElementById('show-mer').checked);
+    chart.setDatasetVisibility(1, document.getElementById('show-yh').checked);
+    chart.setDatasetVisibility(2, document.getElementById('show-mer-trend').checked);
+    chart.setDatasetVisibility(3, document.getElementById('show-yh-trend').checked);
+    chart.update();
+  }
+  makeChart('linear');
+  ['show-mer','show-yh','show-mer-trend','show-yh-trend'].forEach(id =>
+    document.getElementById(id).addEventListener('change', refreshVisibility));
+  document.getElementById('log-scale').addEventListener('change', e => makeChart(e.target.checked ? 'logarithmic' : 'linear'));
+} catch(e) { showErr(`Exception: ${e.message}`); }
+</script></body></html>

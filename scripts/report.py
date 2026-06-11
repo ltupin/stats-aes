@@ -277,6 +277,37 @@ GAMES = {
         ],
         "exclude_urls": set(),
     },
+    "samsho3": {
+        "label": "Samurai Shodown 3",
+        # SS3 = サムライスピリッツ斬紅郎無双剣. « 斬紅郎 » est unique à SS3.
+        "INCLUDE": re.compile(
+            r"斬紅郎|サムライスピリッツ[\s　]*斬紅郎"
+            r"|SAMURAI\s*SHODOWN\s*(?:3|III)|SAMURAI\s*SPIRITS\s*(?:3|III)", re.IGNORECASE),
+        "EXCLUDE_GAME": [
+            "真サムライ","真侍魂","覇王丸地獄変","天草降臨","アマクサ","零","ゼロ","六番勝負","羅刹",
+            "サムライスピリッツ2","サムライスピリッツ4","サムライスピリッツ5","サムライスピリッツ6",
+            "SAMURAI SHODOWN II","SAMURAI SHODOWN IV","SAMURAI SHODOWN V","SAMURAI SHODOWN VI",
+            "キングオブファイターズ","KOF","King of Fighters","餓狼伝説","リアルバウト",
+            "龍虎の拳","メタルスラッグ","Metal Slug","ワールドヒーローズ","ブレイカーズ","風雲","アテナ","月華",
+        ],
+        "exclude_urls": set(),
+    },
+    "samsho4": {
+        "label": "Samurai Shodown 4",
+        # SS4 = サムライスピリッツ天草降臨. « 天草降臨 » est unique à SS4 (pas le simple
+        # « 天草 », qui est aussi le boss de SS1).
+        "INCLUDE": re.compile(
+            r"天草降臨|アマクサ降臨|サムライスピリッツ[\s　]*天草"
+            r"|SAMURAI\s*SHODOWN\s*(?:4|IV)|SAMURAI\s*SPIRITS\s*(?:4|IV)", re.IGNORECASE),
+        "EXCLUDE_GAME": [
+            "真サムライ","真侍魂","覇王丸地獄変","斬紅郎","無双剣","零","ゼロ","六番勝負","羅刹",
+            "サムライスピリッツ2","サムライスピリッツ3","サムライスピリッツ5","サムライスピリッツ6",
+            "SAMURAI SHODOWN II","SAMURAI SHODOWN III","SAMURAI SHODOWN V","SAMURAI SHODOWN VI",
+            "キングオブファイターズ","KOF","King of Fighters","餓狼伝説","リアルバウト",
+            "龍虎の拳","メタルスラッグ","Metal Slug","ワールドヒーローズ","ブレイカーズ","風雲","アテナ","月華",
+        ],
+        "exclude_urls": set(),
+    },
     "aof2": {
         "label": "Art of Fighting 2",
         "INCLUDE": re.compile(r"龍虎の拳[\s　]*[2２](?![0-9０-９])"
@@ -377,6 +408,20 @@ EBAY = {
                               # autre franchise présente = lot/erreur (ex. lot de notices)
                               r"|fatal\s*fury|garou|餓狼|king\s*of\s*fighters|\bkof\b"
                               r"|metal\s*slug|world\s*heroes|art\s*of\s*fighting|龍虎", re.I),
+    },
+    "samsho3": {
+        "INCLUDE": re.compile(r"samurai\s*(?:shodown|spirits|showdown)\s*(?:3|iii)"
+                              r"|zankuro|斬紅郎", re.I),
+        "EXCLUDE": re.compile(r"\b(2|ii|4|iv|5|v|6|vi)\b|amakusa|天草|shin|真|\bzero\b"
+                              r"|anthology|collection|fatal\s*fury|garou|kof|king\s*of\s*fighters"
+                              r"|art\s*of\s*fighting|龍虎|metal\s*slug|world\s*heroes", re.I),
+    },
+    "samsho4": {
+        "INCLUDE": re.compile(r"samurai\s*(?:shodown|spirits|showdown)\s*(?:4|iv)"
+                              r"|amakusa|天草降臨", re.I),
+        "EXCLUDE": re.compile(r"\b(2|ii|3|iii|5|v|6|vi)\b|zankuro|斬紅郎|shin|真|\bzero\b"
+                              r"|anthology|collection|fatal\s*fury|garou|kof|king\s*of\s*fighters"
+                              r"|art\s*of\s*fighting|龍虎|metal\s*slug|world\s*heroes", re.I),
     },
     "ffs": {
         "INCLUDE": re.compile(r"(?:fatal\s*fury|garou\s*densetsu|餓狼伝説)\s*"
