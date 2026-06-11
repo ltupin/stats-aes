@@ -35,12 +35,19 @@ post-annonce de SON titre, donc un opus à 600 et un autre à 150 comptent parei
 Indice qui monte = ventes au-dessus du prix habituel ; volume qui retombe = activité qui se calme.
 Les semaines à moins de 2 ventes n'ont pas de point d'indice.</p>
 </div>
-<script>const DATA={"vol": [{"x": 1766966400000, "y": 16}, {"x": 1767571200000, "y": 44}, {"x": 1768176000000, "y": 40}, {"x": 1768780800000, "y": 73}, {"x": 1769385600000, "y": 25}, {"x": 1769990400000, "y": 51}, {"x": 1770595200000, "y": 57}, {"x": 1771200000000, "y": 52}, {"x": 1771804800000, "y": 46}, {"x": 1772409600000, "y": 49}, {"x": 1773014400000, "y": 30}, {"x": 1773619200000, "y": 43}, {"x": 1774224000000, "y": 54}, {"x": 1774828800000, "y": 20}, {"x": 1775433600000, "y": 45}, {"x": 1776038400000, "y": 90}, {"x": 1776643200000, "y": 124}, {"x": 1777248000000, "y": 128}, {"x": 1777852800000, "y": 190}, {"x": 1778457600000, "y": 149}, {"x": 1779062400000, "y": 132}, {"x": 1779667200000, "y": 128}, {"x": 1780272000000, "y": 91}, {"x": 1780876800000, "y": 38}], "idx": [{"x": 1766966400000, "y": 0.623}, {"x": 1767571200000, "y": 0.621}, {"x": 1768176000000, "y": 0.651}, {"x": 1768780800000, "y": 0.56}, {"x": 1769385600000, "y": 0.477}, {"x": 1769990400000, "y": 0.572}, {"x": 1770595200000, "y": 0.5}, {"x": 1771200000000, "y": 0.575}, {"x": 1771804800000, "y": 0.522}, {"x": 1772409600000, "y": 0.527}, {"x": 1773014400000, "y": 0.697}, {"x": 1773619200000, "y": 0.487}, {"x": 1774224000000, "y": 0.483}, {"x": 1774828800000, "y": 0.694}, {"x": 1775433600000, "y": 0.598}, {"x": 1776038400000, "y": 0.569}, {"x": 1776643200000, "y": 0.702}, {"x": 1777248000000, "y": 0.965}, {"x": 1777852800000, "y": 1.041}, {"x": 1778457600000, "y": 1.133}, {"x": 1779062400000, "y": 1.079}, {"x": 1779667200000, "y": 1.105}, {"x": 1780272000000, "y": 1.259}, {"x": 1780876800000, "y": 1.041}], "announce_x": 1776297600000, "start_x": 1767225600000};</script>
+<script>const DATA={"labels": ["05/01", "12/01", "19/01", "26/01", "02/02", "09/02", "16/02", "23/02", "02/03", "09/03", "16/03", "23/03", "30/03", "06/04", "13/04", "20/04", "27/04", "04/05", "11/05", "18/05", "25/05", "01/06", "08/06"], "vol": [44, 40, 73, 25, 51, 57, 52, 46, 49, 30, 43, 54, 20, 45, 90, 124, 128, 190, 149, 132, 128, 91, 38], "idx": [0.621, 0.651, 0.56, 0.477, 0.572, 0.5, 0.575, 0.522, 0.527, 0.697, 0.487, 0.483, 0.694, 0.598, 0.569, 0.702, 0.965, 1.041, 1.133, 1.079, 1.105, 1.259, 1.041], "announce_idx": 15};</script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
 <script>
-const ANNOUNCE_X = DATA.announce_x, START_X = DATA.start_x;
+const AIDX = DATA.announce_idx;
+// Trait Plaion : positionné au bord gauche de la 1ère barre post-annonce
+// (position réelle de la barre, fiable sur un axe catégoriel).
 const annoLinePlugin = { id:'annoLine', afterDatasetsDraw(chart){
-  const x = chart.scales.x.getPixelForValue(ANNOUNCE_X); if(isNaN(x)) return;
+  const meta = chart.getDatasetMeta(0);
+  if (AIDX <= 0 || AIDX > meta.data.length) return;
+  const bars = meta.data;
+  let x;
+  if (AIDX < bars.length) { const b = bars[AIDX]; x = b.x - (b.width ? b.width/2 : 0) - 2; }
+  else { const b = bars[bars.length-1]; x = b.x + (b.width ? b.width/2 : 0); }
   const c = chart.ctx, top = chart.chartArea.top, bot = chart.chartArea.bottom;
   c.save(); c.strokeStyle='#dc2626'; c.lineWidth=2; c.setLineDash([6,4]);
   c.beginPath(); c.moveTo(x,top); c.lineTo(x,bot); c.stroke(); c.setLineDash([]);
@@ -49,21 +56,21 @@ const annoLinePlugin = { id:'annoLine', afterDatasetsDraw(chart){
   c.fillStyle='#fff'; c.fillText(lbl,x+10,top+19); c.restore();
 }};
 new Chart(document.getElementById('c').getContext('2d'),{
-  data:{ datasets:[
-    { type:'bar', label:'Ventes / semaine', yAxisID:'y', data:DATA.vol, barThickness:14,
-      backgroundColor: DATA.vol.map(p=> p.x>=ANNOUNCE_X ? 'rgba(37,99,235,.55)':'rgba(150,150,160,.45)') },
+  data:{ labels: DATA.labels, datasets:[
+    { type:'bar', label:'Ventes / semaine', yAxisID:'y', data:DATA.vol,
+      backgroundColor: DATA.labels.map((_,i)=> i>=AIDX ? 'rgba(37,99,235,.6)':'rgba(150,150,160,.5)'),
+      categoryPercentage:0.9, barPercentage:0.95 },
     { type:'line', label:'Indice de prix', yAxisID:'y1', data:DATA.idx, spanGaps:true,
       borderColor:'#dc2626', backgroundColor:'#dc2626', borderWidth:2, pointRadius:3, tension:.2 } ]},
-  options:{ responsive:true, maintainAspectRatio:false, parsing:{xAxisKey:'x',yAxisKey:'y'},
+  options:{ responsive:true, maintainAspectRatio:false,
     plugins:{ legend:{position:'top'},
       tooltip:{ callbacks:{
-        title:i=>new Date(i[0].parsed.x).toLocaleDateString('fr-FR',{year:'numeric',month:'short',day:'numeric'}),
+        title:i=>'Semaine du '+i[0].label,
         label:c=> c.dataset.type==='bar' ? ` ${c.parsed.y} ventes`
           : (c.parsed.y!=null?` indice ${c.parsed.y.toFixed(2)}`:'') } } },
     scales:{
-      x:{ type:'linear', min:START_X,
-          ticks:{ callback:v=>new Date(v).toLocaleDateString('fr-FR',{month:'short',day:'2-digit'}) },
-          title:{display:true,text:'Semaine'} },
+      x:{ title:{display:true,text:'Semaine (début)'},
+          ticks:{ autoSkip:true, maxRotation:0, font:{size:10} }, grid:{display:false} },
       y:{ position:'left', title:{display:true,text:'ventes / semaine'}, beginAtZero:true },
       y1:{ position:'right', title:{display:true,text:'indice de prix'}, grid:{drawOnChartArea:false}, suggestedMin:0.6, suggestedMax:1.3 } },
   },

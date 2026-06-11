@@ -68,14 +68,18 @@ def generate(cfg):
         b["n"] += 1
         if base.get(k):
             b["ratios"].append(y / base[k])
-    order = sorted(weeks, key=lambda w: weeks[w]["ms"])
+    start_x = cfg.get("start_x", report.start_x)
+    order = [w for w in sorted(weeks, key=lambda w: weeks[w]["ms"])
+             if weeks[w]["ms"] >= start_x]
+    def lbl(w):
+        return dt.datetime.fromtimestamp(weeks[w]["ms"] / 1000, dt.timezone.utc).strftime("%d/%m")
     data = {
-        "vol": [{"x": weeks[w]["ms"], "y": weeks[w]["n"]} for w in order],
-        "idx": [{"x": weeks[w]["ms"],
-                 "y": round(statistics.median(weeks[w]["ratios"]), 3)
-                 if len(weeks[w]["ratios"]) >= 2 else None} for w in order],
-        "announce_x": report.announce_x,
-        "start_x": cfg.get("start_x", report.start_x),
+        "labels": [lbl(w) for w in order],
+        "vol": [weeks[w]["n"] for w in order],
+        "idx": [round(statistics.median(weeks[w]["ratios"]), 3)
+                if len(weeks[w]["ratios"]) >= 2 else None for w in order],
+        # index de la 1ère semaine POST-annonce (= position du trait Plaion)
+        "announce_idx": sum(1 for w in order if weeks[w]["ms"] < report.announce_x),
     }
     pre = [y / base[k] for k, x, y in pts if x < report.announce_x and base.get(k)]
     post = [y / base[k] for k, x, y in pts if x >= report.announce_x and base.get(k)]
@@ -138,9 +142,16 @@ Les semaines à moins de 2 ventes n'ont pas de point d'indice.</p>
 
 CHART_JS = """<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
 <script>
-const ANNOUNCE_X = DATA.announce_x, START_X = DATA.start_x;
+const AIDX = DATA.announce_idx;
+// Trait Plaion : positionné au bord gauche de la 1ère barre post-annonce
+// (position réelle de la barre, fiable sur un axe catégoriel).
 const annoLinePlugin = { id:'annoLine', afterDatasetsDraw(chart){
-  const x = chart.scales.x.getPixelForValue(ANNOUNCE_X); if(isNaN(x)) return;
+  const meta = chart.getDatasetMeta(0);
+  if (AIDX <= 0 || AIDX > meta.data.length) return;
+  const bars = meta.data;
+  let x;
+  if (AIDX < bars.length) { const b = bars[AIDX]; x = b.x - (b.width ? b.width/2 : 0) - 2; }
+  else { const b = bars[bars.length-1]; x = b.x + (b.width ? b.width/2 : 0); }
   const c = chart.ctx, top = chart.chartArea.top, bot = chart.chartArea.bottom;
   c.save(); c.strokeStyle='#dc2626'; c.lineWidth=2; c.setLineDash([6,4]);
   c.beginPath(); c.moveTo(x,top); c.lineTo(x,bot); c.stroke(); c.setLineDash([]);
@@ -149,21 +160,21 @@ const annoLinePlugin = { id:'annoLine', afterDatasetsDraw(chart){
   c.fillStyle='#fff'; c.fillText(lbl,x+10,top+19); c.restore();
 }};
 new Chart(document.getElementById('c').getContext('2d'),{
-  data:{ datasets:[
-    { type:'bar', label:'Ventes / semaine', yAxisID:'y', data:DATA.vol, barThickness:14,
-      backgroundColor: DATA.vol.map(p=> p.x>=ANNOUNCE_X ? 'rgba(37,99,235,.55)':'rgba(150,150,160,.45)') },
+  data:{ labels: DATA.labels, datasets:[
+    { type:'bar', label:'Ventes / semaine', yAxisID:'y', data:DATA.vol,
+      backgroundColor: DATA.labels.map((_,i)=> i>=AIDX ? 'rgba(37,99,235,.6)':'rgba(150,150,160,.5)'),
+      categoryPercentage:0.9, barPercentage:0.95 },
     { type:'line', label:'Indice de prix', yAxisID:'y1', data:DATA.idx, spanGaps:true,
       borderColor:'#dc2626', backgroundColor:'#dc2626', borderWidth:2, pointRadius:3, tension:.2 } ]},
-  options:{ responsive:true, maintainAspectRatio:false, parsing:{xAxisKey:'x',yAxisKey:'y'},
+  options:{ responsive:true, maintainAspectRatio:false,
     plugins:{ legend:{position:'top'},
       tooltip:{ callbacks:{
-        title:i=>new Date(i[0].parsed.x).toLocaleDateString('fr-FR',{year:'numeric',month:'short',day:'numeric'}),
+        title:i=>'Semaine du '+i[0].label,
         label:c=> c.dataset.type==='bar' ? ` ${c.parsed.y} ventes`
           : (c.parsed.y!=null?` indice ${c.parsed.y.toFixed(2)}`:'') } } },
     scales:{
-      x:{ type:'linear', min:START_X,
-          ticks:{ callback:v=>new Date(v).toLocaleDateString('fr-FR',{month:'short',day:'2-digit'}) },
-          title:{display:true,text:'Semaine'} },
+      x:{ title:{display:true,text:'Semaine (début)'},
+          ticks:{ autoSkip:true, maxRotation:0, font:{size:10} }, grid:{display:false} },
       y:{ position:'left', title:{display:true,text:'ventes / semaine'}, beginAtZero:true },
       y1:{ position:'right', title:{display:true,text:'indice de prix'}, grid:{drawOnChartArea:false}, suggestedMin:0.6, suggestedMax:1.3 } },
   },
