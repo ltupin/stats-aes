@@ -4,21 +4,19 @@
 <style>
   body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f5f6fa;color:#1a1a2e;margin:0;padding:28px 20px 56px}
   .wrap{max-width:1000px;margin:0 auto}
-  h1{font-size:1.5rem;margin:0 0 4px}
-  .sub{color:#777;font-size:.85rem;margin:0 0 18px}
+  h1{font-size:1.5rem;margin:0 0 4px} .sub{color:#777;font-size:.85rem;margin:0 0 18px}
   .cards{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px}
   .stat{background:#fff;border-radius:10px;padding:12px 16px;box-shadow:0 1px 4px rgba(0,0,0,.07);min-width:120px}
-  .stat .v{font-size:1.35rem;font-weight:700}
-  .stat .l{color:#888;font-size:.76rem}
-  .card{background:#fff;border-radius:14px;padding:18px 20px 10px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+  .stat .v{font-size:1.35rem;font-weight:700} .stat .l{color:#888;font-size:.76rem}
+  .card{background:#fff;border-radius:14px;padding:18px 20px 10px;box-shadow:0 1px 4px rgba(0,0,0,.07);margin-bottom:18px}
+  .card h2{font-size:1.05rem;margin:0 0 2px} .card .cap{color:#888;font-size:.8rem;margin:0 0 10px}
   .legend{font-size:.8rem;color:#666;margin:8px 2px 0}
-  .note{color:#888;font-size:.78rem;margin-top:14px;line-height:1.5}
-  .nav{font-size:.82rem;margin-bottom:14px}
-  .nav a{color:#2563eb;text-decoration:none}
+  .note{color:#888;font-size:.82rem;line-height:1.5;background:#fff;border-radius:14px;padding:16px 20px;box-shadow:0 1px 4px rgba(0,0,0,.07);margin-bottom:18px}
+  .nav{font-size:.82rem;margin-bottom:14px} .nav a{color:#2563eb;text-decoration:none}
 </style></head><body><div class="wrap">
 <div class="nav"><a href="../index.html">← sommaire</a> · <a href="france_global.html">🇫🇷 France</a> · <a href="japan_global.html">🇯🇵 Japon</a></div>
-<h1>🇯🇵 Marché Japon (Yahoo Auctions) — vue d'ensemble · 18 jeux Neo Geo AES</h1>
-<p class="sub">Données du 11/06/2026 · agrégat de tous les titres, prix normalisés · source : Yahoo Auctions (enchères clôturées, dates de vente réelles)</p>
+<h1>🇯🇵 Marché Japon (Yahoo Auctions) — vue d'ensemble</h1>
+<p class="sub">Données du 11/06/2026 · agrégat de tous les jeux · source : Yahoo Auctions (enchères clôturées)</p>
 <div class="cards">
   <div class="stat"><div class="v">1715</div><div class="l">ventes totales</div></div>
   <div class="stat"><div class="v">678</div><div class="l">avant 16/04</div></div>
@@ -26,53 +24,60 @@
   <div class="stat"><div class="v">0.56 → 1.0</div><div class="l">indice prix (avant → depuis)</div></div>
 </div>
 <div class="card">
-  <div style="height:460px;position:relative"><canvas id="c"></canvas></div>
-  <div class="legend">Barres = ventes/semaine · Ligne = indice de prix
-  (1.00 = prix typique post-annonce du jeu). Trait rouge = annonce Plaion (16/04).</div>
+  <h2>Ventes & niveau de prix</h2>
+  <p class="cap">Barres = ventes/semaine · Ligne = indice de prix (1.00 = prix typique post-annonce). Trait rouge = annonce Plaion.</p>
+  <div style="height:380px;position:relative"><canvas id="c"></canvas></div>
 </div>
-<p class="note">L'indice neutralise le mélange de jeux : chaque vente est rapportée à la médiane
-post-annonce de SON titre, donc un opus à 600 et un autre à 150 comptent pareil (1.00 = « prix normal »).
-Indice qui monte = ventes au-dessus du prix habituel ; volume qui retombe = activité qui se calme.
-Les semaines à moins de 2 ventes n'ont pas de point d'indice.</p>
+<div class="card">
+  <h2>Offre — annonces Mercari mises en vente / semaine</h2>
+  <p class="cap">Par semaine de mise en ligne : 🔵 déjà vendues + ⬜ encore en vente = offre totale arrivée sur le marché. La hauteur de barre = niveau d'offre (baisse = moins de vendeurs). À comparer aux ventes ci-dessus : si l'offre tient mais les ventes baissent → demande en repli ; si l'offre baisse aussi → repli d'offre. (Yahoo/eBay n'exposent que les ventes ; seul Mercari donne l'offre.)</p>
+  <p class="cap">⚠️ Les dernières semaines sous-estiment « déjà vendues » : ces annonces récentes n'ont pas encore eu le temps de se vendre.</p>
+  <div style="height:360px;position:relative"><canvas id="c2"></canvas></div>
 </div>
-<script>const DATA={"labels": ["05/01", "12/01", "19/01", "26/01", "02/02", "09/02", "16/02", "23/02", "02/03", "09/03", "16/03", "23/03", "30/03", "06/04", "13/04", "20/04", "27/04", "04/05", "11/05", "18/05", "25/05", "01/06", "08/06"], "vol": [44, 40, 73, 25, 51, 57, 52, 46, 49, 30, 43, 54, 20, 45, 90, 124, 128, 190, 149, 132, 128, 91, 38], "idx": [0.621, 0.651, 0.56, 0.477, 0.572, 0.5, 0.575, 0.522, 0.527, 0.697, 0.487, 0.483, 0.694, 0.598, 0.569, 0.702, 0.965, 1.041, 1.133, 1.079, 1.105, 1.259, 1.041], "announce_idx": 15};</script>
+</div>
+<script>const DATA={"labels": ["29/12", "05/01", "12/01", "19/01", "26/01", "02/02", "09/02", "16/02", "23/02", "02/03", "09/03", "16/03", "23/03", "30/03", "06/04", "13/04", "20/04", "27/04", "04/05", "11/05", "18/05", "25/05", "01/06", "08/06"], "vol": [16, 44, 40, 73, 25, 51, 57, 52, 46, 49, 30, 43, 54, 20, 45, 90, 124, 128, 190, 149, 132, 128, 91, 38], "idx": [0.623, 0.621, 0.651, 0.56, 0.477, 0.572, 0.5, 0.575, 0.522, 0.527, 0.697, 0.487, 0.483, 0.694, 0.598, 0.569, 0.702, 0.965, 1.041, 1.133, 1.079, 1.105, 1.259, 1.041], "sold": [16, 44, 40, 73, 25, 51, 57, 52, 46, 49, 30, 43, 54, 20, 45, 90, 124, 128, 190, 149, 132, 128, 91, 38], "unsold": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "announce_idx": 16, "total": 1715, "npre": 678, "npost": 1037, "preidx": 0.56, "postidx": 1.0, "labels2": ["29/12", "05/01", "12/01", "19/01", "26/01", "02/02", "09/02", "16/02", "23/02", "02/03", "09/03", "16/03", "23/03", "30/03", "06/04", "13/04", "20/04", "27/04", "04/05", "11/05", "18/05", "25/05", "01/06", "08/06"], "sold2": [7, 13, 7, 9, 15, 5, 13, 7, 15, 6, 16, 13, 20, 11, 12, 16, 26, 52, 88, 62, 53, 38, 28, 6], "onsale2": [0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 2, 0, 0, 0, 0, 3, 2, 4, 10, 21, 27, 33, 38], "announce_idx2": 16};</script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
 <script>
 const AIDX = DATA.announce_idx;
-// Trait Plaion : positionné au bord gauche de la 1ère barre post-annonce
-// (position réelle de la barre, fiable sur un axe catégoriel).
-const annoLinePlugin = { id:'annoLine', afterDatasetsDraw(chart){
-  const meta = chart.getDatasetMeta(0);
-  if (AIDX <= 0 || AIDX > meta.data.length) return;
-  const bars = meta.data;
-  let x;
-  if (AIDX < bars.length) { const b = bars[AIDX]; x = b.x - (b.width ? b.width/2 : 0) - 2; }
-  else { const b = bars[bars.length-1]; x = b.x + (b.width ? b.width/2 : 0); }
-  const c = chart.ctx, top = chart.chartArea.top, bot = chart.chartArea.bottom;
+function plaion(chart, idx){
+  const bars = chart.getDatasetMeta(0).data;
+  if (idx <= 0 || idx > bars.length || !bars.length) return;
+  let x; if (idx < bars.length){ const b=bars[idx]; x=b.x-(b.width?b.width/2:0)-2; }
+  else { const b=bars[bars.length-1]; x=b.x+(b.width?b.width/2:0); }
+  const c=chart.ctx, top=chart.chartArea.top, bot=chart.chartArea.bottom;
   c.save(); c.strokeStyle='#dc2626'; c.lineWidth=2; c.setLineDash([6,4]);
   c.beginPath(); c.moveTo(x,top); c.lineTo(x,bot); c.stroke(); c.setLineDash([]);
-  c.fillStyle='rgba(220,38,38,.9)'; const lbl='📣 Plaion AES+'; c.font='bold 11px sans-serif';
-  const w=c.measureText(lbl).width+12; c.fillRect(x+4,top+4,w,22);
-  c.fillStyle='#fff'; c.fillText(lbl,x+10,top+19); c.restore();
-}};
+  c.fillStyle='rgba(220,38,38,.9)'; const l='📣 Plaion AES+'; c.font='bold 11px sans-serif';
+  c.fillRect(x+4,top+4,c.measureText(l).width+12,22); c.fillStyle='#fff'; c.fillText(l,x+10,top+19); c.restore();
+}
+const makeAnno = idx => ({ id:'anno'+idx, afterDatasetsDraw:ch=>plaion(ch,idx) });
+const annoLine = makeAnno(AIDX);
+// Chart 1 : ventes + indice prix
 new Chart(document.getElementById('c').getContext('2d'),{
-  data:{ labels: DATA.labels, datasets:[
+  data:{ labels:DATA.labels, datasets:[
     { type:'bar', label:'Ventes / semaine', yAxisID:'y', data:DATA.vol,
       backgroundColor: DATA.labels.map((_,i)=> i>=AIDX ? 'rgba(37,99,235,.6)':'rgba(150,150,160,.5)'),
       categoryPercentage:0.9, barPercentage:0.95 },
     { type:'line', label:'Indice de prix', yAxisID:'y1', data:DATA.idx, spanGaps:true,
-      borderColor:'#dc2626', backgroundColor:'#dc2626', borderWidth:2, pointRadius:3, tension:.2 } ]},
+      borderColor:'#dc2626', borderWidth:2, pointRadius:3, tension:.2 } ]},
   options:{ responsive:true, maintainAspectRatio:false,
-    plugins:{ legend:{position:'top'},
-      tooltip:{ callbacks:{
-        title:i=>'Semaine du '+i[0].label,
-        label:c=> c.dataset.type==='bar' ? ` ${c.parsed.y} ventes`
-          : (c.parsed.y!=null?` indice ${c.parsed.y.toFixed(2)}`:'') } } },
-    scales:{
-      x:{ title:{display:true,text:'Semaine (début)'},
-          ticks:{ autoSkip:true, maxRotation:0, font:{size:10} }, grid:{display:false} },
-      y:{ position:'left', title:{display:true,text:'ventes / semaine'}, beginAtZero:true },
-      y1:{ position:'right', title:{display:true,text:'indice de prix'}, grid:{drawOnChartArea:false}, suggestedMin:0.6, suggestedMax:1.3 } },
-  },
-  plugins:[annoLinePlugin] });
+    plugins:{ legend:{position:'top'}, tooltip:{ callbacks:{
+      title:i=>'Semaine du '+i[0].label,
+      label:c=> c.dataset.type==='bar'?` ${c.parsed.y} ventes`:(c.parsed.y!=null?` indice ${c.parsed.y.toFixed(2)}`:'') } } },
+    scales:{ x:{ticks:{autoSkip:true,maxRotation:0,font:{size:10}},grid:{display:false}},
+      y:{position:'left',title:{display:true,text:'ventes / semaine'},beginAtZero:true},
+      y1:{position:'right',title:{display:true,text:'indice de prix'},grid:{drawOnChartArea:false},suggestedMin:0.6,suggestedMax:1.3} } },
+  plugins:[annoLine] });
+// Chart 2 : offre Mercari (mises en vente / semaine, empilées vendues + en vente)
+if (DATA.sold2) {
+  new Chart(document.getElementById('c2').getContext('2d'),{
+    data:{ labels:DATA.labels2, datasets:[
+      { type:'bar', label:'Déjà vendues', data:DATA.sold2, backgroundColor:'rgba(37,99,235,.65)', stack:'s', categoryPercentage:0.9, barPercentage:0.95 },
+      { type:'bar', label:'Encore en vente', data:DATA.onsale2, backgroundColor:'rgba(180,180,190,.6)', stack:'s', categoryPercentage:0.9, barPercentage:0.95 } ]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{position:'top'}, tooltip:{ callbacks:{ title:i=>'Semaine du '+i[0].label } } },
+      scales:{ x:{stacked:true,ticks:{autoSkip:true,maxRotation:0,font:{size:10}},grid:{display:false}},
+        y:{stacked:true,title:{display:true,text:'annonces mises en vente'},beginAtZero:true} } },
+    plugins:[makeAnno(DATA.announce_idx2)] });
+}
 </script></body></html>
