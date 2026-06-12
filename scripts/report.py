@@ -96,6 +96,13 @@ NB_HON_RX   = re.compile(r"\d+\s*[本点]")  # N本 / N点 = lot de N articles
 # Neuf/scellé japonais (exclu, comme le neuf/scellé eBay) — mais on GARDE
 # l'occasion « comme neuf » 新品同様 / ほぼ新品.
 JP_NEW_RX = re.compile(r"(?<!ほぼ)新品(?!同様)")
+# Cartouche seule / sans boîte (appliqué titre + description Mercari) — exclut les
+# « loose » que l'utilisateur ne veut pas. Ne pas confondre avec un jeu complet.
+LOOSE_RX = re.compile(
+    r"ソフトのみ|ソフト単品|カセットのみ|ロムのみ|ＲＯＭのみ|ROMのみ"
+    r"|箱[な無]し|元箱[な無]し|箱欠品|箱[がはも]欠品"
+    r"|箱と説明書[な無]し|箱・説明書[な無]し"
+    r"|裸(?:rom|ソフト|カセット)", re.IGNORECASE)
 BOX_ONLY_RX = re.compile(r"(?:箱|帯|説明書|インスト)(?:のみ|だけ)")
 # NEOGEO CD (≠ AES) — tolère 中黒/espaces ("ネオ・ジオ CD") et le "CD" demi-chasse
 # isolé ("CD ソフト", "CD-ROM") que la liste de substrings ne couvrait pas.
@@ -553,14 +560,16 @@ def build_filter(cfg, key):
     EXG = [e.lower() for e in cfg["EXCLUDE_GAME"]]
     # Merge in-code exclusions with persistent file from data/exclude_urls/KEY.txt
     EX_URLS = cfg.get("exclude_urls", set()) | load_exclude_urls(key)
-    def keep(title, url):
+    def keep(title, url, desc=""):
         if url in EX_URLS: return False
-        if not inc_match(title): return False
+        if not inc_match(title): return False     # INCLUDE sur le titre uniquement
         tl = title.lower()
         if SET_RX.search(title) or NB_HON_RX.search(title) or BOX_ONLY_RX.search(title):
             return False
         if JP_NEW_RX.search(title): return False  # neuf/scellé (garde 新品同様)
         if CD_RX.search(title): return False  # NEOGEO CD (≠ AES)
+        # cartouche seule / sans boîte : détecté sur titre ET description Mercari
+        if LOOSE_RX.search(title + " " + (desc or "")): return False
         if any(e in tl for e in EXCLUDE_COMMON_LC): return False
         if any(e in tl for e in EXG):               return False
         return True
@@ -581,7 +590,8 @@ def gather(key, cfg):
         rd = csv.reader(f, delimiter=";"); next(rd)
         for row in rd:
             if len(row) < 5: continue
-            title, url, ps, status, cs = row
+            title, url, ps, status, cs = row[:5]
+            desc = row[5] if len(row) > 5 else ""
             if status not in ("SOLD_OUT", "TRADING"): continue  # TRADING = vendu (transaction en cours)
             try: p = int(ps.replace("¥", "").replace(",", ""))
             except: continue
@@ -590,7 +600,7 @@ def gather(key, cfg):
                 dt = datetime.strptime(cs, "%Y-%m-%d %H:%M UTC").replace(tzinfo=timezone.utc)
             except: continue
             if dt < START: continue
-            if not keep(title, url): continue
+            if not keep(title, url, desc): continue
             mer.append({"x": int(dt.timestamp()*1000), "y": p,
                         "name": title, "url": url, "status": status, "source": "mercari"})
     if yh_path.exists():

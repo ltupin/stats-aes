@@ -154,8 +154,9 @@ def compute_mercari_supply():
             for row in rd:
                 if len(row) < 5:
                     continue
-                title, url, ps, status, cs = row
-                if not keep(title, url):
+                title, url, ps, status, cs = row[:5]
+                desc = row[5] if len(row) > 5 else ""
+                if not keep(title, url, desc):
                     continue
                 try:
                     p = int(ps.replace("¥", "").replace(",", ""))

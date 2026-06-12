@@ -122,12 +122,48 @@ def fetch_yahoo(keyword):
     return items, total, blocked
 
 
-MER_HEADER = ["Titre", "URL", "Prix", "Statut", "Created"]
+MER_HEADER = ["Titre", "URL", "Prix", "Statut", "Created", "Description"]
 YH_HEADER  = ["Titre", "URL", "Prix", "BidCount", "Type", "EndDate"]
 URL_COL = 1  # colonne clé (URL) dans les deux schémas — sert au dédoublonnage
 
 
-def mercari_rows(items):
+def _clean_desc(s):
+    return (s or "").replace("\n", " ").replace("\r", " ").replace(";", ",")[:300]
+
+
+def read_existing_mer_desc(path):
+    """{url: description} déjà stockées (pour ne pas re-fetcher le détail)."""
+    out = {}
+    if path.exists():
+        with open(path, encoding="utf-8", newline="") as f:
+            rd = csv.reader(f, delimiter=";"); next(rd, None)
+            for row in rd:
+                if len(row) > 5 and row[5]:
+                    out[row[1]] = row[5]
+    return out
+
+
+async def fetch_descriptions(ids, concurrency=6):
+    """Récupère la description (page détail) pour une liste d'item ids."""
+    out = {}
+    sem = asyncio.Semaphore(concurrency)
+    async with httpx.AsyncClient() as c:
+        async def one(iid):
+            url = f"https://api.mercari.jp/items/get?id={iid}"
+            key = SigningKey.generate(NIST256p)
+            try:
+                async with sem:
+                    r = await c.get(url, headers={"User-Agent": UA, "X-Platform": "web",
+                                                  "DPoP": _dpop(url, "GET", key)}, timeout=20)
+                out[iid] = ((r.json().get("data") or {}).get("description") or "")
+            except Exception:
+                out[iid] = ""
+        await asyncio.gather(*[one(i) for i in ids])
+    return out
+
+
+def mercari_rows(items, desc=None):
+    desc = desc or {}
     rows = []
     for it in items:
         name = (it.get("name", "") or "").replace("\n", " ").replace(";", ",")
@@ -142,7 +178,7 @@ def mercari_rows(items):
                          .strftime("%Y-%m-%d %H:%M UTC")
         except Exception:
             cs = ""
-        rows.append([name, url, ps, status, cs])
+        rows.append([name, url, ps, status, cs, _clean_desc(desc.get(url, ""))])
     return rows
 
 
@@ -240,7 +276,23 @@ def main():
             mer = []
             print(f"  ⚠️ Mercari indisponible ({type(e).__name__}) — base préservée.",
                   file=sys.stderr)
-        _save(RAW_DIR / f"{key}_mercari.csv", mercari_rows(mer), MER_HEADER, "Mercari")
+        mer_path = RAW_DIR / f"{key}_mercari.csv"
+        descmap = read_existing_mer_desc(mer_path)  # cache des descriptions déjà connues
+        # descriptions à récupérer : items VENDUS/EN TRANSACTION encore sans description
+        need = []
+        for it in mer:
+            url = f"https://jp.mercari.com/item/{it.get('id', '')}"
+            st = (it.get("status", "") or "").upper()
+            if ("SOLD" in st or "TRADING" in st) and not descmap.get(url):
+                need.append(it.get("id"))
+        if need:
+            print(f"  …descriptions à récupérer : {len(need)}")
+            fetched = asyncio.run(fetch_descriptions(need))
+            for it in mer:
+                iid = it.get("id"); url = f"https://jp.mercari.com/item/{iid}"
+                if fetched.get(iid):
+                    descmap[url] = _clean_desc(fetched[iid])
+        _save(mer_path, mercari_rows(mer, descmap), MER_HEADER, "Mercari")
 
     if args.source in ("both", "yahoo"):
         print(f"Yahoo   keyword: {yh_kw}")
