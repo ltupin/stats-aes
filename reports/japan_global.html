@@ -18,10 +18,10 @@
 <h1>🇯🇵 Marché Japon (Yahoo Auctions) — vue d'ensemble</h1>
 <p class="sub">Données du 12/06/2026 · agrégat de tous les jeux · source : Yahoo Auctions (enchères clôturées)</p>
 <div class="cards">
-  <div class="stat"><div class="v">1718</div><div class="l">ventes totales</div></div>
-  <div class="stat"><div class="v">677</div><div class="l">avant 16/04</div></div>
-  <div class="stat"><div class="v">1041</div><div class="l">depuis 16/04</div></div>
-  <div class="stat"><div class="v">0.55 → 1.0</div><div class="l">indice prix (avant → depuis)</div></div>
+  <div class="stat"><div class="v">1673</div><div class="l">ventes totales</div></div>
+  <div class="stat"><div class="v">671</div><div class="l">avant 16/04</div></div>
+  <div class="stat"><div class="v">1002</div><div class="l">depuis 16/04</div></div>
+  <div class="stat"><div class="v">0.54 → 1.0</div><div class="l">indice prix (avant → depuis)</div></div>
 </div>
 <div class="card">
   <h2>Ventes & niveau de prix</h2>
@@ -31,11 +31,11 @@
 <div class="card">
   <h2>Offre — annonces Mercari mises en vente / semaine</h2>
   <p class="cap">🔵 déjà vendues + ⬜ encore en vente = offre Mercari (par semaine de mise en ligne). Les annonces récentes n'ont pas encore eu le temps de se vendre.</p>
-  <p class="cap">📐 Estimation marché : Mercari ≈ 21% des ventes → offre totale du marché ≈ <b>ces barres × 4,8</b> (Yahoo/eBay ne datent pas les mises en vente, d'où l'extrapolation).</p>
+  <p class="cap">📐 Estimation marché : Mercari ≈ 21% des ventes → offre totale du marché ≈ <b>ces barres × 4,7</b> (Yahoo/eBay ne datent pas les mises en vente, d'où l'extrapolation).</p>
   <div style="height:360px;position:relative"><canvas id="c2"></canvas></div>
 </div>
 </div>
-<script>const DATA={"labels": ["29/12", "05/01", "12/01", "19/01", "26/01", "02/02", "09/02", "16/02", "23/02", "02/03", "09/03", "16/03", "23/03", "30/03", "06/04", "13/04", "20/04", "27/04", "04/05", "11/05", "18/05", "25/05", "01/06", "08/06"], "vol": [16, 44, 40, 73, 25, 51, 57, 52, 46, 49, 29, 43, 54, 20, 45, 90, 124, 128, 190, 149, 132, 128, 91, 42], "idx": [0.623, 0.612, 0.651, 0.56, 0.477, 0.572, 0.5, 0.567, 0.522, 0.531, 0.713, 0.484, 0.476, 0.694, 0.598, 0.569, 0.699, 0.964, 1.038, 1.133, 1.075, 1.104, 1.258, 1.044], "sold": [16, 44, 40, 73, 25, 51, 57, 52, 46, 49, 29, 43, 54, 20, 45, 90, 124, 128, 190, 149, 132, 128, 91, 42], "unsold": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "announce_idx": 16, "total": 1718, "npre": 677, "npost": 1041, "preidx": 0.55, "postidx": 1.0, "labels2": ["29/12", "05/01", "12/01", "19/01", "26/01", "02/02", "09/02", "16/02", "23/02", "02/03", "09/03", "16/03", "23/03", "30/03", "06/04", "13/04", "20/04", "27/04", "04/05", "11/05", "18/05", "25/05", "01/06", "08/06"], "sold2": [7, 13, 7, 9, 15, 5, 13, 7, 15, 6, 16, 13, 20, 11, 12, 16, 26, 53, 88, 62, 53, 38, 28, 10], "onsale2": [0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 2, 0, 0, 0, 0, 3, 2, 4, 10, 21, 27, 33, 47], "announce_idx2": 16};</script>
+<script>const DATA={"labels": ["29/12", "05/01", "12/01", "19/01", "26/01", "02/02", "09/02", "16/02", "23/02", "02/03", "09/03", "16/03", "23/03", "30/03", "06/04", "13/04", "20/04", "27/04", "04/05", "11/05", "18/05", "25/05", "01/06", "08/06"], "vol": [16, 44, 39, 73, 24, 51, 57, 50, 45, 49, 28, 43, 54, 20, 45, 90, 123, 127, 182, 141, 117, 125, 89, 41], "idx": [0.602, 0.61, 0.662, 0.552, 0.469, 0.558, 0.474, 0.579, 0.475, 0.524, 0.694, 0.467, 0.466, 0.688, 0.598, 0.559, 0.687, 0.939, 1.032, 1.131, 1.095, 1.08, 1.241, 1.041], "sold": [16, 44, 39, 73, 24, 51, 57, 50, 45, 49, 28, 43, 54, 20, 45, 90, 123, 127, 182, 141, 117, 125, 89, 41], "unsold": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "announce_idx": 16, "total": 1673, "npre": 671, "npost": 1002, "preidx": 0.54, "postidx": 1.0, "labels2": ["29/12", "05/01", "12/01", "19/01", "26/01", "02/02", "09/02", "16/02", "23/02", "02/03", "09/03", "16/03", "23/03", "30/03", "06/04", "13/04", "20/04", "27/04", "04/05", "11/05", "18/05", "25/05", "01/06", "08/06"], "sold2": [7, 13, 7, 9, 15, 5, 13, 7, 15, 6, 16, 13, 20, 10, 12, 16, 26, 51, 87, 58, 52, 37, 27, 18], "onsale2": [0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 2, 0, 0, 0, 0, 3, 2, 4, 9, 20, 25, 31, 37], "announce_idx2": 16};</script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
 <script>
 const AIDX = DATA.announce_idx;

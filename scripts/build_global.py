@@ -171,7 +171,7 @@ def compute_mercari_supply():
                 if x < report.start_x:
                     continue
                 b = weeks.setdefault(monday_ms(x), {"sold": 0, "onsale": 0})
-                if status == "SOLD_OUT":
+                if status in ("SOLD_OUT", "TRADING"):
                     b["sold"] += 1
                 else:
                     b["onsale"] += 1

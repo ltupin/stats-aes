@@ -61,6 +61,8 @@ EXCLUDE_COMMON_LC = [s.lower() for s in [
     "ハンカチ","タオル","Tシャツ","Ｔシャツ","缶ケース","プラモデル",
     "ガン消し","ガンケシ","消しゴム","ケシゴム","リペイント","ガチャ","ガシャポン","食玩","カードダス",
     "トレーディングカード","トレカ","カードリスト","ノーマルカード","キラカード",
+    "ソフトのみ","ソフト単品","ソフト単体","カセットのみ","ロムのみ","ＲＯＭのみ","romのみ",
+    "箱なし","箱無し","箱無","裸rom","裸ソフト",
     "同人","手描き","手書き","イラスト集","スケッチブック","スケブ","直筆","ラフ画",
     "ボードゲーム","ボード ゲーム","カードゲーム","空ケース","ケースのみ","ジャケットのみ","ジャケットだけ",
     "switch","ネオジオコレクション","neogeo collection","neo geo collection",
@@ -580,7 +582,7 @@ def gather(key, cfg):
         for row in rd:
             if len(row) < 5: continue
             title, url, ps, status, cs = row
-            if status != "SOLD_OUT": continue
+            if status not in ("SOLD_OUT", "TRADING"): continue  # TRADING = vendu (transaction en cours)
             try: p = int(ps.replace("¥", "").replace(",", ""))
             except: continue
             if p < PRICE_FLOOR or p > 5_000_000: continue
