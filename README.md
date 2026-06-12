@@ -104,6 +104,23 @@ keep/drop chaque item au clavier. Les drops sont persistés dans
 `data/exclude_urls/KEY.txt` et s'appliquent automatiquement aux fetches
 suivants.
 
+## Scan quotidien automatique
+
+Un **LaunchAgent** (`~/Library/LaunchAgents/com.stats-aes.dailyscan.plist`) lance
+`scripts/daily_scan.sh` **chaque jour à 7:00** : eBay.fr (IP FR) → VPN Japon
+(`scripts/vpn.sh`, OpenVPN CLI) → Mercari + Yahoo (IP JP) → régénération →
+`git push` → récap. Log dans `~/Library/Logs/stats-aes-daily.log`.
+
+Vérifier qu'il a bien tourné (date du dernier passage, résultat, état) :
+
+```bash
+scripts/check_scan.sh
+```
+
+Le job tourne aussi si le Mac est en **veille** (réveil par macOS) ; il ne
+tourne **pas** si le Mac est **complètement éteint** à 7:00 (il faut alors
+lancer un scan manuel : `scripts/daily_scan.sh`).
+
 ## Méthodologie
 
 - **Sources** :
