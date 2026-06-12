@@ -191,15 +191,28 @@ MARKETS = {
 }
 
 
+def market_scale():
+    """Part de Mercari dans les ventes → facteur pour estimer l'offre totale."""
+    m = y = e = 0
+    for k, cfg in report.GAMES.items():
+        mer, yh = report.gather(k, cfg)
+        m += len(mer); y += len(yh); e += len(report.gather_ebay(k))
+    tot = m + y + e
+    return (round(100 * m / tot) if tot else 0, round(tot / m, 1) if m else 1)
+
+
 def generate(cfg):
     data = compute_yahoo() if cfg.get("supply") else compute_sales(cfg)
+    chart2 = CHART2_NOTE
     if cfg.get("supply"):
         data.update(compute_mercari_supply())
+        share, K = market_scale()
+        chart2 = CHART2_HTML.format(share=share, K=str(K).replace(".", ","))
     h = {"now": dt.datetime.now(timezone.utc).strftime("%d/%m/%Y"),
          "flag": cfg["flag"], "market": cfg["market"], "note_src": cfg["note_src"],
          "total": data["total"], "npre": data["npre"], "npost": data["npost"],
          "preidx": data["preidx"], "postidx": data["postidx"],
-         "chart2": CHART2_HTML if cfg.get("supply") else CHART2_NOTE}
+         "chart2": chart2}
     html = HEAD + HEADER.format(**h) + "<script>const DATA=" \
         + json.dumps(data, ensure_ascii=False) + ";</script>\n" + CHART_JS
     (report.RPT_DIR / cfg["file"]).write_text(html, encoding="utf-8")
@@ -245,7 +258,8 @@ HEADER = """<h1>{flag} Marché {market} — vue d'ensemble</h1>
 
 CHART2_HTML = """<div class="card">
   <h2>Offre — annonces Mercari mises en vente / semaine</h2>
-  <p class="cap">🔵 déjà vendues + ⬜ encore en vente = offre totale (par semaine de mise en ligne). Les annonces récentes n'ont pas encore eu le temps de se vendre.</p>
+  <p class="cap">🔵 déjà vendues + ⬜ encore en vente = offre Mercari (par semaine de mise en ligne). Les annonces récentes n'ont pas encore eu le temps de se vendre.</p>
+  <p class="cap">📐 Estimation marché : Mercari ≈ {share}% des ventes → offre totale du marché ≈ <b>ces barres × {K}</b> (Yahoo/eBay ne datent pas les mises en vente, d'où l'extrapolation).</p>
   <div style="height:360px;position:relative"><canvas id="c2"></canvas></div>
 </div>"""
 
