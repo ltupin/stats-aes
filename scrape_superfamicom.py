@@ -9,16 +9,27 @@ import re
 import time
 import urllib.request
 from html import unescape
+from datetime import datetime
 
 BASE = 'https://superfamicom.org'
 LIST_URL = BASE + '/game-list'
 OUT_FILE = 'superfamicom_japan_games.csv'
 
 
-def fetch(url):
-    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        return resp.read().decode('utf-8', errors='ignore')
+def fetch(url, retries=3, delay=2.0):
+    last_error = None
+    for attempt in range(1, retries + 1):
+        try:
+            req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                return resp.read().decode('utf-8', errors='ignore')
+        except Exception as exc:
+            last_error = exc
+            if attempt < retries:
+                print(f'[{datetime.now().strftime("%H:%M:%S")}] Retry {attempt}/{retries} for {url}: {exc}')
+                time.sleep(delay)
+            else:
+                raise last_error
 
 
 def clean_text(value):
@@ -90,7 +101,7 @@ def extract_dates_and_category(html):
 
 
 def main():
-    print('Fetching game list pages...')
+    print(f'[{datetime.now().strftime("%H:%M:%S")}] Starting scrape for all game-list pages...')
     links = []
     seen_paths = set()
     page = 1
@@ -108,41 +119,48 @@ def main():
                 seen_paths.add(path)
                 links.append((path, name))
                 new += 1
-        print(f'Page {page}: found {len(page_links)} links, {new} new')
+        print(f'[{datetime.now().strftime("%H:%M:%S")}] Page {page}: found {len(page_links)} links, {new} new')
         if new == 0:
             break
         page += 1
         time.sleep(0.15)
-    print(f'Total candidate links: {len(links)}')
+    print(f'[{datetime.now().strftime("%H:%M:%S")}] Total candidate links: {len(links)}')
 
-    results = []
-    for idx, (path, link_name) in enumerate(links, 1):
-        url = BASE + path
-        try:
-            page_html = fetch(url)
-        except Exception as exc:
-            print(f'Error fetching {url}: {exc}')
-            continue
-        if not page_has_japan(page_html):
-            continue
+    rows_written = 0
+    try:
+        with open(OUT_FILE, 'w', newline='', encoding='utf-8') as handle:
+            writer = csv.writer(handle)
+            writer.writerow(['english_title', 'japanese_title', 'producer', 'serial', 'date', 'category'])
 
-        title = extract_title(page_html, fallback=link_name)
-        japanese_title = extract_japanese_title(page_html)
-        producer = extract_producer(page_html)
-        serial = extract_serial(page_html)
-        date_value, category = extract_dates_and_category(page_html)
-        results.append([title, japanese_title, producer, serial, date_value, category])
+            for idx, (path, link_name) in enumerate(links, 1):
+                url = BASE + path
+                try:
+                    page_html = fetch(url)
+                except Exception as exc:
+                    print(f'Error fetching {url}: {exc}')
+                    continue
+                if not page_has_japan(page_html):
+                    continue
 
-        if idx % 100 == 0 or idx == len(links):
-            print(f'Processed {idx}/{len(links)} pages')
-        time.sleep(0.15)
+                title = extract_title(page_html, fallback=link_name)
+                japanese_title = extract_japanese_title(page_html)
+                producer = extract_producer(page_html)
+                serial = extract_serial(page_html)
+                date_value, category = extract_dates_and_category(page_html)
+                writer.writerow([title, japanese_title, producer, serial, date_value, category])
+                handle.flush()
+                rows_written += 1
 
-    with open(OUT_FILE, 'w', newline='', encoding='utf-8') as handle:
-        writer = csv.writer(handle)
-        writer.writerow(['english_title', 'japanese_title', 'producer', 'serial', 'date', 'category'])
-        writer.writerows(results)
+                if idx % 50 == 0 or idx == len(links):
+                    print(f'[{datetime.now().strftime("%H:%M:%S")}] Processed {idx}/{len(links)} pages')
+                else:
+                    print(f'[{datetime.now().strftime("%H:%M:%S")}] Processing page {idx}/{len(links)}: {url}', flush=True)
+                time.sleep(0.15)
+    except KeyboardInterrupt:
+        print(f'[{datetime.now().strftime("%H:%M:%S")}] Interrupted; wrote {rows_written} rows to {OUT_FILE}')
+        raise
 
-    print(f'Wrote {len(results)} rows to {OUT_FILE}')
+    print(f'[{datetime.now().strftime("%H:%M:%S")}] Wrote {rows_written} rows to {OUT_FILE}')
 
 
 if __name__ == '__main__':
