@@ -8,7 +8,7 @@ eBay n'expose que les ventes → pas de chart 2 côté France.
 
     ../.venv/bin/python build_global.py
 """
-import csv, json, statistics, datetime as dt
+import csv, json, re, statistics, datetime as dt
 from datetime import timezone, timedelta
 
 import report
@@ -158,6 +158,8 @@ def compute_mercari_supply():
                 desc = row[5] if len(row) > 5 else ""
                 if not keep(title, url, desc):
                     continue
+                if not re.fullmatch(r"https://jp\.mercari\.com/item/m\d{11}", url):
+                    continue
                 try:
                     p = int(ps.replace("¥", "").replace(",", ""))
                 except ValueError:
@@ -174,7 +176,7 @@ def compute_mercari_supply():
                 b = weeks.setdefault(monday_ms(x), {"sold": 0, "onsale": 0})
                 if status in ("SOLD_OUT", "TRADING"):
                     b["sold"] += 1
-                else:
+                elif status == "ON_SALE":
                     b["onsale"] += 1
     order = sorted(weeks)
     return {"labels2": [lbl(w) for w in order],
