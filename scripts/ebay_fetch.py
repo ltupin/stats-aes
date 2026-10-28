@@ -80,8 +80,9 @@ def parse_fr_date(caption):
         return ""
     day, mon, year = m.group(1), m.group(2).lower().strip(".")[:4], m.group(3)
     mon = mon.replace("é", "e").replace("è", "e").replace("û", "u").replace("à", "a")
-    key = {"janv": 1, "fevr": 2, "mars": 3, "avri": 4, "mai": 5, "juin": 6, "juil": 7,
-           "aout": 8, "sept": 9, "octo": 10, "nove": 11, "dece": 12}.get(mon[:4])
+    key = {"janv": 1, "fevr": 2, "mars": 3, "avr": 4, "avri": 4, "mai": 5,
+           "juin": 6, "juil": 7, "aout": 8, "sept": 9, "oct": 10, "octo": 10,
+           "nov": 11, "nove": 11, "dec": 12, "dece": 12}.get(mon[:4])
     if not key:
         return ""
     return f"{year}-{key:02d}-{int(day):02d}"

@@ -296,7 +296,7 @@ new Chart(document.getElementById('c').getContext('2d'),{
     plugins:{ legend:{position:'top'}, tooltip:{ callbacks:{
       title:i=>'Semaine du '+i[0].label,
       label:c=> c.dataset.type==='bar'?` ${c.parsed.y} ventes`:(c.parsed.y!=null?` indice ${c.parsed.y.toFixed(2)}`:'') } } },
-    scales:{ x:{ticks:{autoSkip:true,maxRotation:0,font:{size:10}},grid:{display:false}},
+    scales:{ x:{ticks:{autoSkip:false,callback:(v,i,t)=>i===t.length-1||i%2===0&&i<t.length-2?DATA.labels[i]:'',maxRotation:0,font:{size:10}},grid:{display:false}},
       y:{position:'left',title:{display:true,text:'ventes / semaine'},beginAtZero:true},
       y1:{position:'right',title:{display:true,text:'indice de prix'},grid:{drawOnChartArea:false},suggestedMin:0.6,suggestedMax:1.3} } },
   plugins:[annoLine] });
@@ -308,7 +308,7 @@ if (DATA.sold2) {
       { type:'bar', label:'Encore en vente', data:DATA.onsale2, backgroundColor:'rgba(180,180,190,.6)', stack:'s', categoryPercentage:0.9, barPercentage:0.95 } ]},
     options:{ responsive:true, maintainAspectRatio:false,
       plugins:{ legend:{position:'top'}, tooltip:{ callbacks:{ title:i=>'Semaine du '+i[0].label } } },
-      scales:{ x:{stacked:true,ticks:{autoSkip:true,maxRotation:0,font:{size:10}},grid:{display:false}},
+    scales:{ x:{stacked:true,ticks:{autoSkip:false,callback:(v,i,t)=>i===t.length-1||i%2===0&&i<t.length-2?DATA.labels2[i]:'',maxRotation:0,font:{size:10}},grid:{display:false}},
         y:{stacked:true,title:{display:true,text:'annonces mises en vente'},beginAtZero:true} } },
     plugins:[makeAnno(DATA.announce_idx2)] });
 }
